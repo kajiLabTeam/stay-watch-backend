@@ -1,0 +1,38 @@
+version: "3"
+services:
+  vol_golang:
+    container_name: vol_golang
+    build: ./go
+    volumes:
+      - ./go/app:/app
+    command:
+      - "go"
+      - "run"
+      - "main.go"
+    environment:
+      WAIT_HOSTS: vol_mysql
+    ## Do not comment out for production cases.
+    # restart: always
+    ports:
+      - "8082:80"
+    networks:
+      - vol_network
+  vol_mysql:
+    container_name: vol_mysql
+    build: ./mysql
+    volumes:
+      - ./mysql/db:/docker-entrypoint-initdb.d
+    ports:
+      - "33066:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: my-secret-pw
+      MYSQL_DATABASE: production_db
+      MYSQL_USER: gopher
+      MYSQL_PASSWORD: setsetset
+    networks:
+      - vol_network
+    cap_add:
+      - SYS_NICE
+networks:
+  vol_network:
+    external: true
