@@ -16,7 +16,7 @@ func main() {
 	// CRUD 書籍
 
 	engine.Use(cors.New(cors.Config{
-		AllowOrigins: []string{"http://localhost:3000"},
+		AllowOrigins: []string{"http://localhost:3000", "https://stay-watch-front.vercel.app/"},
 		AllowMethods: []string{"GET", "POST", "PUT", "DELETE"},
 		AllowHeaders: []string{
 			"Access-Control-Allow-Credentials",
