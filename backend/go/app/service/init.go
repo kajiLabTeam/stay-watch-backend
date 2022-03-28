@@ -19,7 +19,6 @@ func init() {
 	if err != nil && err.Error() != "" {
 		log.Fatal(err.Error())
 	}
-
 	DbEngine.ShowSQL(true)
 	DbEngine.SetMaxOpenConns(2)
 	// DbEngine.Sync2(new(model.User))
