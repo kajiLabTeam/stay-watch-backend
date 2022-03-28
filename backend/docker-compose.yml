@@ -11,6 +11,7 @@ services:
       - "main.go"
     environment:
       WAIT_HOSTS: vol_mysql
+      MYSQL_ROOT_HOST: "%"
     ## Do not comment out for production cases.
     # restart: always
     ports:
