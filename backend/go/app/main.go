@@ -14,7 +14,6 @@ func main() {
 	// ミドルウェア
 	// engine.Use(middleware.RecordUaAndTime)
 	// CRUD 書籍
-
 	engine.Use(cors.New(cors.Config{
 		AllowOrigins: []string{"http://localhost:3000", "https://stay-watch-front.vercel.app"},
 		AllowMethods: []string{"GET", "POST", "PUT", "DELETE"},
@@ -29,7 +28,6 @@ func main() {
 		AllowCredentials: true,
 		MaxAge:           24 * time.Hour,
 	}))
-
 	roomEngine := engine.Group("/room")
 	{
 		v1 := roomEngine.Group("/v1")
@@ -39,7 +37,6 @@ func main() {
 			v1.POST("/beacon", controller.Beacon)
 		}
 	}
-
 	userEngine := engine.Group("/user")
 	{
 		v1 := userEngine.Group("/v1")
@@ -49,7 +46,5 @@ func main() {
 			v1.POST("/register", controller.Register)
 		}
 	}
-
 	engine.Run(":80")
-
 }
