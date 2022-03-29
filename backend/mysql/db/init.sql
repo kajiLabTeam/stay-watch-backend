@@ -14,7 +14,7 @@ INSERT INTO user (id, name, team) VALUES ('e7d61ea3f8dd49c88f2ff2484c07acb9-2021
 INSERT INTO user (id, name, team) VALUES ('e7d61ea3f8dd49c88f2ff2484c07acb9-2021-3', 'toyama', 'ロケーション');
 INSERT INTO user (id, name, team) VALUES ('e7d61ea3f8dd49c88f2ff2484c07acb9-7436-17873', 'ogane', 'ロケーション');
 INSERT INTO user (id, name, team) VALUES ('e7d61ea3f8dd49c88f2ff2484c07acb9-36624-25369', 'takizawa', 'インタラクション');
-INSERT INTO user (id, name, team) VALUES ('e7d61ea3f8dd49c88f2ff2484c07acb9-7474-59294', 'kaji', 'Teacher');
+INSERT INTO user (id, name, team) VALUES ('e7d61ea3f8dd49c88f2ff2484c07acb9-7474-59294', 'kaji', 'Professor');
 INSERT INTO user (id, name, team) VALUES ('e7d61ea3f8dd49c88f2ff2484c07acb9-2021-99', 'isiguro','B2');
 INSERT INTO user (id, name, team) VALUES ('e7d61ea3f8dd49c88f2ff2484c07acb9-2019-60556', 'Miyagawa-san', 'ロケーション');
 INSERT INTO user (id, name, team) VALUES ('e7d61ea3f8dd49c88f2ff2484c07acb9-2021-5', 'kameda', 'ロケーション');
@@ -24,6 +24,7 @@ INSERT INTO user (id, name, team) VALUES ('e7d61ea3f8dd49c88f2ff2484c07acb9-2021
 INSERT INTO user (id, name, team) VALUES ('e7d61ea3f8dd49c88f2ff2484c07acb9-1-19', 'ayato', 'センシング');
 INSERT INTO user (id, name, team) VALUES ('e7d61ea3f8dd49c88f2ff2484c07acb9-2021-10', 'maruyama', 'センシング');
 INSERT INTO user (id, name, team) VALUES ('e7d61ea3f8dd49c88f2ff2484c07acb9-1-121', 'ken', 'M1');
+
 
 
 CREATE TABLE log
@@ -36,18 +37,11 @@ CREATE TABLE log
   rssi      int(11)
 );
 
--- INSERT INTO log (room_id, start_at, end_at, user_id, rssi) VALUES ( 1, '2019-01-01 00:00:00', '2019-01-01 00:00:00', '1234567890', -50);
--- INSERT INTO log (room_id, start_at, end_at, user_id, rssi) VALUES ( 1, '2019-01-01 00:00:00', '2019-01-01 00:00:00', '1234567890', -40);
-
 CREATE TABLE stayer
 (
   user_id        VARCHAR(100),
   room_id     int(11)
 );
-
--- INSERT INTO stayer (user_id, room_id) VALUES ('e7d61ea3f8dd49c88f2ff2484c07acb9-22823-42602', 1);
--- INSERT INTO stayer (user_id, room_id) VALUES ('e7d61ea3f8dd49c88f2ff2484c07acb9-36624-25369', 1);
--- INSERT INTO stayer (user_id, room_id) VALUES ('e7d61ea3f8dd49c88f2ff2484c07acb9-2021-200",', 1);
 
 CREATE TABLE room
 (
