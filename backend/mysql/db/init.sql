@@ -25,8 +25,6 @@ INSERT INTO user (id, name, team) VALUES ('e7d61ea3f8dd49c88f2ff2484c07acb9-1-19
 INSERT INTO user (id, name, team) VALUES ('e7d61ea3f8dd49c88f2ff2484c07acb9-2021-10', 'maruyama', 'センシング');
 INSERT INTO user (id, name, team) VALUES ('e7d61ea3f8dd49c88f2ff2484c07acb9-1-121', 'ken', 'M1');
 
-
-
 CREATE TABLE log
 (
   id int(11) primary key AUTO_INCREMENT,
@@ -53,3 +51,4 @@ INSERT INTO room (name) VALUES ('梶研究室-学生部屋');
 INSERT INTO room (name) VALUES ('梶研究室-スマートルーム');
 INSERT INTO room (name) VALUES ('梶研究室-院生室');
 INSERT INTO room (name) VALUES ('梶研究室-FA部屋');
+INSERT INTO room (name) VALUES ('梶研究室-先生部屋');

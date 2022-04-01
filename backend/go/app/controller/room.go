@@ -113,9 +113,14 @@ func Beacon(c *gin.Context) {
 	allStayer, err := RoomService.GetStayerByRoomID(beaconRoom.RoomID)
 
 	for _, pastStayer := range allStayer {
+
 		isExist := false
 		//前のStayerが現在も同じ部屋にいるか線形探索で確認
 		for _, currentStayer := range beaconRoom.Beacons {
+
+			// if pastStayer.cu == currentStayer.Rssi
+
+
 			//現在も同じ部屋にいる場合
 			if pastStayer.UserID == currentStayer.Uuid && pastStayer.RoomID == beaconRoom.RoomID {
 				isExist = true
