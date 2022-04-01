@@ -19,6 +19,8 @@ services:
   vol_mysql:
     container_name: vol_mysql
     build: ./mysql
+    expose:
+      - "33063"
     ports:
       - "33063:3306"
     volumes:
