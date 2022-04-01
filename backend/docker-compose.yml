@@ -20,7 +20,7 @@ services:
     container_name: vol_mysql
     build: ./mysql
     ports:
-      - "33060:3306"
+      - "33063:3306"
     volumes:
       - ./mysql/db:/docker-entrypoint-initdb.d
     environment:
