@@ -31,4 +31,5 @@ type Room struct {
 type Stayer struct {
 	UserID string `json:"userID" xorm:"user_id"`
 	RoomID int64  `json:"roomID" xorm:"room_id"`
+	Rssi   int64  `json:"rssi" xorm:"rssi"`
 }

@@ -35,8 +35,6 @@ func (RoomService) GetStayer(stayer *model.Stayer) (error, bool) {
 	return nil, false
 }
 
-
-
 //滞在者全体を取得する
 func (RoomService) GetAllStayer() ([]model.Stayer, error) {
 	stayers := make([]model.Stayer, 0)
@@ -62,6 +60,16 @@ func (RoomService) GetStayerByRoomID(roomID int64) ([]model.Stayer, error) {
 func (RoomService) SetStayer(stayer *model.Stayer) error {
 
 	_, err := DbEngine.Table("stayer").Insert(stayer)
+	if err != nil {
+		log.Fatal(err.Error())
+		return err
+	}
+	return nil
+}
+
+func (RoomService) UpdateStayer(stayer *model.Stayer) error {
+
+	_, err := DbEngine.Table("stayer").Where("user_id=?", stayer.UserID).Update(stayer)
 	if err != nil {
 		log.Fatal(err.Error())
 		return err

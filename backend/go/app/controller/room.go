@@ -99,6 +99,7 @@ func Log(c *gin.Context) {
 
 //ビーコン情報を受け取る
 func Beacon(c *gin.Context) {
+
 	beaconRoom := model.BeaconRoom{}
 	// fmt.Println("c=", c.Bind(&beaconRoom))
 	err := c.Bind(&beaconRoom)
@@ -110,24 +111,60 @@ func Beacon(c *gin.Context) {
 
 	RoomService := service.RoomService{}
 	//事前にStayerテーブルのデータを取得する
-	allStayer, err := RoomService.GetStayerByRoomID(beaconRoom.RoomID)
+	pastAllStayer, err := RoomService.GetAllStayer()
 
-	for _, pastStayer := range allStayer {
+	for _, pastStayer := range pastAllStayer {
 
 		isExist := false
+		targetUserRssi := -200
+
 		//前のStayerが現在も同じ部屋にいるか線形探索で確認
 		for _, currentStayer := range beaconRoom.Beacons {
 
 			// if pastStayer.cu == currentStayer.Rssi
-
-
 			//現在も同じ部屋にいる場合
-			if pastStayer.UserID == currentStayer.Uuid && pastStayer.RoomID == beaconRoom.RoomID {
+			if pastStayer.UserID == currentStayer.Uuid {
+				targetUserRssi = int(currentStayer.Rssi)
 				isExist = true
 			}
+
 		}
-		//もし現在いないまたは他の部屋に移動した場合
-		if !isExist {
+
+		fmt.Println(targetUserRssi, int(pastStayer.Rssi))
+
+		//別のラズパイのRSSIの方が強い場合stayerから削除したい
+		if isExist && targetUserRssi > int(pastStayer.Rssi) {
+			//同じ部屋にいる場合は更新
+			if beaconRoom.RoomID == pastStayer.RoomID {
+				fmt.Println("同じ部屋にいる場合は更新")
+				err := RoomService.UpdateStayer(&model.Stayer{
+					UserID: pastStayer.UserID,
+					RoomID: pastStayer.RoomID,
+					Rssi:   int64(targetUserRssi),
+				})
+				if err != nil {
+					c.String(http.StatusInternalServerError, "Server Error")
+					return
+				}
+			} else {
+				fmt.Println("別の部屋にいる場合は削除")
+				//別の部屋の場合Stayerテーブルから削除する
+				err := RoomService.DeleteStayer(pastStayer.UserID)
+				if err != nil {
+					fmt.Println(err)
+				}
+				//logテーブルのendAtを更新する
+				err = RoomService.InsertEndAt(pastStayer.UserID)
+				if err != nil {
+					fmt.Println(err)
+				}
+			}
+		}
+
+		//以前いた部屋のデータに存在しない場合 {Beacons:[] ,RoomID:1}
+		if !isExist && pastStayer.RoomID == beaconRoom.RoomID {
+			fmt.Println("以前いた部屋のデータに存在しない場合")
+
 			//Stayerテーブルから削除する
 			err := RoomService.DeleteStayer(pastStayer.UserID)
 			if err != nil {
@@ -140,6 +177,7 @@ func Beacon(c *gin.Context) {
 				fmt.Println(err)
 			}
 		}
+
 	}
 
 	for _, currentStayer := range beaconRoom.Beacons {
@@ -152,7 +190,7 @@ func Beacon(c *gin.Context) {
 		}
 		//該当ユーザがいない場合はstayerテーブルとlogテーブルに新規に追加する
 		if !stayerFlag {
-			err = RoomService.SetStayer(&model.Stayer{UserID: currentStayer.Uuid, RoomID: beaconRoom.RoomID})
+			err = RoomService.SetStayer(&model.Stayer{UserID: currentStayer.Uuid, RoomID: beaconRoom.RoomID, Rssi: currentStayer.Rssi})
 			if err != nil {
 				c.String(http.StatusBadRequest, "Bad Request")
 				return

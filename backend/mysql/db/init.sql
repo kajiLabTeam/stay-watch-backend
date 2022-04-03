@@ -38,7 +38,8 @@ CREATE TABLE log
 CREATE TABLE stayer
 (
   user_id        VARCHAR(100),
-  room_id     int(11)
+  room_id     int(11),
+  rssi      int(11)
 );
 
 CREATE TABLE room
