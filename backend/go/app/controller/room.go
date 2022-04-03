@@ -132,7 +132,7 @@ func Beacon(c *gin.Context) {
 
 		fmt.Println(targetUserRssi, int(pastStayer.Rssi))
 
-		//別のラズパイのRSSIの方が強い場合stayerから削除したい
+		//RSSIが以前より強い場合
 		if isExist && targetUserRssi > int(pastStayer.Rssi) {
 			//同じ部屋にいる場合は更新
 			if beaconRoom.RoomID == pastStayer.RoomID {
