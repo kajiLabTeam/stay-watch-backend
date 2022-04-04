@@ -15,7 +15,7 @@ func main() {
 	// engine.Use(middleware.RecordUaAndTime)
 	// CRUD 書籍
 	engine.Use(cors.New(cors.Config{
-		AllowOrigins: []string{"http://localhost:3000", "https://stay-watch-front.vercel.app,https://stay-watch-go.kajilab.tk"},
+		AllowOrigins: []string{"http://localhost:3000", "https://stay-watch-front.vercel.app", "https://stay-watch-go.kajilab.tk"},
 		AllowMethods: []string{"GET", "POST", "PUT", "DELETE"},
 		AllowHeaders: []string{
 			"Access-Control-Allow-Credentials",
