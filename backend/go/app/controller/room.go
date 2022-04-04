@@ -161,22 +161,22 @@ func Beacon(c *gin.Context) {
 			}
 		}
 
-		// //RSSIが以前より弱い場合
-		// if isExist && targetUserRssi < int(pastStayer.Rssi) {
-		// 	//同じ部屋にいる場合は更新
-		// 	if beaconRoom.RoomID == pastStayer.RoomID {
-		// 		fmt.Println("同じ部屋にいる場合はRSSIを更新 弱くなる")
-		// 		err := RoomService.UpdateStayer(&model.Stayer{
-		// 			UserID: pastStayer.UserID,
-		// 			RoomID: pastStayer.RoomID,
-		// 			Rssi:   int64(targetUserRssi),
-		// 		})
-		// 		if err != nil {
-		// 			c.String(http.StatusInternalServerError, "Server Error")
-		// 			return
-		// 		}
-		// 	}
-		// }
+		//RSSIが以前より弱い場合
+		if isExist && targetUserRssi < int(pastStayer.Rssi) {
+			//同じ部屋にいる場合は更新
+			if beaconRoom.RoomID == pastStayer.RoomID {
+				fmt.Println("同じ部屋にいる場合はRSSIを更新 弱くなる")
+				err := RoomService.UpdateStayer(&model.Stayer{
+					UserID: pastStayer.UserID,
+					RoomID: pastStayer.RoomID,
+					Rssi:   int64(targetUserRssi),
+				})
+				if err != nil {
+					c.String(http.StatusInternalServerError, "Server Error")
+					return
+				}
+			}
+		}
 
 		//以前いた部屋のデータに存在しない場合 {Beacons:[] ,RoomID:1}
 		if !isExist && pastStayer.RoomID == beaconRoom.RoomID {
