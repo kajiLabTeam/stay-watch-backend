@@ -51,7 +51,7 @@ CREATE TABLE room
 );
 
 INSERT INTO room (name) VALUES ('梶研究室-学生部屋');
-INSERT INTO room (name) VALUES ('梶研究室-先生部屋');
 INSERT INTO room (name) VALUES ('梶研究室-スマートルーム');
 INSERT INTO room (name) VALUES ('梶研究室-院生室');
 INSERT INTO room (name) VALUES ('梶研究室-FA部屋');
+INSERT INTO room (name) VALUES ('梶研究室-先生部屋');
