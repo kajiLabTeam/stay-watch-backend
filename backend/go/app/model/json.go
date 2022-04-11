@@ -1,10 +1,11 @@
 package model
 
 type StayerGetResponse struct {
-	ID   string `json:"id"`
-	Name string `json:"name"`
-	Team string `json:"team"`
-	Room string `json:"room"`
+	ID     string `json:"id"`
+	Name   string `json:"name"`
+	Team   string `json:"team"`
+	Room   string `json:"room"`
+	RoomID int    `json:"roomID"`
 }
 
 type LogGetResponse struct {

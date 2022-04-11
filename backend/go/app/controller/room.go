@@ -46,10 +46,11 @@ func Stayer(c *gin.Context) {
 		}
 
 		stayerGetResponse = append(stayerGetResponse, model.StayerGetResponse{
-			ID:   stayer.UserID,
-			Name: userName,
-			Team: teamName,
-			Room: roomName,
+			ID:     stayer.UserID,
+			Name:   userName,
+			Team:   teamName,
+			Room:   roomName,
+			RoomID: int(stayer.RoomID),
 		})
 	}
 	c.JSON(200, stayerGetResponse)

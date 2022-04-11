@@ -34,12 +34,15 @@ CREATE TABLE log
   rssi      int(11)
 );
 
+
 CREATE TABLE stayer
 (
   user_id        VARCHAR(100),
   room_id     int(11),
   rssi      int(11)
 );
+
+INSERT INTO stayer (user_id, room_id, rssi) VALUES ('e7d61ea3f8dd49c88f2ff2484c07acb9-2021-1', 1, -50);
 
 CREATE TABLE room
 (
