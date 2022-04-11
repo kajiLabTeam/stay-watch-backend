@@ -42,7 +42,7 @@ CREATE TABLE stayer
   rssi      int(11)
 );
 
-INSERT INTO stayer (user_id, room_id, rssi) VALUES ('e7d61ea3f8dd49c88f2ff2484c07acb9-2021-1', 1, -50);
+
 
 CREATE TABLE room
 (
@@ -51,7 +51,7 @@ CREATE TABLE room
 );
 
 INSERT INTO room (name) VALUES ('梶研究室-学生部屋');
+INSERT INTO room (name) VALUES ('梶研究室-先生部屋');
 INSERT INTO room (name) VALUES ('梶研究室-スマートルーム');
 INSERT INTO room (name) VALUES ('梶研究室-院生室');
 INSERT INTO room (name) VALUES ('梶研究室-FA部屋');
-INSERT INTO room (name) VALUES ('梶研究室-先生部屋');
