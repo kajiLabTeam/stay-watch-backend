@@ -30,8 +30,8 @@ services:
       - vol_network
     cap_add:
       - SYS_NICE
-    ports:
-      - 33060:3306
+    # ports:
+    #   - 33060:3306
 networks:
   vol_network:
     external: true
