@@ -1,4 +1,4 @@
-use production_db;
+use app;
 
 
 CREATE TABLE user
@@ -12,7 +12,6 @@ INSERT INTO user (id, name, team) VALUES ('e7d61ea3f8dd49c88f2ff2484c07acb9-2021
 INSERT INTO user (id, name, team) VALUES ('e7d61ea3f8dd49c88f2ff2484c07acb9-2021-2', 'ukai', 'インタラクション');
 INSERT INTO user (id, name, team) VALUES ('e7d61ea3f8dd49c88f2ff2484c07acb9-2021-3', 'toyama', 'ロケーション');
 INSERT INTO user (id, name, team) VALUES ('e7d61ea3f8dd49c88f2ff2484c07acb9-7436-17873', 'ogane', 'ロケーション');
-INSERT INTO user (id, name, team) VALUES ('e7d61ea3f8dd49c88f2ff2484c07acb9-36624-25369', 'takizawa', 'インタラクション');
 INSERT INTO user (id, name, team) VALUES ('e7d61ea3f8dd49c88f2ff2484c07acb9-7474-59294', 'kaji', 'Professor');
 INSERT INTO user (id, name, team) VALUES ('e7d61ea3f8dd49c88f2ff2484c07acb9-2021-99', 'isiguro','B2');
 INSERT INTO user (id, name, team) VALUES ('e7d61ea3f8dd49c88f2ff2484c07acb9-2019-60556', 'Miyagawa-san', 'ロケーション');
@@ -23,6 +22,13 @@ INSERT INTO user (id, name, team) VALUES ('e7d61ea3f8dd49c88f2ff2484c07acb9-2021
 INSERT INTO user (id, name, team) VALUES ('e7d61ea3f8dd49c88f2ff2484c07acb9-1-19', 'ayato', 'センシング');
 INSERT INTO user (id, name, team) VALUES ('e7d61ea3f8dd49c88f2ff2484c07acb9-2021-10', 'maruyama', 'センシング');
 INSERT INTO user (id, name, team) VALUES ('e7d61ea3f8dd49c88f2ff2484c07acb9-1-121', 'ken', 'M1');
+INSERT INTO user (id, name, team) VALUES ('e7d61ea3f8dd49c88f2ff2484c07acb9-2021-2', 'ukai', 'B4');
+INSERT INTO user (id, name, team) VALUES ('e7d61ea3f8dd49c88f2ff2484c07acb9-2021-6', 'akito', 'B4');
+INSERT INTO user (id, name, team) VALUES ('e7d61ea3f8dd49c88f2ff2484c07acb9-2021-11', 'iwao', 'B3');
+INSERT INTO user (id, name, team) VALUES ('e7d61ea3f8dd49c88f2ff2484c07acb9-2021-4', 'shamoto', 'B4');
+INSERT INTO user (id, name, team) VALUES ('e7d61ea3f8dd49c88f2ff2484c07acb9-2021-8', 'terada', 'B4');
+INSERT INTO user (id, name, team) VALUES ('e7d61ea3f8dd49c88f2ff2484c07acb9-2021-9', 'fueta', 'B4');
+
 
 CREATE TABLE log
 (
@@ -34,7 +40,6 @@ CREATE TABLE log
   rssi      int(11)
 );
 
-
 CREATE TABLE stayer
 (
   user_id        VARCHAR(100),
@@ -43,15 +48,121 @@ CREATE TABLE stayer
 );
 
 
-
 CREATE TABLE room
 (
   id        int(11) primary key AUTO_INCREMENT,
   name      VARCHAR(50)
 );
 
-INSERT INTO room (name) VALUES ('梶研究室-学生部屋');
-INSERT INTO room (name) VALUES ('梶研究室-スマートルーム');
-INSERT INTO room (name) VALUES ('梶研究室-院生室');
-INSERT INTO room (name) VALUES ('梶研究室-FA部屋');
-INSERT INTO room (name) VALUES ('梶研究室-先生部屋');
+INSERT INTO room (name) VALUES ('梶研-学生部屋');
+INSERT INTO room (name) VALUES ('梶研-スマートルーム');
+INSERT INTO room (name) VALUES ('梶研-院生室');
+INSERT INTO room (name) VALUES ('梶研-FA部屋');
+INSERT INTO room (name) VALUES ('梶研-先生部屋');
+
+
+CREATE TABLE tag
+(
+  id        int(11) primary key AUTO_INCREMENT,
+  name      VARCHAR(50)
+);
+
+INSERT INTO tag (name) VALUES ('梶研');
+INSERT INTO tag (name) VALUES ('ロケーション');
+INSERT INTO tag (name) VALUES ('インタラクション');
+INSERT INTO tag (name) VALUES ('センシング');
+INSERT INTO tag (name) VALUES ('B1');
+INSERT INTO tag (name) VALUES ('B2');
+INSERT INTO tag (name) VALUES ('B3');
+INSERT INTO tag (name) VALUES ('B4');
+INSERT INTO tag (name) VALUES ('M1');
+INSERT INTO tag (name) VALUES ('M2');
+INSERT INTO tag (name) VALUES ('Professor');
+
+
+CREATE TABLE tag_map
+(
+  id       int(11) primary key AUTO_INCREMENT,
+  user_id  VARCHAR(50),
+  tag_id   int(11)
+);
+
+INSERT INTO tag_map (user_id, tag_id) VALUES ('e7d61ea3f8dd49c88f2ff2484c07acb9-2021-1', 1);
+INSERT INTO tag_map (user_id, tag_id) VALUES ('e7d61ea3f8dd49c88f2ff2484c07acb9-2021-1', 2);
+INSERT INTO tag_map (user_id, tag_id) VALUES ('e7d61ea3f8dd49c88f2ff2484c07acb9-2021-1', 8);
+INSERT INTO tag_map (user_id, tag_id) VALUES ('e7d61ea3f8dd49c88f2ff2484c07acb9-2021-2', 1);
+INSERT INTO tag_map (user_id, tag_id) VALUES ('e7d61ea3f8dd49c88f2ff2484c07acb9-2021-2', 3);
+INSERT INTO tag_map (user_id, tag_id) VALUES ('e7d61ea3f8dd49c88f2ff2484c07acb9-2021-2', 8);
+INSERT INTO tag_map (user_id, tag_id) VALUES ('e7d61ea3f8dd49c88f2ff2484c07acb9-2021-3', 1);
+INSERT INTO tag_map (user_id, tag_id) VALUES ('e7d61ea3f8dd49c88f2ff2484c07acb9-2021-3', 2);
+INSERT INTO tag_map (user_id, tag_id) VALUES ('e7d61ea3f8dd49c88f2ff2484c07acb9-2021-3', 8);
+INSERT INTO tag_map (user_id, tag_id) VALUES ('e7d61ea3f8dd49c88f2ff2484c07acb9-7436-17873', 1);
+INSERT INTO tag_map (user_id, tag_id) VALUES ('e7d61ea3f8dd49c88f2ff2484c07acb9-7436-17873', 2);
+INSERT INTO tag_map (user_id, tag_id) VALUES ('e7d61ea3f8dd49c88f2ff2484c07acb9-7436-17873', 10);
+INSERT INTO tag_map (user_id, tag_id) VALUES ('e7d61ea3f8dd49c88f2ff2484c07acb9-7474-59294', 1);
+INSERT INTO tag_map (user_id, tag_id) VALUES ('e7d61ea3f8dd49c88f2ff2484c07acb9-7474-59294', 11);
+INSERT INTO tag_map (user_id, tag_id) VALUES ('e7d61ea3f8dd49c88f2ff2484c07acb9-2021-99', 1);
+INSERT INTO tag_map (user_id, tag_id) VALUES ('e7d61ea3f8dd49c88f2ff2484c07acb9-2021-99', 7);
+INSERT INTO tag_map (user_id, tag_id) VALUES ('e7d61ea3f8dd49c88f2ff2484c07acb9-2019-60556', 1);
+INSERT INTO tag_map (user_id, tag_id) VALUES ('e7d61ea3f8dd49c88f2ff2484c07acb9-2019-60556', 2);
+INSERT INTO tag_map (user_id, tag_id) VALUES ('e7d61ea3f8dd49c88f2ff2484c07acb9-2019-60556', 10);
+INSERT INTO tag_map (user_id, tag_id) VALUES ('e7d61ea3f8dd49c88f2ff2484c07acb9-2021-5', 1);
+INSERT INTO tag_map (user_id, tag_id) VALUES ('e7d61ea3f8dd49c88f2ff2484c07acb9-2021-5', 2);
+INSERT INTO tag_map (user_id, tag_id) VALUES ('e7d61ea3f8dd49c88f2ff2484c07acb9-2021-5', 8);
+INSERT INTO tag_map (user_id, tag_id) VALUES ('e7d61ea3f8dd49c88f2ff2484c07acb9-22823-42602', 1);
+INSERT INTO tag_map (user_id, tag_id) VALUES ('e7d61ea3f8dd49c88f2ff2484c07acb9-22823-42602', 2);
+INSERT INTO tag_map (user_id, tag_id) VALUES ('e7d61ea3f8dd49c88f2ff2484c07acb9-22823-42602', 9);
+INSERT INTO tag_map (user_id, tag_id) VALUES ('e7d61ea3f8dd49c88f2ff2484c07acb9-2021-200', 1);
+INSERT INTO tag_map (user_id, tag_id) VALUES ('e7d61ea3f8dd49c88f2ff2484c07acb9-2021-200', 2);
+INSERT INTO tag_map (user_id, tag_id) VALUES ('e7d61ea3f8dd49c88f2ff2484c07acb9-2021-7', 1);
+INSERT INTO tag_map (user_id, tag_id) VALUES ('e7d61ea3f8dd49c88f2ff2484c07acb9-2021-7', 4);
+INSERT INTO tag_map (user_id, tag_id) VALUES ('e7d61ea3f8dd49c88f2ff2484c07acb9-2021-7', 8);
+INSERT INTO tag_map (user_id, tag_id) VALUES ('e7d61ea3f8dd49c88f2ff2484c07acb9-1-19', 1);
+INSERT INTO tag_map (user_id, tag_id) VALUES ('e7d61ea3f8dd49c88f2ff2484c07acb9-1-19', 4);
+INSERT INTO tag_map (user_id, tag_id) VALUES ('e7d61ea3f8dd49c88f2ff2484c07acb9-1-19', 9);
+INSERT INTO tag_map (user_id, tag_id) VALUES ('e7d61ea3f8dd49c88f2ff2484c07acb9-2021-10', 1);
+INSERT INTO tag_map (user_id, tag_id) VALUES ('e7d61ea3f8dd49c88f2ff2484c07acb9-2021-10', 4);
+INSERT INTO tag_map (user_id, tag_id) VALUES ('e7d61ea3f8dd49c88f2ff2484c07acb9-2021-10', 8);
+INSERT INTO tag_map (user_id, tag_id) VALUES ('e7d61ea3f8dd49c88f2ff2484c07acb9-1-121', 1);
+INSERT INTO tag_map (user_id, tag_id) VALUES ('e7d61ea3f8dd49c88f2ff2484c07acb9-1-121', 9);
+INSERT INTO tag_map (user_id, tag_id) VALUES ('e7d61ea3f8dd49c88f2ff2484c07acb9-2021-6', 1);
+INSERT INTO tag_map (user_id, tag_id) VALUES ('e7d61ea3f8dd49c88f2ff2484c07acb9-2021-6', 4);
+INSERT INTO tag_map (user_id, tag_id) VALUES ('e7d61ea3f8dd49c88f2ff2484c07acb9-2021-6', 8);
+INSERT INTO tag_map (user_id, tag_id) VALUES ('e7d61ea3f8dd49c88f2ff2484c07acb9-2021-11', 1);
+INSERT INTO tag_map (user_id, tag_id) VALUES ('e7d61ea3f8dd49c88f2ff2484c07acb9-2021-11', 7);
+INSERT INTO tag_map (user_id, tag_id) VALUES ('e7d61ea3f8dd49c88f2ff2484c07acb9-2021-4', 1);
+INSERT INTO tag_map (user_id, tag_id) VALUES ('e7d61ea3f8dd49c88f2ff2484c07acb9-2021-4', 4);
+INSERT INTO tag_map (user_id, tag_id) VALUES ('e7d61ea3f8dd49c88f2ff2484c07acb9-2021-4', 8);
+INSERT INTO tag_map (user_id, tag_id) VALUES ('e7d61ea3f8dd49c88f2ff2484c07acb9-2021-8', 1);
+INSERT INTO tag_map (user_id, tag_id) VALUES ('e7d61ea3f8dd49c88f2ff2484c07acb9-2021-8', 4);
+INSERT INTO tag_map (user_id, tag_id) VALUES ('e7d61ea3f8dd49c88f2ff2484c07acb9-2021-8', 8);
+INSERT INTO tag_map (user_id, tag_id) VALUES ('e7d61ea3f8dd49c88f2ff2484c07acb9-2021-9', 1);
+INSERT INTO tag_map (user_id, tag_id) VALUES ('e7d61ea3f8dd49c88f2ff2484c07acb9-2021-9', 3);
+INSERT INTO tag_map (user_id, tag_id) VALUES ('e7d61ea3f8dd49c88f2ff2484c07acb9-2021-9', 8);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

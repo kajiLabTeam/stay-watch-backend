@@ -14,6 +14,8 @@ import (
 func Stayer(c *gin.Context) {
 
 	RoomService := service.RoomService{}
+	UserService := service.UserService{}
+
 	//Stayerテーブルから全てのデータを取得する
 	allStayer, err := RoomService.GetAllStayer()
 	if err != nil {
@@ -28,7 +30,7 @@ func Stayer(c *gin.Context) {
 
 	for _, stayer := range allStayer {
 
-		userName, err := RoomService.GetUserName(stayer.UserID)
+		userName, err := UserService.GetUserName(stayer.UserID)
 		if err != nil {
 			c.String(http.StatusInternalServerError, "Server Error")
 			return
@@ -39,10 +41,32 @@ func Stayer(c *gin.Context) {
 			return
 		}
 
-		teamName, err := RoomService.GetUserTeam(stayer.UserID)
+		teamName, err := UserService.GetUserTeam(stayer.UserID)
 		if err != nil {
 			c.String(http.StatusInternalServerError, "Server Error")
 			return
+		}
+
+		tags := make([]model.Tag, 0)
+
+		tagsID, err := UserService.GetUserTagsID(stayer.UserID)
+		if err != nil {
+			c.String(http.StatusInternalServerError, "Server Error")
+			return
+		}
+
+		for _, tagID := range tagsID {
+			//タグIDからタグ名を取得する
+			tagName, err := UserService.GetTagName(tagID)
+			if err != nil {
+				c.String(http.StatusInternalServerError, "Server Error")
+				return
+			}
+			tag := model.Tag{
+				ID:   tagID,
+				Name: tagName,
+			}
+			tags = append(tags, tag)
 		}
 
 		stayerGetResponse = append(stayerGetResponse, model.StayerGetResponse{
@@ -51,6 +75,7 @@ func Stayer(c *gin.Context) {
 			Team:   teamName,
 			Room:   roomName,
 			RoomID: int(stayer.RoomID),
+			Tags:   tags,
 		})
 	}
 	c.JSON(200, stayerGetResponse)
@@ -58,6 +83,8 @@ func Stayer(c *gin.Context) {
 
 func Log(c *gin.Context) {
 	RoomService := service.RoomService{}
+	UserService := service.UserService{}
+
 	//Logテーブルから全てのデータを取得する
 	allLog, err := RoomService.GetAllLog()
 	if err != nil {
@@ -69,7 +96,7 @@ func Log(c *gin.Context) {
 
 	for _, log := range allLog {
 
-		userName, err := RoomService.GetUserName(log.UserID)
+		userName, err := UserService.GetUserName(log.UserID)
 		if err != nil {
 			c.String(http.StatusInternalServerError, "Server Error")
 			return
@@ -80,7 +107,7 @@ func Log(c *gin.Context) {
 			return
 		}
 
-		teamName, err := RoomService.GetUserTeam(log.UserID)
+		teamName, err := UserService.GetUserTeam(log.UserID)
 		if err != nil {
 			c.String(http.StatusInternalServerError, "Server Error")
 			return

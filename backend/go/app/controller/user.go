@@ -33,11 +33,46 @@ func Register(c *gin.Context) {
 }
 
 func List(c *gin.Context) {
-	userService := service.UserService{}
-	users, err := userService.GetAllUser()
+	UserService := service.UserService{}
+	users, err := UserService.GetAllUser()
 	if err != nil {
 		c.String(http.StatusInternalServerError, "Server Error")
 		return
 	}
-	c.JSON(200, users)
+
+	userInformationGetResponse := []model.UserInformationGetResponse{}
+
+	for _, user := range users {
+
+		tags := make([]model.Tag, 0)
+
+		tagsID, err := UserService.GetUserTagsID(user.ID)
+		if err != nil {
+			c.String(http.StatusInternalServerError, "Server Error")
+			return
+		}
+
+		for _, tagID := range tagsID {
+			//タグIDからタグ名を取得する
+			tagName, err := UserService.GetTagName(tagID)
+			if err != nil {
+				c.String(http.StatusInternalServerError, "Server Error")
+				return
+			}
+			tag := model.Tag{
+				ID:   tagID,
+				Name: tagName,
+			}
+			tags = append(tags, tag)
+		}
+
+		userInformationGetResponse = append(userInformationGetResponse, model.UserInformationGetResponse{
+			ID:   user.ID,
+			Name: user.Name,
+			Team: user.Team,
+			Tags: tags,
+		})
+	}
+
+	c.JSON(200, userInformationGetResponse)
 }

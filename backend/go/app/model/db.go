@@ -33,3 +33,14 @@ type Stayer struct {
 	RoomID int64  `json:"roomID" xorm:"room_id"`
 	Rssi   int64  `json:"rssi" xorm:"rssi"`
 }
+
+type Tag struct {
+	ID   int64  `json:"id" xorm:"id"`
+	Name string `json:"name" xorm:"name"`
+}
+
+type TagMap struct {
+	ID     int64  `json:"ID" xorm:"id"`
+	UserID string `json:"userID" xorm:"user_id"`
+	TagID  string `json:"tagID" xorm:"tag_id"`
+}

@@ -28,3 +28,47 @@ func (UserService) GetAllUser() ([]model.User, error) {
 	}
 	return users, nil
 }
+
+//IDから名前を取得する
+func (UserService) GetUserName(userID string) (string, error) {
+	user := model.User{}
+	_, err := DbEngine.Table("user").Where("id=?", userID).Get(&user)
+	if err != nil {
+		log.Fatal(err.Error())
+		return "", err
+	}
+	return user.Name, nil
+}
+
+//IDからチーム名を取得する
+func (UserService) GetUserTeam(userID string) (string, error) {
+	user := model.User{}
+	_, err := DbEngine.Table("user").Where("id=?", userID).Get(&user)
+	if err != nil {
+		log.Fatal(err.Error())
+		return "", err
+	}
+	return user.Team, nil
+}
+
+//IDからタグ(複数形)IDを取得する
+func (UserService) GetUserTagsID(userID string) ([]int64, error) {
+	tags := make([]int64, 0)
+	err := DbEngine.Table("tag_map").Where("user_id=?", userID).Cols("tag_id").Find(&tags)
+	if err != nil {
+		log.Fatal(err.Error())
+		return nil, err
+	}
+	return tags, nil
+}
+
+//タグIDからタグ名を取得する
+func (UserService) GetTagName(tagID int64) (string, error) {
+	tag := model.Tag{}
+	_, err := DbEngine.Table("tag").Where("id=?", tagID).Get(&tag)
+	if err != nil {
+		log.Fatal(err.Error())
+		return "", err
+	}
+	return tag.Name, nil
+}

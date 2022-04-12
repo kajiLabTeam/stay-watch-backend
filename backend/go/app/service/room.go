@@ -109,28 +109,6 @@ func (RoomService) GetRoomName(roomID int64) (string, error) {
 	return room.Name, nil
 }
 
-//IDから名前を取得する
-func (RoomService) GetUserName(userID string) (string, error) {
-	user := model.User{}
-	_, err := DbEngine.Table("user").Where("id=?", userID).Get(&user)
-	if err != nil {
-		log.Fatal(err.Error())
-		return "", err
-	}
-	return user.Name, nil
-}
-
-//IDからチーム名を取得する
-func (RoomService) GetUserTeam(userID string) (string, error) {
-	user := model.User{}
-	_, err := DbEngine.Table("user").Where("id=?", userID).Get(&user)
-	if err != nil {
-		log.Fatal(err.Error())
-		return "", err
-	}
-	return user.Team, nil
-}
-
 //全てのログを取得する
 func (RoomService) GetAllLog() ([]model.Log, error) {
 	logs := make([]model.Log, 0)

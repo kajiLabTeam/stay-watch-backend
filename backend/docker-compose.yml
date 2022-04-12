@@ -23,13 +23,15 @@ services:
       - ./mysql/db:/docker-entrypoint-initdb.d
     environment:
       MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: production_db
+      MYSQL_DATABASE: app
       MYSQL_USER: gopher
       MYSQL_PASSWORD: setsetset
     networks:
       - vol_network
     cap_add:
       - SYS_NICE
+    ports:
+      - 33060:3306
 networks:
   vol_network:
     external: true
