@@ -88,9 +88,8 @@ func (RoomService) DeleteStayer(userID string) error {
 }
 
 func (RoomService) InsertEndAt(userID string) error {
-
 	currentTime := time.Now()
-	_, err := DbEngine.Table("log").Where("user_id=?", userID).Update(map[string]string{"end_at": currentTime.Format("2006-01-02 15:04:05")})
+	_, err := DbEngine.Table("log").Desc("start_at").Limit(1).Where("user_id=?", userID).Update(map[string]string{"end_at": currentTime.Format("2006-01-02 15:04:05")})
 	if err != nil {
 		log.Fatal(err.Error())
 		return err

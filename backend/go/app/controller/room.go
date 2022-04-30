@@ -150,7 +150,7 @@ func Beacon(c *gin.Context) {
 		for _, currentStayer := range beaconRoom.Beacons {
 
 			// if pastStayer.cu == currentStayer.Rssi
-			//現在も同じ部屋にいる場合
+			//1つ前のstgayerテーブルにもいた場合
 			if pastStayer.UserID == currentStayer.Uuid {
 				targetUserRssi = int(currentStayer.Rssi)
 				isExist = true
