@@ -73,53 +73,13 @@ func List(c *gin.Context) {
 			Tags: tags,
 		})
 	}
-
 	c.JSON(200, userInformationGetResponse)
-
 }
 
 func SimultaneousList(c *gin.Context) {
-	UserService := service.UserService{}
-	users, err := UserService.GetAllUser()
-	if err != nil {
-		c.String(http.StatusInternalServerError, "Server Error")
-		return
-	}
+	userID := c.Param("user_id")
 
-	userInformationGetResponse := []model.UserInformationGetResponse{}
-
-	for _, user := range users {
-
-		tags := make([]model.Tag, 0)
-
-		tagsID, err := UserService.GetUserTagsID(user.ID)
-		if err != nil {
-			c.String(http.StatusInternalServerError, "Server Error")
-			return
-		}
-
-		for _, tagID := range tagsID {
-			//タグIDからタグ名を取得する
-			tagName, err := UserService.GetTagName(tagID)
-			if err != nil {
-				c.String(http.StatusInternalServerError, "Server Error")
-				return
-			}
-			tag := model.Tag{
-				ID:   tagID,
-				Name: tagName,
-			}
-			tags = append(tags, tag)
-		}
-
-		userInformationGetResponse = append(userInformationGetResponse, model.UserInformationGetResponse{
-			ID:   user.ID,
-			Name: user.Name,
-			Team: user.Team,
-			Tags: tags,
-		})
-	}
-
-	c.JSON(200, userInformationGetResponse)
-
+	c.JSON(200, gin.H{
+		"user_id": userID,
+	})
 }

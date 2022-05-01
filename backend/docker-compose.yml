@@ -13,7 +13,7 @@ services:
       WAIT_HOSTS: vol_mysql
       MYSQL_ROOT_HOST: "%"
     ports:
-      - "8082:80"
+      - "8082:8080"
     networks:
       - vol_network
   vol_mysql:
