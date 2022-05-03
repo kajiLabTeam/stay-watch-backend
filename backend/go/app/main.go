@@ -49,3 +49,20 @@ func main() {
 	}
 	engine.Run(":8080")
 }
+
+// package main
+
+// import (
+// 	"Stay_watch/service"
+// 	"fmt"
+// )
+
+// func main() {
+// 	RoomService := service.RoomService{}
+
+// 	times, err := RoomService.GetTimesFromStartAtAndEntAt("2022-04-20 08:00:00", "2022-04-20 10:00:00")
+// 	if err != nil {
+// 		fmt.Println("err=", err)
+// 	}
+// 	fmt.Println("times=", times)
+// }

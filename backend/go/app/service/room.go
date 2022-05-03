@@ -98,10 +98,10 @@ func (RoomService) InsertEndAt(userID string) error {
 	return nil
 }
 
-func (RoomService) GetSimultaneousList(userID string) ([]model.Log, error) {
+func (RoomService) GetSimultaneousList(userID string) ([]model.UserRoomTimeLogGetResponse, error) {
 	currentTime := time.Now()
 	logs := make([]model.Log, 0)
-	err := DbEngine.Table("log").Where("user_id=?", userID).And("start_at >= ?", currentTime.Add(time.Hour*-24*7).Format("2006-01-02 15:04:05")).Find(&logs)
+	err := DbEngine.Table("log").Where("user_id=?", userID).And("start_at >= ?", currentTime.Add(time.Hour*-24*14).Format("2006-01-02 15:04:05")).Find(&logs)
 	if err != nil {
 		log.Fatal(err.Error())
 		return nil, err
@@ -133,17 +133,12 @@ func (RoomService) GetSimultaneousList(userID string) ([]model.Log, error) {
 	}
 
 	sameDayAndRoomlogs := make([]model.Log, 0)
-	err = DbEngine.Table("log").Where(dateSql).And(roomSql).Asc("user_id").Find(&sameDayAndRoomlogs)
+	err = DbEngine.Table("log").Where(dateSql).And(roomSql).Asc("user_id").Asc("start_at").Asc("room_id").Find(&sameDayAndRoomlogs)
 	if err != nil {
 		log.Fatal(err.Error())
 		return nil, err
 	}
 
-	// userIDs := make([]string, 0)
-	// for _, sameDayAndRoomlog := range sameDayAndRoomlogs {
-	// 	userIDs = append(userIDs, sameDayAndRoomlog.UserID)
-	// }
-	// uniqueUserIDs := sliceUniqueString(userIDs)
 	UserService := UserService{}
 	RoomService := RoomService{}
 	userRoomTimeLogGetResponses := make([]model.UserRoomTimeLogGetResponse, 0)
@@ -171,11 +166,13 @@ func (RoomService) GetSimultaneousList(userID string) ([]model.Log, error) {
 			//同じ部屋最後の時間を追加
 			timeRoom.Times = times
 			timeRooms = append(timeRooms, timeRoom)
+			times = nil
 
 			//同じ部屋で違う日に同じ時間がある場合
 			roomStayTime.Date = sameDayAndRoomlog.StartAt[:10]
 			roomStayTime.TimeRooms = timeRooms
 			roomStayTimes = append(roomStayTimes, roomStayTime)
+			timeRooms = nil
 
 			//同じ部屋で違うuserIDがある場合
 			userName, err := UserService.GetUserName(sameDayAndRoomlog.UserID)
@@ -187,9 +184,9 @@ func (RoomService) GetSimultaneousList(userID string) ([]model.Log, error) {
 			userRoomTimeLogGetResponse.RoomStayTimes = roomStayTimes
 			userRoomTimeLogGetResponse.Name = userName
 			userRoomTimeLogGetResponses = append(userRoomTimeLogGetResponses, userRoomTimeLogGetResponse)
+			roomStayTimes = nil
 
 		} else {
-
 			if sameDayAndRoomlog.UserID == sameDayAndRoomlogs[index+1].UserID {
 
 				if sameDayAndRoomlog.StartAt[:10] == sameDayAndRoomlogs[index+1].StartAt[:10] {
@@ -209,6 +206,7 @@ func (RoomService) GetSimultaneousList(userID string) ([]model.Log, error) {
 						//同じ部屋最後の時間を追加
 						timeRoom.Times = times
 						timeRooms = append(timeRooms, timeRoom)
+						times = nil
 					}
 				} else {
 					times = append(times, 9)
@@ -223,11 +221,13 @@ func (RoomService) GetSimultaneousList(userID string) ([]model.Log, error) {
 					//同じ部屋最後の時間を追加
 					timeRoom.Times = times
 					timeRooms = append(timeRooms, timeRoom)
+					times = nil
 
 					//同じ部屋で違う日に同じ時間がある場合
 					roomStayTime.Date = sameDayAndRoomlog.StartAt[:10]
 					roomStayTime.TimeRooms = timeRooms
 					roomStayTimes = append(roomStayTimes, roomStayTime)
+					timeRooms = nil
 				}
 			} else {
 				times = append(times, 9)
@@ -242,11 +242,13 @@ func (RoomService) GetSimultaneousList(userID string) ([]model.Log, error) {
 				//同じ部屋最後の時間を追加
 				timeRoom.Times = times
 				timeRooms = append(timeRooms, timeRoom)
+				times = nil
 
 				//同じ部屋で違う日に同じ時間がある場合
 				roomStayTime.Date = sameDayAndRoomlog.StartAt[:10]
 				roomStayTime.TimeRooms = timeRooms
 				roomStayTimes = append(roomStayTimes, roomStayTime)
+				timeRooms = nil
 
 				//同じ部屋で違うuserIDがある場合
 				userName, err := UserService.GetUserName(sameDayAndRoomlog.UserID)
@@ -258,26 +260,14 @@ func (RoomService) GetSimultaneousList(userID string) ([]model.Log, error) {
 				userRoomTimeLogGetResponse.RoomStayTimes = roomStayTimes
 				userRoomTimeLogGetResponse.Name = userName
 				userRoomTimeLogGetResponses = append(userRoomTimeLogGetResponses, userRoomTimeLogGetResponse)
+				roomStayTimes = nil
 			}
-
 		}
-
 	}
+	fmt.Println(userRoomTimeLogGetResponses)
 
-	// for _, uniqueUserID := range uniqueUserIDs {
-	// 	UserService.GetUserName(uniqueUserID)
-	// 	for _, sameDayAndRoomlog := range sameDayAndRoomlogs {
-	// 		if sameDayAndRoomlog.UserID == uniqueUserID {
-	// 			userRoomTimeLogGetResponses = append(userRoomTimeLogGetResponses, model.UserRoomTimeLogGetResponse{
-	// 				UserName: UserService.UserName,
-	// 				StartAt:  sameDayAndRoomlog.StartAt,
-	// 				EndAt:    sameDayAndRoomlog.EndAt,
-	// 			})
-	// 		}
-	// 	}
-	// }
 
-	return sameDayAndRoomlogs, nil
+	return userRoomTimeLogGetResponses, nil
 }
 
 func sliceUniqueString(target []string) (unique []string) {
@@ -304,6 +294,23 @@ func sliceUniqueNumber(target []int64) (unique []int64) {
 	}
 
 	return unique
+}
+
+func (RoomService) GetTimesFromStartAtAndEntAt(startAt string, endAt string) ([]string, error) {
+	times := []string{}
+	startAtTime, err := time.Parse("2006-01-02 15:04:05", startAt)
+	if err != nil {
+		return nil, err
+	}
+	endAtTime, err := time.Parse("2006-01-02 15:04:05", endAt)
+	if err != nil {
+		return nil, err
+	}
+	for startAtTime.Before(endAtTime) {
+		times = append(times, startAtTime.Format("15:04"))
+		startAtTime = startAtTime.Add(time.Minute * 15)
+	}
+	return times, nil
 }
 
 //ルームIDからルームの名前を取得する
