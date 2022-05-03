@@ -260,3 +260,17 @@ func Beacon(c *gin.Context) {
 		"status": "OK",
 	})
 }
+
+func SimultaneousList(c *gin.Context) {
+	userID := c.Param("user_id")
+
+	RoomService := service.RoomService{}
+
+	SimultaneousList, err := RoomService.GetSimultaneousList(userID)
+	if err != nil {
+		c.String(http.StatusInternalServerError, "Server Error")
+		return
+	}
+
+	c.JSON(http.StatusOK, SimultaneousList)
+}

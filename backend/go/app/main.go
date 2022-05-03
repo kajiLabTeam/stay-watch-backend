@@ -35,6 +35,7 @@ func main() {
 			v1.GET("/stayer", controller.Stayer)
 			v1.GET("/log", controller.Log)
 			v1.POST("/beacon", controller.Beacon)
+			v1.GET("/list/simultaneous/:user_id", controller.SimultaneousList)
 		}
 	}
 	userEngine := engine.Group("/user")
@@ -42,7 +43,6 @@ func main() {
 		v1 := userEngine.Group("/v1")
 		{
 			v1.GET("/list", controller.List)
-			v1.GET("/list/simultaneous/:user_id", controller.SimultaneousList)
 			v1.GET("/detail", controller.Detail)
 			v1.POST("/register", controller.Register)
 		}

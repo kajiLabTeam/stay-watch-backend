@@ -24,3 +24,20 @@ type UserInformationGetResponse struct {
 	Team string `json:"team"`
 	Tags []Tag  `json:"tags"`
 }
+
+type UserRoomTimeLogGetResponse struct {
+	ID            string         `json:"id"`
+	Name          string         `json:"name"`
+	RoomStayTimes []RoomStayTime `json:"roomStayTimes"`
+}
+
+type RoomStayTime struct {
+	Date      string     `json:"date"`
+	TimeRooms []TimeRoom `json:"timeRooms"`
+}
+
+type TimeRoom struct {
+	Times []int  `json:"times"`
+	Name  string `json:"name"`
+	ID    int    `json:"id"`
+}

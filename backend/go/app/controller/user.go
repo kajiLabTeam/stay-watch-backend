@@ -76,10 +76,4 @@ func List(c *gin.Context) {
 	c.JSON(200, userInformationGetResponse)
 }
 
-func SimultaneousList(c *gin.Context) {
-	userID := c.Param("user_id")
 
-	c.JSON(200, gin.H{
-		"user_id": userID,
-	})
-}

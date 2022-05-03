@@ -29,7 +29,6 @@ INSERT INTO user (id, name, team) VALUES ('e7d61ea3f8dd49c88f2ff2484c07acb9-2021
 INSERT INTO user (id, name, team) VALUES ('e7d61ea3f8dd49c88f2ff2484c07acb9-2021-8', 'terada', 'B4');
 INSERT INTO user (id, name, team) VALUES ('e7d61ea3f8dd49c88f2ff2484c07acb9-2021-9', 'fueta', 'B4');
 
-
 CREATE TABLE log
 (
   id int(11) primary key AUTO_INCREMENT,
