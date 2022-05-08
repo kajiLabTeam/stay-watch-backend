@@ -98,9 +98,11 @@ func (RoomService) InsertEndAt(userID string) error {
 	return nil
 }
 
-func (RoomService) GetSimultaneousList(userID string) ([]model.UserRoomTimeLogGetResponse, error) {
+func (RoomService) GetSimultaneousList(userID string) ([]model.SimulataneousStayLogGetResponse, error) {
 	currentTime := time.Now()
 	logs := make([]model.Log, 0)
+
+	//指定したuserの14日以内のログを取得
 	err := DbEngine.Table("log").Where("user_id=?", userID).And("start_at >= ?", currentTime.Add(time.Hour*-24*14).Format("2006-01-02 15:04:05")).Find(&logs)
 	if err != nil {
 		log.Fatal(err.Error())
@@ -113,7 +115,10 @@ func (RoomService) GetSimultaneousList(userID string) ([]model.UserRoomTimeLogGe
 		dates = append(dates, log.StartAt[:10])
 		roomIDs = append(roomIDs, log.RoomID)
 	}
+
+	//滞在した日付
 	uniqueDates := sliceUniqueString(dates)
+	//滞在した部屋
 	uniqueRoomIDs := sliceUniqueNumber(roomIDs)
 
 	dateSql := ""
@@ -133,7 +138,7 @@ func (RoomService) GetSimultaneousList(userID string) ([]model.UserRoomTimeLogGe
 	}
 
 	sameDayAndRoomlogs := make([]model.Log, 0)
-	err = DbEngine.Table("log").Where(dateSql).And(roomSql).Asc("user_id").Asc("start_at").Asc("room_id").Find(&sameDayAndRoomlogs)
+	err = DbEngine.Table("log").Where(dateSql).And(roomSql).Asc("start_at").Asc("room_id").Find(&sameDayAndRoomlogs)
 	if err != nil {
 		log.Fatal(err.Error())
 		return nil, err
@@ -141,133 +146,221 @@ func (RoomService) GetSimultaneousList(userID string) ([]model.UserRoomTimeLogGe
 
 	UserService := UserService{}
 	RoomService := RoomService{}
-	userRoomTimeLogGetResponses := make([]model.UserRoomTimeLogGetResponse, 0)
-	roomStayTimes := make([]model.RoomStayTime, 0)
-	timeRooms := make([]model.TimeRoom, 0)
-	times := make([]int, 0)
 
-	userRoomTimeLogGetResponse := model.UserRoomTimeLogGetResponse{}
+	simulataneousStayLogsGetResponse := make([]model.SimulataneousStayLogGetResponse, 0)
+	roomsGetResponse := make([]model.RoomGetResponse, 0)
+	stayTimes := make([]model.StayTime, 0)
+	simulataneousStayLogGetResponse := model.SimulataneousStayLogGetResponse{}
+	dateCount := 1
+
 	for index, sameDayAndRoomlog := range sameDayAndRoomlogs {
 		//Ascで昇順にしているため、違うuserIDになるまでループする
-		roomStayTime := model.RoomStayTime{}
-		timeRoom := model.TimeRoom{}
+		roomGetResponse := model.RoomGetResponse{}
+		stayTime := model.StayTime{}
 
 		//最後のindexの時
 		if index == len(sameDayAndRoomlogs)-1 {
-			times = append(times, 9)
-
-			timeRoom.ID = int(sameDayAndRoomlog.RoomID)
-			roomName, err := RoomService.GetRoomName(sameDayAndRoomlog.RoomID)
-			if err != nil {
-				log.Fatal(err.Error())
-				return nil, err
-			}
-			timeRoom.Name = roomName
-			//同じ部屋最後の時間を追加
-			timeRoom.Times = times
-			timeRooms = append(timeRooms, timeRoom)
-			times = nil
-
-			//同じ部屋で違う日に同じ時間がある場合
-			roomStayTime.Date = sameDayAndRoomlog.StartAt[:10]
-			roomStayTime.TimeRooms = timeRooms
-			roomStayTimes = append(roomStayTimes, roomStayTime)
-			timeRooms = nil
-
-			//同じ部屋で違うuserIDがある場合
+			stayTime.ID = sameDayAndRoomlog.ID
 			userName, err := UserService.GetUserName(sameDayAndRoomlog.UserID)
 			if err != nil {
 				log.Fatal(err.Error())
 				return nil, err
 			}
-			userRoomTimeLogGetResponse.ID = sameDayAndRoomlog.UserID
-			userRoomTimeLogGetResponse.RoomStayTimes = roomStayTimes
-			userRoomTimeLogGetResponse.Name = userName
-			userRoomTimeLogGetResponses = append(userRoomTimeLogGetResponses, userRoomTimeLogGetResponse)
-			roomStayTimes = nil
+			stayTime.UserName = userName
 
+			locationTime, err := RoomService.convertDatetimeToLocationTime(sameDayAndRoomlog.StartAt, "Asia/Tokyo")
+			if err != nil {
+				log.Fatal(err.Error())
+				return nil, err
+			}
+			unixMilli := timeToUnixMilli(locationTime)
+			stayTime.StartAt = unixMilli
+
+			locationTime, err = RoomService.convertDatetimeToLocationTime(sameDayAndRoomlog.EndAt, "Asia/Tokyo")
+			if err != nil {
+				log.Fatal(err.Error())
+				return nil, err
+			}
+			unixMilli = timeToUnixMilli(locationTime)
+			stayTime.EndAt = unixMilli
+
+			//検索対象者は赤色にする
+			if userID == sameDayAndRoomlog.UserID {
+				stayTime.Color = "red"
+			} else {
+				stayTime.Color = "green"
+			}
+			stayTimes = append(stayTimes, stayTime)
+
+			roomGetResponse.ID = sameDayAndRoomlog.RoomID
+			roomName, err := RoomService.GetRoomName(sameDayAndRoomlog.RoomID)
+			if err != nil {
+				log.Fatal(err.Error())
+				return nil, err
+			}
+			roomGetResponse.Name = roomName
+			roomGetResponse.StayTimes = stayTimes
+			roomsGetResponse = append(roomsGetResponse, roomGetResponse)
+			stayTimes = nil
+
+			//後でuniqueDateのindexに置き換えるかも
+			simulataneousStayLogGetResponse.ID = int64(dateCount)
+			dateCount++
+			simulataneousStayLogGetResponse.Date = sameDayAndRoomlog.StartAt[:10]
+			simulataneousStayLogGetResponse.Rooms = roomsGetResponse
+			simulataneousStayLogsGetResponse = append(simulataneousStayLogsGetResponse, simulataneousStayLogGetResponse)
+			roomsGetResponse = nil
 		} else {
-			if sameDayAndRoomlog.UserID == sameDayAndRoomlogs[index+1].UserID {
-
-				if sameDayAndRoomlog.StartAt[:10] == sameDayAndRoomlogs[index+1].StartAt[:10] {
-					if sameDayAndRoomlog.RoomID == sameDayAndRoomlogs[index+1].RoomID {
-						//同じ部屋で同じ日に同じ時間がある場合
-						times = append(times, 9)
-					} else {
-						times = append(times, 9)
-
-						timeRoom.ID = int(sameDayAndRoomlog.RoomID)
-						roomName, err := RoomService.GetRoomName(sameDayAndRoomlog.RoomID)
-						if err != nil {
-							log.Fatal(err.Error())
-							return nil, err
-						}
-						timeRoom.Name = roomName
-						//同じ部屋最後の時間を追加
-						timeRoom.Times = times
-						timeRooms = append(timeRooms, timeRoom)
-						times = nil
+			if sameDayAndRoomlog.StartAt[:10] == sameDayAndRoomlogs[index+1].StartAt[:10] {
+				if sameDayAndRoomlog.RoomID == sameDayAndRoomlogs[index+1].RoomID {
+					stayTime.ID = sameDayAndRoomlog.ID
+					userName, err := UserService.GetUserName(sameDayAndRoomlog.UserID)
+					if err != nil {
+						log.Fatal(err.Error())
+						return nil, err
 					}
-				} else {
-					times = append(times, 9)
+					stayTime.UserName = userName
 
-					timeRoom.ID = int(sameDayAndRoomlog.RoomID)
+					locationTime, err := RoomService.convertDatetimeToLocationTime(sameDayAndRoomlog.StartAt, "Asia/Tokyo")
+					if err != nil {
+						log.Fatal(err.Error())
+						return nil, err
+					}
+					unixMilli := timeToUnixMilli(locationTime)
+					stayTime.StartAt = unixMilli
+
+					locationTime, err = RoomService.convertDatetimeToLocationTime(sameDayAndRoomlog.EndAt, "Asia/Tokyo")
+					if err != nil {
+						log.Fatal(err.Error())
+						return nil, err
+					}
+					unixMilli = timeToUnixMilli(locationTime)
+					stayTime.EndAt = unixMilli
+
+					//検索対象者は赤色にする
+					if userID == sameDayAndRoomlog.UserID {
+						stayTime.Color = "red"
+					} else {
+						stayTime.Color = "green"
+					}
+					stayTimes = append(stayTimes, stayTime)
+				} else {
+					stayTime.ID = sameDayAndRoomlog.ID
+					userName, err := UserService.GetUserName(sameDayAndRoomlog.UserID)
+					if err != nil {
+						log.Fatal(err.Error())
+						return nil, err
+					}
+					stayTime.UserName = userName
+
+					locationTime, err := RoomService.convertDatetimeToLocationTime(sameDayAndRoomlog.StartAt, "Asia/Tokyo")
+					if err != nil {
+						log.Fatal(err.Error())
+						return nil, err
+					}
+					unixMilli := timeToUnixMilli(locationTime)
+					stayTime.StartAt = unixMilli
+
+					locationTime, err = RoomService.convertDatetimeToLocationTime(sameDayAndRoomlog.EndAt, "Asia/Tokyo")
+					if err != nil {
+						log.Fatal(err.Error())
+						return nil, err
+					}
+					unixMilli = timeToUnixMilli(locationTime)
+					stayTime.EndAt = unixMilli
+
+					//検索対象者は赤色にする
+					if userID == sameDayAndRoomlog.UserID {
+						stayTime.Color = "red"
+					} else {
+						stayTime.Color = "green"
+					}
+					stayTimes = append(stayTimes, stayTime)
+
+					roomGetResponse.ID = sameDayAndRoomlog.RoomID
 					roomName, err := RoomService.GetRoomName(sameDayAndRoomlog.RoomID)
 					if err != nil {
 						log.Fatal(err.Error())
 						return nil, err
 					}
-					timeRoom.Name = roomName
-					//同じ部屋最後の時間を追加
-					timeRoom.Times = times
-					timeRooms = append(timeRooms, timeRoom)
-					times = nil
-
-					//同じ部屋で違う日に同じ時間がある場合
-					roomStayTime.Date = sameDayAndRoomlog.StartAt[:10]
-					roomStayTime.TimeRooms = timeRooms
-					roomStayTimes = append(roomStayTimes, roomStayTime)
-					timeRooms = nil
+					roomGetResponse.Name = roomName
+					roomGetResponse.StayTimes = stayTimes
+					roomsGetResponse = append(roomsGetResponse, roomGetResponse)
+					stayTimes = nil
 				}
 			} else {
-				times = append(times, 9)
-
-				timeRoom.ID = int(sameDayAndRoomlog.RoomID)
-				roomName, err := RoomService.GetRoomName(sameDayAndRoomlog.RoomID)
-				if err != nil {
-					log.Fatal(err.Error())
-					return nil, err
-				}
-				timeRoom.Name = roomName
-				//同じ部屋最後の時間を追加
-				timeRoom.Times = times
-				timeRooms = append(timeRooms, timeRoom)
-				times = nil
-
-				//同じ部屋で違う日に同じ時間がある場合
-				roomStayTime.Date = sameDayAndRoomlog.StartAt[:10]
-				roomStayTime.TimeRooms = timeRooms
-				roomStayTimes = append(roomStayTimes, roomStayTime)
-				timeRooms = nil
-
-				//同じ部屋で違うuserIDがある場合
+				stayTime.ID = sameDayAndRoomlog.ID
 				userName, err := UserService.GetUserName(sameDayAndRoomlog.UserID)
 				if err != nil {
 					log.Fatal(err.Error())
 					return nil, err
 				}
-				userRoomTimeLogGetResponse.ID = sameDayAndRoomlog.UserID
-				userRoomTimeLogGetResponse.RoomStayTimes = roomStayTimes
-				userRoomTimeLogGetResponse.Name = userName
-				userRoomTimeLogGetResponses = append(userRoomTimeLogGetResponses, userRoomTimeLogGetResponse)
-				roomStayTimes = nil
+				stayTime.UserName = userName
+
+				locationTime, err := RoomService.convertDatetimeToLocationTime(sameDayAndRoomlog.StartAt, "Asia/Tokyo")
+				if err != nil {
+					log.Fatal(err.Error())
+					return nil, err
+				}
+				unixMilli := timeToUnixMilli(locationTime)
+				stayTime.StartAt = unixMilli
+
+				locationTime, err = RoomService.convertDatetimeToLocationTime(sameDayAndRoomlog.EndAt, "Asia/Tokyo")
+				if err != nil {
+					log.Fatal(err.Error())
+					return nil, err
+				}
+				unixMilli = timeToUnixMilli(locationTime)
+				stayTime.EndAt = unixMilli
+
+				//検索対象者は赤色にする
+				if userID == sameDayAndRoomlog.UserID {
+					stayTime.Color = "red"
+				} else {
+					stayTime.Color = "green"
+				}
+				stayTimes = append(stayTimes, stayTime)
+
+				roomGetResponse.ID = sameDayAndRoomlog.RoomID
+				roomName, err := RoomService.GetRoomName(sameDayAndRoomlog.RoomID)
+				if err != nil {
+					log.Fatal(err.Error())
+					return nil, err
+				}
+				roomGetResponse.Name = roomName
+				roomGetResponse.StayTimes = stayTimes
+				roomsGetResponse = append(roomsGetResponse, roomGetResponse)
+				stayTimes = nil
+
+				//後でuniqueDateのindexに置き換えるかも
+				simulataneousStayLogGetResponse.ID = int64(dateCount)
+				dateCount++
+				simulataneousStayLogGetResponse.Date = sameDayAndRoomlog.StartAt[:10]
+				simulataneousStayLogGetResponse.Rooms = roomsGetResponse
+				simulataneousStayLogsGetResponse = append(simulataneousStayLogsGetResponse, simulataneousStayLogGetResponse)
+				roomsGetResponse = nil
 			}
 		}
 	}
-	fmt.Println(userRoomTimeLogGetResponses)
 
+	fmt.Println(simulataneousStayLogsGetResponse)
 
-	return userRoomTimeLogGetResponses, nil
+	return simulataneousStayLogsGetResponse, nil
+}
+
+//引数datetime文字列とタイムゾーン文字列を受け取りTime型に変換する関数
+func (RoomService) convertDatetimeToLocationTime(datetime string, timezone string) (time.Time, error) {
+	jst, _ := time.LoadLocation(timezone)
+	locationTime, err := time.ParseInLocation("2006-01-02 15:04:05", datetime, jst)
+	if err != nil {
+		log.Fatal(err.Error())
+		return time.Time{}, err
+	}
+	return locationTime, nil
+}
+
+func timeToUnixMilli(t time.Time) int64 {
+	return t.UnixNano() / 1000000
 }
 
 func sliceUniqueString(target []string) (unique []string) {
@@ -334,3 +427,5 @@ func (RoomService) GetAllLog() ([]model.Log, error) {
 	}
 	return logs, nil
 }
+
+

@@ -10,7 +10,7 @@ type StayerGetResponse struct {
 }
 
 type LogGetResponse struct {
-	ID      string `json:"id"`
+	ID      int64  `json:"id"`
 	StartAt string `json:"startAt"`
 	EndAt   string `json:"endAt"`
 	Room    string `json:"room"`
@@ -40,4 +40,24 @@ type TimeRoom struct {
 	Times []int  `json:"times"`
 	Name  string `json:"name"`
 	ID    int    `json:"id"`
+}
+
+type SimulataneousStayLogGetResponse struct {
+	ID    int64             `json:"id"`
+	Date  string            `json:"date"`
+	Rooms []RoomGetResponse `json:"rooms"`
+}
+
+type RoomGetResponse struct {
+	ID        int64      `json:"id"`
+	Name      string     `json:"name"`
+	StayTimes []StayTime `json:"stayTimes"`
+}
+
+type StayTime struct {
+	ID       int64  `json:"id"`
+	UserName string `json:"userName"`
+	StartAt  int64  `json:"startAt"`
+	EndAt    int64  `json:"endAt"`
+	Color    string `json:"color"`
 }

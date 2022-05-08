@@ -114,7 +114,7 @@ func Log(c *gin.Context) {
 		}
 
 		logGetResponse = append(logGetResponse, model.LogGetResponse{
-			ID:      log.UserID,
+			ID:      log.ID,
 			Name:    userName,
 			Room:    roomName,
 			StartAt: log.StartAt,

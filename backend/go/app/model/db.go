@@ -7,12 +7,14 @@ type User struct {
 }
 
 type Log struct {
+	ID      int64  `json:"ID" xorm:"id"`
 	RoomID  int64  `json:"roomID" xorm:"room_id"`
 	StartAt string `json:"startAt" xorm:"start_at"`
 	EndAt   string `json:"endAt" xorm:"end_at"`
 	UserID  string `json:"userID" xorm:"user_id"`
 	Rssi    int64  `json:"rssi" xorm:"rssi"`
 }
+
 type BeaconRoom struct {
 	Beacons []*Beacon `json:"beacons"`
 	RoomID  int64     `json:"roomID"`
