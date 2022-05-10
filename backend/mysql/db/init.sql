@@ -38,23 +38,23 @@ CREATE TABLE log
   rssi      int(11)
 );
 
-INSERT INTO log (room_id, start_at, end_at, user_id, rssi) VALUES (1, '2022-04-30 08:00:00', '2022-04-30 10:00:00', 'e7d61ea3f8dd49c88f2ff2484c07acb9-2021-1', -60);
-INSERT INTO log (room_id, start_at, end_at, user_id, rssi) VALUES (1, '2022-04-30 11:00:00', '2022-04-30 15:00:00', 'e7d61ea3f8dd49c88f2ff2484c07acb9-2021-1', -60);
-INSERT INTO log (room_id, start_at, end_at, user_id, rssi) VALUES (1, '2022-04-30 13:00:00', '2022-04-30 16:00:00', 'e7d61ea3f8dd49c88f2ff2484c07acb9-2021-3', -60);
-INSERT INTO log (room_id, start_at, end_at, user_id, rssi) VALUES (1, '2022-04-30 14:00:00', '2022-04-30 15:30:00', 'e7d61ea3f8dd49c88f2ff2484c07acb9-2021-3', -60);
-INSERT INTO log (room_id, start_at, end_at, user_id, rssi) VALUES (1, '2022-04-30 14:00:00', '2022-04-30 15:30:00', 'e7d61ea3f8dd49c88f2ff2484c07acb9-7436-17873', -60);
-INSERT INTO log (room_id, start_at, end_at, user_id, rssi) VALUES (1, '2022-04-30 16:00:00', '2022-04-30 18:30:00', 'e7d61ea3f8dd49c88f2ff2484c07acb9-22823-42602', -60);
-INSERT INTO log (room_id, start_at, end_at, user_id, rssi) VALUES (1, '2022-04-30 14:00:00', '2022-04-30 15:30:00', 'e7d61ea3f8dd49c88f2ff2484c07acb9-2021-5', -60);
-INSERT INTO log (room_id, start_at, end_at, user_id, rssi) VALUES (1, '2022-05-01 08:00:00', '2022-05-01 10:00:00', 'e7d61ea3f8dd49c88f2ff2484c07acb9-2021-1', -60);
-INSERT INTO log (room_id, start_at, end_at, user_id, rssi) VALUES (2, '2022-05-01 11:00:00', '2022-05-01 15:00:00', 'e7d61ea3f8dd49c88f2ff2484c07acb9-2021-1', -60);
-INSERT INTO log (room_id, start_at, end_at, user_id, rssi) VALUES (1, '2022-05-01 13:00:00', '2022-05-01 16:00:00', 'e7d61ea3f8dd49c88f2ff2484c07acb9-2021-3', -60);
-INSERT INTO log (room_id, start_at, end_at, user_id, rssi) VALUES (2, '2022-05-01 14:00:00', '2022-05-01 15:30:00', 'e7d61ea3f8dd49c88f2ff2484c07acb9-2021-3', -60);
-INSERT INTO log (room_id, start_at, end_at, user_id, rssi) VALUES (2, '2022-05-01 09:00:00', '2022-05-01 12:00:00', 'e7d61ea3f8dd49c88f2ff2484c07acb9-7436-17873', -60);
-INSERT INTO log (room_id, start_at, end_at, user_id, rssi) VALUES (2, '2022-05-01 10:00:00', '2022-05-01 13:30:00', 'e7d61ea3f8dd49c88f2ff2484c07acb9-22823-42602', -60);
-INSERT INTO log (room_id, start_at, end_at, user_id, rssi) VALUES (2, '2022-05-01 8:00:00', '2022-05-01 13:00:00', 'e7d61ea3f8dd49c88f2ff2484c07acb9-2021-5', -60);
-INSERT INTO log (room_id, start_at, end_at, user_id, rssi) VALUES (2, '2022-05-01 13:00:00', '2022-05-01 15:00:00', 'e7d61ea3f8dd49c88f2ff2484c07acb9-7436-17873', -60);
-INSERT INTO log (room_id, start_at, end_at, user_id, rssi) VALUES (2, '2022-05-01 15:00:00', '2022-05-01 18:30:00', 'e7d61ea3f8dd49c88f2ff2484c07acb9-22823-42602', -60);
-INSERT INTO log (room_id, start_at, end_at, user_id, rssi) VALUES (2, '2022-05-01 14:00:00', '2022-05-01 16:00:00', 'e7d61ea3f8dd49c88f2ff2484c07acb9-2021-5', -60);
+-- INSERT INTO log (room_id, start_at, end_at, user_id, rssi) VALUES (1, '2022-04-30 08:00:00', '2022-04-30 10:00:00', 'e7d61ea3f8dd49c88f2ff2484c07acb9-2021-1', -60);
+-- INSERT INTO log (room_id, start_at, end_at, user_id, rssi) VALUES (1, '2022-04-30 11:00:00', '2022-04-30 15:00:00', 'e7d61ea3f8dd49c88f2ff2484c07acb9-2021-1', -60);
+-- INSERT INTO log (room_id, start_at, end_at, user_id, rssi) VALUES (1, '2022-04-30 13:00:00', '2022-04-30 16:00:00', 'e7d61ea3f8dd49c88f2ff2484c07acb9-2021-3', -60);
+-- INSERT INTO log (room_id, start_at, end_at, user_id, rssi) VALUES (1, '2022-04-30 14:00:00', '2022-04-30 15:30:00', 'e7d61ea3f8dd49c88f2ff2484c07acb9-2021-3', -60);
+-- INSERT INTO log (room_id, start_at, end_at, user_id, rssi) VALUES (1, '2022-04-30 14:00:00', '2022-04-30 15:30:00', 'e7d61ea3f8dd49c88f2ff2484c07acb9-7436-17873', -60);
+-- INSERT INTO log (room_id, start_at, end_at, user_id, rssi) VALUES (1, '2022-04-30 16:00:00', '2022-04-30 18:30:00', 'e7d61ea3f8dd49c88f2ff2484c07acb9-22823-42602', -60);
+-- INSERT INTO log (room_id, start_at, end_at, user_id, rssi) VALUES (1, '2022-04-30 14:00:00', '2022-04-30 15:30:00', 'e7d61ea3f8dd49c88f2ff2484c07acb9-2021-5', -60);
+-- INSERT INTO log (room_id, start_at, end_at, user_id, rssi) VALUES (1, '2022-05-01 08:00:00', '2022-05-01 10:00:00', 'e7d61ea3f8dd49c88f2ff2484c07acb9-2021-1', -60);
+-- INSERT INTO log (room_id, start_at, end_at, user_id, rssi) VALUES (2, '2022-05-01 11:00:00', '2022-05-01 15:00:00', 'e7d61ea3f8dd49c88f2ff2484c07acb9-2021-1', -60);
+-- INSERT INTO log (room_id, start_at, end_at, user_id, rssi) VALUES (1, '2022-05-01 13:00:00', '2022-05-01 16:00:00', 'e7d61ea3f8dd49c88f2ff2484c07acb9-2021-3', -60);
+-- INSERT INTO log (room_id, start_at, end_at, user_id, rssi) VALUES (2, '2022-05-01 14:00:00', '2022-05-01 15:30:00', 'e7d61ea3f8dd49c88f2ff2484c07acb9-2021-3', -60);
+-- INSERT INTO log (room_id, start_at, end_at, user_id, rssi) VALUES (2, '2022-05-01 09:00:00', '2022-05-01 12:00:00', 'e7d61ea3f8dd49c88f2ff2484c07acb9-7436-17873', -60);
+-- INSERT INTO log (room_id, start_at, end_at, user_id, rssi) VALUES (2, '2022-05-01 10:00:00', '2022-05-01 13:30:00', 'e7d61ea3f8dd49c88f2ff2484c07acb9-22823-42602', -60);
+-- INSERT INTO log (room_id, start_at, end_at, user_id, rssi) VALUES (2, '2022-05-01 8:00:00', '2022-05-01 13:00:00', 'e7d61ea3f8dd49c88f2ff2484c07acb9-2021-5', -60);
+-- INSERT INTO log (room_id, start_at, end_at, user_id, rssi) VALUES (2, '2022-05-01 13:00:00', '2022-05-01 15:00:00', 'e7d61ea3f8dd49c88f2ff2484c07acb9-7436-17873', -60);
+-- INSERT INTO log (room_id, start_at, end_at, user_id, rssi) VALUES (2, '2022-05-01 15:00:00', '2022-05-01 18:30:00', 'e7d61ea3f8dd49c88f2ff2484c07acb9-22823-42602', -60);
+-- INSERT INTO log (room_id, start_at, end_at, user_id, rssi) VALUES (2, '2022-05-01 14:00:00', '2022-05-01 16:00:00', 'e7d61ea3f8dd49c88f2ff2484c07acb9-2021-5', -60);
 
 
 
