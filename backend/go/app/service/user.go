@@ -72,3 +72,18 @@ func (UserService) GetTagName(tagID int64) (string, error) {
 	}
 	return tag.Name, nil
 }
+
+//attendanceテーブルに登録する
+func (UserService) RegisterAttendance(userID string, date string, exit bool) error {
+	attendance := model.Attendance{
+		UserID: userID,
+		Date:   date,
+		Exit:   exit,
+	}
+	_, err := DbEngine.Table("attendance").Insert(&attendance)
+	if err != nil {
+		log.Fatal(err.Error())
+		return err
+	}
+	return nil
+}

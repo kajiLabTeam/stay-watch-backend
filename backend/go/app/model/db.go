@@ -46,3 +46,10 @@ type TagMap struct {
 	UserID string `json:"userID" xorm:"user_id"`
 	TagID  string `json:"tagID" xorm:"tag_id"`
 }
+
+type Attendance struct {
+	ID     int64  `json:"ID" xorm:"id"`
+	UserID string `json:"userID" xorm:"user_id"`
+	Date   string `json:"date" xorm:"date"`
+	Exit   bool   `json:"exit" xorm:"exit"`
+}

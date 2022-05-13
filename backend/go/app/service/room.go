@@ -2,6 +2,7 @@ package service
 
 import (
 	"Stay_watch/model"
+	"Stay_watch/util"
 	"fmt"
 	"log"
 	"time"
@@ -116,10 +117,12 @@ func (RoomService) GetSimultaneousList(userID string) ([]model.SimulataneousStay
 		roomIDs = append(roomIDs, log.RoomID)
 	}
 
+	util := util.Util{}
+
 	//滞在した日付
-	uniqueDates := sliceUniqueString(dates)
+	uniqueDates := util.SliceUniqueString(dates)
 	//滞在した部屋
-	uniqueRoomIDs := sliceUniqueNumber(roomIDs)
+	uniqueRoomIDs := util.SliceUniqueNumber(roomIDs)
 
 	dateSql := ""
 	for index, uniqueDate := range uniqueDates {
@@ -138,7 +141,7 @@ func (RoomService) GetSimultaneousList(userID string) ([]model.SimulataneousStay
 	}
 
 	sameDayAndRoomlogs := make([]model.Log, 0)
-	err = DbEngine.Table("log").Where(dateSql).And(roomSql).Asc("start_at").Asc("room_id").Find(&sameDayAndRoomlogs)
+	err = DbEngine.Table("log").Where(dateSql).And(roomSql).OrderBy("date_format(start_at,'%Y-%m-%d') ,room_id ").Find(&sameDayAndRoomlogs)
 	if err != nil {
 		log.Fatal(err.Error())
 		return nil, err
@@ -344,6 +347,7 @@ func (RoomService) GetSimultaneousList(userID string) ([]model.SimulataneousStay
 	}
 
 	fmt.Println(simulataneousStayLogsGetResponse)
+	fmt.Println("追加")
 
 	return simulataneousStayLogsGetResponse, nil
 }
@@ -428,4 +432,21 @@ func (RoomService) GetAllLog() ([]model.Log, error) {
 	return logs, nil
 }
 
-
+//指定した時間のログを取得する
+func (RoomService) GetLogsFromStartAtAndEntAt(startAt string, endAt string) ([]model.Log, error) {
+	logs := make([]model.Log, 0)
+	startAtTime, err := time.Parse("2006-01-02 15:04:05", startAt)
+	if err != nil {
+		return nil, err
+	}
+	endAtTime, err := time.Parse("2006-01-02 15:04:05", endAt)
+	if err != nil {
+		return nil, err
+	}
+	err = DbEngine.Where("start_at>=? and start_at<=?", startAtTime, endAtTime).Find(&logs)
+	if err != nil {
+		log.Fatal(err.Error())
+		return nil, err
+	}
+	return logs, nil
+}

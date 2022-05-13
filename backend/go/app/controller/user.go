@@ -75,5 +75,3 @@ func List(c *gin.Context) {
 	}
 	c.JSON(200, userInformationGetResponse)
 }
-
-
