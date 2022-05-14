@@ -4,6 +4,7 @@ use app;
 CREATE TABLE IF NOT EXISTS user
 (
   id        VARCHAR(100),
+  uuid    VARCHAR(100),
   name      VARCHAR(50),
   team      VARCHAR(50)
 );
@@ -58,11 +59,6 @@ INSERT INTO user (id, name, team) VALUES ('e7d61ea3f8dd49c88f2ff2484c07ac18', 'k
 INSERT INTO user (id, name, team) VALUES ('e7d61ea3f8dd49c88f2ff2484c07ac19', 'sakai','B3');
 INSERT INTO user (id, name, team) VALUES ('e7d61ea3f8dd49c88f2ff2484c07ac1a', 'iwaguti','B3');
 INSERT INTO user (id, name, team) VALUES ('e7d61ea3f8dd49c88f2ff2484c07ac1b', 'makino','B1');
-
-
-
-
-
 
 
 
