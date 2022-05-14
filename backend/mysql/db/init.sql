@@ -223,15 +223,23 @@ INSERT INTO tag_map (user_id, tag_id) VALUES ('e7d61ea3f8dd49c88f2ff2484c07ac1b'
 
 
 
-
-
-
 CREATE TABLE IF NOT EXISTS `attendance` (
   `id` int(11) NOT NULL primary key AUTO_INCREMENT,
   `user_id` varchar(255) NOT NULL,
   `date` date NOT NULL,
   `exit` BIT NOT NULL
 )
+
+
+
+CREATE TABLE IF NOT EXISTS `attendance_tmp` (
+  `id` int(11) NOT NULL primary key AUTO_INCREMENT,
+  `user_id` varchar(255) NOT NULL,s
+  `exit` BIT NOT NULL
+)
+
+
+
 
 
 
