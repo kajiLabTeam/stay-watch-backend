@@ -120,16 +120,15 @@ func Beacon(c *gin.Context) {
 			c.String(http.StatusInternalServerError, "Server Error")
 			return
 		}
-		UserService.TemporarilySavedAttendance(currentUserID, 1)
-		fmt.Println("実行")
-		// currentTime := time.Now()
-		// //もし火曜日だったら
-		// if currentTime.Weekday() == time.Monday {
-		// 	//8時から12時の時
-		// 	if currentTime.Hour() >= 8 && currentTime.Hour() < 12 {
-		// 		UserService.TemporarilySavedAttendance(currentUserID, 1)
-		// 	}
-		// }
+
+		currentTime := time.Now()
+		//もし火曜日だったら
+		if currentTime.Weekday() == time.Monday {
+			//8時から12時の時
+			if currentTime.Hour() >= 8 && currentTime.Hour() < 12 {
+				UserService.TemporarilySavedAttendance(currentUserID, 1)
+			}
+		}
 
 		//stayerテーブルを検索して該当ユーザがいるか確認する
 		err, stayerFlag := RoomService.GetStayer(&model.Stayer{UserID: currentUserID})
