@@ -16,7 +16,7 @@ var spreadsheetID = "1wzKljj2j8EmRHQ5wK6A6RDtfyJbKzUXUfbKyIHURliU"
 type ExcelService struct{}
 
 func (ExcelService) WriteExcel(attendancesTmp []model.AttendanceTmp) error {
-	credential := option.WithCredentialsFile("/app/credentials/credentials/secret.json")
+	credential := option.WithCredentialsFile("/app/credentials/secret.json")
 	srv, err := sheets.NewService(context.TODO(), credential)
 	if err != nil {
 		log.Fatal(err)
