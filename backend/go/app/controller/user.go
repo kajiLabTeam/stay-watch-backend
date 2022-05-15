@@ -33,6 +33,7 @@ func Register(c *gin.Context) {
 }
 
 func List(c *gin.Context) {
+
 	UserService := service.UserService{}
 	users, err := UserService.GetAllUser()
 	if err != nil {
@@ -69,9 +70,29 @@ func List(c *gin.Context) {
 		userInformationGetResponse = append(userInformationGetResponse, model.UserInformationGetResponse{
 			ID:   user.ID,
 			Name: user.Name,
-			Team: user.Team,
 			Tags: tags,
 		})
 	}
 	c.JSON(200, userInformationGetResponse)
+}
+
+func Attendance(c *gin.Context) {
+
+	UserService := service.UserService{}
+
+	//attendaance_tmpテーブルから全てのデータを取得する
+	allAttendancesTmp, err := UserService.GetAllAttendancesTmp()
+	if err != nil {
+		c.String(http.StatusInternalServerError, "Server Error")
+		return
+	}
+
+	ExcelService := service.ExcelService{}
+
+	ExcelService.WriteExcel(allAttendancesTmp)
+
+	c.JSON(200, gin.H{
+		"status": "ok",
+	})
+
 }

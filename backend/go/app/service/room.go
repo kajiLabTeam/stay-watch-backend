@@ -23,8 +23,6 @@ func (RoomService) SetLog(Log *model.Log) error {
 //該当ユーザが存在するか確認
 func (RoomService) GetStayer(stayer *model.Stayer) (error, bool) {
 	affected, err := DbEngine.Get(stayer)
-	// fmt.Println("affected=", affected)
-	// fmt.Printf("%T\n", affected) // int
 
 	if err != nil {
 		log.Fatal(err.Error())
@@ -79,7 +77,7 @@ func (RoomService) UpdateStayer(stayer *model.Stayer) error {
 	return nil
 }
 
-func (RoomService) DeleteStayer(userID string) error {
+func (RoomService) DeleteStayer(userID int64) error {
 
 	_, err := DbEngine.Table("stayer").Where("user_id=?", userID).Delete(model.Stayer{})
 	if err != nil {
@@ -89,7 +87,7 @@ func (RoomService) DeleteStayer(userID string) error {
 	return nil
 }
 
-func (RoomService) InsertEndAt(userID string) error {
+func (RoomService) InsertEndAt(userID int64) error {
 	currentTime := time.Now()
 	_, err := DbEngine.Table("log").Desc("start_at").Limit(1).Where("user_id=?", userID).Update(map[string]string{"end_at": currentTime.Format("2006-01-02 15:04:05")})
 	if err != nil {
@@ -99,7 +97,7 @@ func (RoomService) InsertEndAt(userID string) error {
 	return nil
 }
 
-func (RoomService) GetSimultaneousList(userID string) ([]model.SimulataneousStayLogGetResponse, error) {
+func (RoomService) GetSimultaneousList(userID int64) ([]model.SimulataneousStayLogGetResponse, error) {
 	currentTime := time.Now()
 	logs := make([]model.Log, 0)
 
@@ -171,20 +169,20 @@ func (RoomService) GetSimultaneousList(userID string) ([]model.SimulataneousStay
 			}
 			stayTime.UserName = userName
 
-			locationTime, err := RoomService.convertDatetimeToLocationTime(sameDayAndRoomlog.StartAt, "Asia/Tokyo")
+			locationTime, err := util.ConvertDatetimeToLocationTime(sameDayAndRoomlog.StartAt, "Asia/Tokyo")
 			if err != nil {
 				log.Fatal(err.Error())
 				return nil, err
 			}
-			unixMilli := timeToUnixMilli(locationTime)
+			unixMilli := util.TimeToUnixMilli(locationTime)
 			stayTime.StartAt = unixMilli
 
-			locationTime, err = RoomService.convertDatetimeToLocationTime(sameDayAndRoomlog.EndAt, "Asia/Tokyo")
+			locationTime, err = util.ConvertDatetimeToLocationTime(sameDayAndRoomlog.EndAt, "Asia/Tokyo")
 			if err != nil {
 				log.Fatal(err.Error())
 				return nil, err
 			}
-			unixMilli = timeToUnixMilli(locationTime)
+			unixMilli = util.TimeToUnixMilli(locationTime)
 			stayTime.EndAt = unixMilli
 
 			//検索対象者は赤色にする
@@ -224,20 +222,20 @@ func (RoomService) GetSimultaneousList(userID string) ([]model.SimulataneousStay
 					}
 					stayTime.UserName = userName
 
-					locationTime, err := RoomService.convertDatetimeToLocationTime(sameDayAndRoomlog.StartAt, "Asia/Tokyo")
+					locationTime, err := util.ConvertDatetimeToLocationTime(sameDayAndRoomlog.StartAt, "Asia/Tokyo")
 					if err != nil {
 						log.Fatal(err.Error())
 						return nil, err
 					}
-					unixMilli := timeToUnixMilli(locationTime)
+					unixMilli := util.TimeToUnixMilli(locationTime)
 					stayTime.StartAt = unixMilli
 
-					locationTime, err = RoomService.convertDatetimeToLocationTime(sameDayAndRoomlog.EndAt, "Asia/Tokyo")
+					locationTime, err = util.ConvertDatetimeToLocationTime(sameDayAndRoomlog.EndAt, "Asia/Tokyo")
 					if err != nil {
 						log.Fatal(err.Error())
 						return nil, err
 					}
-					unixMilli = timeToUnixMilli(locationTime)
+					unixMilli = util.TimeToUnixMilli(locationTime)
 					stayTime.EndAt = unixMilli
 
 					//検索対象者は赤色にする
@@ -256,20 +254,20 @@ func (RoomService) GetSimultaneousList(userID string) ([]model.SimulataneousStay
 					}
 					stayTime.UserName = userName
 
-					locationTime, err := RoomService.convertDatetimeToLocationTime(sameDayAndRoomlog.StartAt, "Asia/Tokyo")
+					locationTime, err := util.ConvertDatetimeToLocationTime(sameDayAndRoomlog.StartAt, "Asia/Tokyo")
 					if err != nil {
 						log.Fatal(err.Error())
 						return nil, err
 					}
-					unixMilli := timeToUnixMilli(locationTime)
+					unixMilli := util.TimeToUnixMilli(locationTime)
 					stayTime.StartAt = unixMilli
 
-					locationTime, err = RoomService.convertDatetimeToLocationTime(sameDayAndRoomlog.EndAt, "Asia/Tokyo")
+					locationTime, err = util.ConvertDatetimeToLocationTime(sameDayAndRoomlog.EndAt, "Asia/Tokyo")
 					if err != nil {
 						log.Fatal(err.Error())
 						return nil, err
 					}
-					unixMilli = timeToUnixMilli(locationTime)
+					unixMilli = util.TimeToUnixMilli(locationTime)
 					stayTime.EndAt = unixMilli
 
 					//検索対象者は赤色にする
@@ -300,20 +298,20 @@ func (RoomService) GetSimultaneousList(userID string) ([]model.SimulataneousStay
 				}
 				stayTime.UserName = userName
 
-				locationTime, err := RoomService.convertDatetimeToLocationTime(sameDayAndRoomlog.StartAt, "Asia/Tokyo")
+				locationTime, err := util.ConvertDatetimeToLocationTime(sameDayAndRoomlog.StartAt, "Asia/Tokyo")
 				if err != nil {
 					log.Fatal(err.Error())
 					return nil, err
 				}
-				unixMilli := timeToUnixMilli(locationTime)
+				unixMilli := util.TimeToUnixMilli(locationTime)
 				stayTime.StartAt = unixMilli
 
-				locationTime, err = RoomService.convertDatetimeToLocationTime(sameDayAndRoomlog.EndAt, "Asia/Tokyo")
+				locationTime, err = util.ConvertDatetimeToLocationTime(sameDayAndRoomlog.EndAt, "Asia/Tokyo")
 				if err != nil {
 					log.Fatal(err.Error())
 					return nil, err
 				}
-				unixMilli = timeToUnixMilli(locationTime)
+				unixMilli = util.TimeToUnixMilli(locationTime)
 				stayTime.EndAt = unixMilli
 
 				//検索対象者は赤色にする
@@ -347,50 +345,8 @@ func (RoomService) GetSimultaneousList(userID string) ([]model.SimulataneousStay
 	}
 
 	fmt.Println(simulataneousStayLogsGetResponse)
-	fmt.Println("追加")
 
 	return simulataneousStayLogsGetResponse, nil
-}
-
-//引数datetime文字列とタイムゾーン文字列を受け取りTime型に変換する関数
-func (RoomService) convertDatetimeToLocationTime(datetime string, timezone string) (time.Time, error) {
-	jst, _ := time.LoadLocation(timezone)
-	locationTime, err := time.ParseInLocation("2006-01-02 15:04:05", datetime, jst)
-	if err != nil {
-		log.Fatal(err.Error())
-		return time.Time{}, err
-	}
-	return locationTime, nil
-}
-
-func timeToUnixMilli(t time.Time) int64 {
-	return t.UnixNano() / 1000000
-}
-
-func sliceUniqueString(target []string) (unique []string) {
-	m := map[string]bool{}
-
-	for _, v := range target {
-		if !m[v] {
-			m[v] = true
-			unique = append(unique, v)
-		}
-	}
-
-	return unique
-}
-
-func sliceUniqueNumber(target []int64) (unique []int64) {
-	m := map[int64]bool{}
-
-	for _, v := range target {
-		if !m[v] {
-			m[v] = true
-			unique = append(unique, v)
-		}
-	}
-
-	return unique
 }
 
 func (RoomService) GetTimesFromStartAtAndEntAt(startAt string, endAt string) ([]string, error) {
