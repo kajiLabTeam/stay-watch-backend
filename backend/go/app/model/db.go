@@ -1,9 +1,9 @@
 package model
 
 type User struct {
-	ID   string `json:"ID" xorm:"id"`
+	ID   int64  `json:"ID" xorm:"id"`
+	UUID string `json:"uuid" xorm:"uid"`
 	Name string `json:"name" xorm:"name"`
-	Team string `json:"team" xorm:"team"`
 }
 
 type Log struct {
@@ -11,7 +11,7 @@ type Log struct {
 	RoomID  int64  `json:"roomID" xorm:"room_id"`
 	StartAt string `json:"startAt" xorm:"start_at"`
 	EndAt   string `json:"endAt" xorm:"end_at"`
-	UserID  string `json:"userID" xorm:"user_id"`
+	UserID  int64  `json:"userID" xorm:"user_id"`
 	Rssi    int64  `json:"rssi" xorm:"rssi"`
 }
 
@@ -31,9 +31,9 @@ type Room struct {
 }
 
 type Stayer struct {
-	UserID string `json:"userID" xorm:"user_id"`
-	RoomID int64  `json:"roomID" xorm:"room_id"`
-	Rssi   int64  `json:"rssi" xorm:"rssi"`
+	UserID int64 `json:"userID" xorm:"user_id"`
+	RoomID int64 `json:"roomID" xorm:"room_id"`
+	Rssi   int64 `json:"rssi" xorm:"rssi"`
 }
 
 type Tag struct {
@@ -43,13 +43,18 @@ type Tag struct {
 
 type TagMap struct {
 	ID     int64  `json:"ID" xorm:"id"`
-	UserID string `json:"userID" xorm:"user_id"`
+	UserID int64  `json:"userID" xorm:"user_id"`
 	TagID  string `json:"tagID" xorm:"tag_id"`
 }
 
 type Attendance struct {
 	ID     int64  `json:"ID" xorm:"id"`
-	UserID string `json:"userID" xorm:"user_id"`
+	UserID int64  `json:"userID" xorm:"user_id"`
 	Date   string `json:"date" xorm:"date"`
-	Exit   bool   `json:"exit" xorm:"exit"`
+	Flag   bool   `json:"exit" xorm:"flag"`
+}
+
+type AttendanceTmp struct {
+	UserID int64 `json:"userID" xorm:"user_id"`
+	Flag   int64 `json:"exit" xorm:"flag"`
 }

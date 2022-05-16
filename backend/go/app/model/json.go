@@ -1,9 +1,9 @@
 package model
 
 type StayerGetResponse struct {
-	ID     string `json:"id"`
-	Name   string `json:"name"`
-	Team   string `json:"team"`
+	ID   int64  `json:"id"`
+	Name string `json:"name"`
+
 	Room   string `json:"room"`
 	RoomID int    `json:"roomID"`
 	Tags   []Tag  `json:"tags"`
@@ -15,20 +15,12 @@ type LogGetResponse struct {
 	EndAt   string `json:"endAt"`
 	Room    string `json:"room"`
 	Name    string `json:"name"`
-	Team    string `json:"team"`
 }
 
 type UserInformationGetResponse struct {
-	ID   string `json:"id"`
+	ID   int64  `json:"id"`
 	Name string `json:"name"`
-	Team string `json:"team"`
-	Tags []Tag  `json:"tags"`
-}
-
-type UserRoomTimeLogGetResponse struct {
-	ID            string         `json:"id"`
-	Name          string         `json:"name"`
-	RoomStayTimes []RoomStayTime `json:"roomStayTimes"`
+	Tags []Tag `json:"tags"`
 }
 
 type RoomStayTime struct {

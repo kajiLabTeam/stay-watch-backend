@@ -45,6 +45,7 @@ func main() {
 			v1.GET("/list", controller.List)
 			v1.GET("/detail", controller.Detail)
 			v1.POST("/register", controller.Register)
+			v1.POST("/attendance", controller.Attendance)
 		}
 	}
 
@@ -53,12 +54,12 @@ func main() {
 
 // package main
 
-// import (
-// 	"Stay_watch/service"
-// 	"Stay_watch/util"
-// 	"fmt"
-// 	"time"
-// )
+// func main() {
+
+// 	UserService := service.UserService{}
+// 	UserService.TemporarilySavedAttendance(1, 1)
+
+// }
 
 // func main() {
 
