@@ -36,7 +36,7 @@ func (ExcelService) WriteExcel(attendancesTmp []model.AttendanceTmp) error {
 	fmt.Println(resp.Values)
 	for index, row := range resp.Values {
 		fmt.Printf("%s\n", row[0])
-		if row[0] == nowDate {
+		if row[0] == nowDate[5:10] {
 			dateIndex = index
 		}
 	}
