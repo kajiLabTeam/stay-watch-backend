@@ -150,7 +150,6 @@ INSERT INTO tag_map (user_id, tag_id) VALUES (17, 3);
 INSERT INTO tag_map (user_id, tag_id) VALUES (17, 8);
 INSERT INTO tag_map (user_id, tag_id) VALUES (18, 1);
 INSERT INTO tag_map (user_id, tag_id) VALUES (18, 7);
-INSERT INTO tag_map (user_id, tag_id) VALUES (18, 1);
 INSERT INTO tag_map (user_id, tag_id) VALUES (19, 1);
 INSERT INTO tag_map (user_id, tag_id) VALUES (19, 7);
 INSERT INTO tag_map (user_id, tag_id) VALUES (20, 1);
