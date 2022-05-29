@@ -150,6 +150,7 @@ INSERT INTO tag_map (user_id, tag_id) VALUES (17, 3);
 INSERT INTO tag_map (user_id, tag_id) VALUES (17, 8);
 INSERT INTO tag_map (user_id, tag_id) VALUES (18, 1);
 INSERT INTO tag_map (user_id, tag_id) VALUES (18, 7);
+INSERT INTO tag_map (user_id, tag_id) VALUES (18, 8);
 INSERT INTO tag_map (user_id, tag_id) VALUES (19, 1);
 INSERT INTO tag_map (user_id, tag_id) VALUES (19, 7);
 INSERT INTO tag_map (user_id, tag_id) VALUES (20, 1);
@@ -204,6 +205,18 @@ INSERT INTO attendance_tmp (user_id, flag) VALUES (13, 0);
 INSERT INTO attendance_tmp (user_id, flag) VALUES (14, 0);
 INSERT INTO attendance_tmp (user_id, flag) VALUES (15, 0);
 INSERT INTO attendance_tmp (user_id, flag) VALUES (16, 0);
+INSERT INTO attendance_tmp (user_id, flag) VALUES (17, 0);
+INSERT INTO attendance_tmp (user_id, flag) VALUES (18, 0);
+INSERT INTO attendance_tmp (user_id, flag) VALUES (19, 0);
+INSERT INTO attendance_tmp (user_id, flag) VALUES (20, 0);
+INSERT INTO attendance_tmp (user_id, flag) VALUES (21, 0);
+INSERT INTO attendance_tmp (user_id, flag) VALUES (22, 0);
+INSERT INTO attendance_tmp (user_id, flag) VALUES (23, 0);
+INSERT INTO attendance_tmp (user_id, flag) VALUES (24, 0);
+INSERT INTO attendance_tmp (user_id, flag) VALUES (25, 0);
+INSERT INTO attendance_tmp (user_id, flag) VALUES (26, 0);
+INSERT INTO attendance_tmp (user_id, flag) VALUES (27, 0);
+
 
 
 
