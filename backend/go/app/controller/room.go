@@ -73,8 +73,15 @@ func Log(c *gin.Context) {
 	RoomService := service.RoomService{}
 	UserService := service.UserService{}
 
-	//Logテーブルから全てのデータを取得する
-	allLog, err := RoomService.GetAllLog()
+	//ページング処理
+	page := c.Query("page")
+	pageInt, err := strconv.Atoi(page)
+	if err != nil {
+		pageInt = 1
+	}
+
+	//ページごとにLogテーブルからデータを取得する
+	pageLog, err := RoomService.GetLogsByPage(pageInt)
 	if err != nil {
 		c.String(http.StatusInternalServerError, "Server Error")
 		return
@@ -82,7 +89,7 @@ func Log(c *gin.Context) {
 
 	logGetResponse := []model.LogGetResponse{}
 
-	for _, log := range allLog {
+	for _, log := range pageLog {
 
 		userName, err := UserService.GetUserName(log.UserID)
 		if err != nil {

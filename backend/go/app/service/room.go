@@ -388,6 +388,44 @@ func (RoomService) GetAllLog() ([]model.Log, error) {
 	return logs, nil
 }
 
+//最新30件のログを取得する
+func (RoomService) GetLatestLogs() ([]model.Log, error) {
+	logs := make([]model.Log, 0)
+	err := DbEngine.Desc("id").Limit(30).Find(&logs)
+	if err != nil {
+		log.Fatal(err.Error())
+		return nil, err
+	}
+	return logs, nil
+}
+
+//pageごとに30件のログを取得する
+func (RoomService) GetLogsByPage(page int) ([]model.Log, error) {
+	if page == 1 {
+		page = 0
+	} else {
+		page = (page - 1) * 30
+	}
+	logs := make([]model.Log, 0)
+	err := DbEngine.Desc("id").Limit(30, page).Find(&logs)
+	if err != nil {
+		log.Fatal(err.Error())
+		return nil, err
+	}
+	return logs, nil
+}
+
+//日付ごとのログを取得する
+func (RoomService) GetLogByDate(date string) ([]model.Log, error) {
+	logs := make([]model.Log, 0)
+	err := DbEngine.Where("start_at like ?", date+"%").Find(&logs)
+	if err != nil {
+		log.Fatal(err.Error())
+		return nil, err
+	}
+	return logs, nil
+}
+
 //指定した時間のログを取得する
 func (RoomService) GetLogsFromStartAtAndEntAt(startAt string, endAt string) ([]model.Log, error) {
 	logs := make([]model.Log, 0)
