@@ -3,6 +3,7 @@ package controller
 import (
 	"Stay_watch/model"
 	"Stay_watch/service"
+	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -78,8 +79,15 @@ func List(c *gin.Context) {
 
 func Attendance(c *gin.Context) {
 
-	UserService := service.UserService{}
+	//構造体定義
+	type Meeting struct {
+		ID string `json:"meetingID"`
+	}
+	var meeting Meeting
+	c.Bind(&meeting)
 
+	fmt.Println(meeting.ID)
+	UserService := service.UserService{}
 	//attendaance_tmpテーブルから全てのデータを取得する
 	allAttendancesTmp, err := UserService.GetAllAttendancesTmp()
 	if err != nil {
@@ -89,7 +97,7 @@ func Attendance(c *gin.Context) {
 
 	ExcelService := service.ExcelService{}
 
-	ExcelService.WriteExcel(allAttendancesTmp)
+	ExcelService.WriteExcel(allAttendancesTmp, meeting.ID)
 
 	c.JSON(200, gin.H{
 		"status": "ok",
