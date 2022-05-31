@@ -63,7 +63,7 @@ func (ExcelService) WriteExcel(attendancesTmp []model.AttendanceTmp, meetingID s
 			fmt.Println(attendance_tmp.UserID)
 		}
 
-		AbstractSlice(mozis)		
+		AbstractSlice(mozis)
 
 		if dateIndex != 0 {
 			//書き込み

@@ -103,7 +103,7 @@ func Attendance(c *gin.Context) {
 		}
 	}
 
-	if len(allAttendancesTmp) == flagCount {
+	if flagCount == 16 {
 		isExist = false
 	}
 
