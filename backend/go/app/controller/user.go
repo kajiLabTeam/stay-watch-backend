@@ -95,9 +95,22 @@ func Attendance(c *gin.Context) {
 		return
 	}
 
-	ExcelService := service.ExcelService{}
+	isExist := true
+	flagCount := 0
+	for _, v := range allAttendancesTmp {
+		if v.Flag == 0 {
+			flagCount++
+		}
+	}
 
-	ExcelService.WriteExcel(allAttendancesTmp, meeting.ID)
+	if len(allAttendancesTmp) == flagCount {
+		isExist = false
+	}
+
+	ExcelService := service.ExcelService{}
+	if isExist {
+		ExcelService.WriteExcel(allAttendancesTmp, meeting.ID)
+	}
 
 	c.JSON(200, gin.H{
 		"status": "ok",
