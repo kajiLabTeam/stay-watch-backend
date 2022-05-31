@@ -1,0 +1,17 @@
+
+###
+GET https://hooks.slack.com/services/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
+
+
+
+###
+GET https://hooks.slack.com/services/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
+
+
+
+###
+POST https://hooks.slack.com/services/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
+content-type: application/json
+{
+    "text": "これは、チャンネル内のテキスト行です。そしてもう1つテキスト行があります。",
+}

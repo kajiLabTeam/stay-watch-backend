@@ -184,38 +184,20 @@ CREATE TABLE IF NOT EXISTS attendance (
 
 
 
-CREATE TABLE IF NOT EXISTS attendance_tmp (  
+CREATE TABLE IF NOT EXISTS attendance_tmp (
   user_id int(11),
   flag int(11)
 );
 
-INSERT INTO attendance_tmp (user_id, flag) VALUES (1, 0);
-INSERT INTO attendance_tmp (user_id, flag) VALUES (2, 0);
-INSERT INTO attendance_tmp (user_id, flag) VALUES (3, 0);
-INSERT INTO attendance_tmp (user_id, flag) VALUES (4, 0);
-INSERT INTO attendance_tmp (user_id, flag) VALUES (5, 0);
-INSERT INTO attendance_tmp (user_id, flag) VALUES (6, 0);
-INSERT INTO attendance_tmp (user_id, flag) VALUES (7, 0);
-INSERT INTO attendance_tmp (user_id, flag) VALUES (8, 0);
-INSERT INTO attendance_tmp (user_id, flag) VALUES (9, 0);
-INSERT INTO attendance_tmp (user_id, flag) VALUES (10, 0);
-INSERT INTO attendance_tmp (user_id, flag) VALUES (11, 0);
-INSERT INTO attendance_tmp (user_id, flag) VALUES (12, 0);
-INSERT INTO attendance_tmp (user_id, flag) VALUES (13, 0);
-INSERT INTO attendance_tmp (user_id, flag) VALUES (14, 0);
-INSERT INTO attendance_tmp (user_id, flag) VALUES (15, 0);
-INSERT INTO attendance_tmp (user_id, flag) VALUES (16, 0);
-INSERT INTO attendance_tmp (user_id, flag) VALUES (17, 0);
-INSERT INTO attendance_tmp (user_id, flag) VALUES (18, 0);
-INSERT INTO attendance_tmp (user_id, flag) VALUES (19, 0);
-INSERT INTO attendance_tmp (user_id, flag) VALUES (20, 0);
-INSERT INTO attendance_tmp (user_id, flag) VALUES (21, 0);
-INSERT INTO attendance_tmp (user_id, flag) VALUES (22, 0);
-INSERT INTO attendance_tmp (user_id, flag) VALUES (23, 0);
-INSERT INTO attendance_tmp (user_id, flag) VALUES (24, 0);
-INSERT INTO attendance_tmp (user_id, flag) VALUES (25, 0);
-INSERT INTO attendance_tmp (user_id, flag) VALUES (26, 0);
-INSERT INTO attendance_tmp (user_id, flag) VALUES (27, 0);
+
+
+
+
+
+
+
+
+
 
 
 
