@@ -1,9 +1,10 @@
-Get http://localhost:8082/user/v1/list
 
 ###
 Get http://localhost:8082/room/v1/log
 
 
+###
+GET https://hooks.slack.com/services/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
 
 ###
 Get http://localhost:8082/room/v1/list/simultaneous/1
@@ -47,6 +48,8 @@ content-type: application/json
 
 
 
-
-
-
+POST https://hooks.slack.com/services/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
+content-type: application/json
+{
+    "text": "これは、チャンネル内のテキスト行です。そしてもう1つテキスト行があります。",
+}
