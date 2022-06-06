@@ -1,15 +1,53 @@
 
 ###
-GET https://hooks.slack.com/services/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
-
-
-
-###
-GET https://hooks.slack.com/services/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
-
+Get http://localhost:8082/room/v1/log
 
 
 ###
+GET https://hooks.slack.com/services/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
+
+###
+Get http://localhost:8082/room/v1/list/simultaneous/1
+
+
+###
+Get http://localhost:8082/user/v1/list/simultaneous/2
+
+### 
+POST http://localhost:8082/room/v1/beacon HTTP/1.1
+content-type: application/json
+
+{
+    "Beacons":[
+        {
+            "uuid": "e7d61ea3f8dd49c88f2ff2484c07ac01",
+            "rssi": -50
+        },
+        {
+            "uuid": "e7d61ea3f8dd49c88f2ff2484c07ac02",
+            "rssi": -50
+        },
+        {
+            "uuid": "e7d61ea3f8dd49c88f2ff2484c07ac00",
+            "rssi": -50
+        }
+    ],
+    "roomID": 1
+}
+
+
+###
+POST http://localhost:8082/room/v1/beacon HTTP/1.1
+content-type: application/json
+
+{
+    "Beacons":[
+    ],
+    "roomID": 1
+}
+
+
+
 POST https://hooks.slack.com/services/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
 content-type: application/json
 {

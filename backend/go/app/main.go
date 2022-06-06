@@ -42,8 +42,9 @@ func main() {
 	{
 		v1 := userEngine.Group("/v1")
 		{
-			v1.GET("/list", controller.List)
+			v1.GET("/list", controller.UserList)
 			v1.GET("/detail", controller.Detail)
+			v1.GET("/list/simultaneous/:user_id", controller.SimultaneousStayUserList)
 			v1.POST("/register", controller.Register)
 			v1.POST("/attendance", controller.Attendance)
 		}

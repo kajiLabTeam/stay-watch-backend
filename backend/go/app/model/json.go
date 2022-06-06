@@ -20,7 +20,7 @@ type LogGetResponse struct {
 type UserInformationGetResponse struct {
 	ID   int64  `json:"id"`
 	Name string `json:"name"`
-	Tags []Tag `json:"tags"`
+	Tags []Tag  `json:"tags"`
 }
 
 type RoomStayTime struct {
@@ -52,4 +52,14 @@ type StayTime struct {
 	StartAt  int64  `json:"startAt"`
 	EndAt    int64  `json:"endAt"`
 	Color    string `json:"color"`
+}
+
+type SimultaneousStayUserGetResponse struct {
+	Date  string `json:"date"`
+	Names []Name `json:"names"`
+}
+
+type Name struct {
+	ID   int64  `json:"id"`
+	Name string `json:"name"`
 }
