@@ -3,8 +3,12 @@ package service
 import (
 	"Stay_watch/model"
 	"Stay_watch/util"
+	"bytes"
+	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"log"
+	"net/http"
 	"time"
 )
 
@@ -170,7 +174,7 @@ func (RoomService) GetSimultaneousList(userID int64) ([]model.SimulataneousStayL
 		//最後のindexの時
 		if index == len(sameDayAndRoomlogs)-1 {
 			stayTime.ID = sameDayAndRoomlog.ID
-			userName, err := UserService.GetUserName(sameDayAndRoomlog.UserID)
+			userName, err := UserService.GetUserNameByUserID(sameDayAndRoomlog.UserID)
 			if err != nil {
 				log.Fatal(err.Error())
 				return nil, err
@@ -202,7 +206,7 @@ func (RoomService) GetSimultaneousList(userID int64) ([]model.SimulataneousStayL
 			stayTimes = append(stayTimes, stayTime)
 
 			roomGetResponse.ID = sameDayAndRoomlog.RoomID
-			roomName, err := RoomService.GetRoomName(sameDayAndRoomlog.RoomID)
+			roomName, err := RoomService.GetRoomNameByRoomID(sameDayAndRoomlog.RoomID)
 			if err != nil {
 				log.Fatal(err.Error())
 				return nil, err
@@ -223,7 +227,7 @@ func (RoomService) GetSimultaneousList(userID int64) ([]model.SimulataneousStayL
 			if sameDayAndRoomlog.StartAt[:10] == sameDayAndRoomlogs[index+1].StartAt[:10] {
 				if sameDayAndRoomlog.RoomID == sameDayAndRoomlogs[index+1].RoomID {
 					stayTime.ID = sameDayAndRoomlog.ID
-					userName, err := UserService.GetUserName(sameDayAndRoomlog.UserID)
+					userName, err := UserService.GetUserNameByUserID(sameDayAndRoomlog.UserID)
 					if err != nil {
 						log.Fatal(err.Error())
 						return nil, err
@@ -255,7 +259,7 @@ func (RoomService) GetSimultaneousList(userID int64) ([]model.SimulataneousStayL
 					stayTimes = append(stayTimes, stayTime)
 				} else {
 					stayTime.ID = sameDayAndRoomlog.ID
-					userName, err := UserService.GetUserName(sameDayAndRoomlog.UserID)
+					userName, err := UserService.GetUserNameByUserID(sameDayAndRoomlog.UserID)
 					if err != nil {
 						log.Fatal(err.Error())
 						return nil, err
@@ -287,7 +291,7 @@ func (RoomService) GetSimultaneousList(userID int64) ([]model.SimulataneousStayL
 					stayTimes = append(stayTimes, stayTime)
 
 					roomGetResponse.ID = sameDayAndRoomlog.RoomID
-					roomName, err := RoomService.GetRoomName(sameDayAndRoomlog.RoomID)
+					roomName, err := RoomService.GetRoomNameByRoomID(sameDayAndRoomlog.RoomID)
 					if err != nil {
 						log.Fatal(err.Error())
 						return nil, err
@@ -299,7 +303,7 @@ func (RoomService) GetSimultaneousList(userID int64) ([]model.SimulataneousStayL
 				}
 			} else {
 				stayTime.ID = sameDayAndRoomlog.ID
-				userName, err := UserService.GetUserName(sameDayAndRoomlog.UserID)
+				userName, err := UserService.GetUserNameByUserID(sameDayAndRoomlog.UserID)
 				if err != nil {
 					log.Fatal(err.Error())
 					return nil, err
@@ -331,7 +335,7 @@ func (RoomService) GetSimultaneousList(userID int64) ([]model.SimulataneousStayL
 				stayTimes = append(stayTimes, stayTime)
 
 				roomGetResponse.ID = sameDayAndRoomlog.RoomID
-				roomName, err := RoomService.GetRoomName(sameDayAndRoomlog.RoomID)
+				roomName, err := RoomService.GetRoomNameByRoomID(sameDayAndRoomlog.RoomID)
 				if err != nil {
 					log.Fatal(err.Error())
 					return nil, err
@@ -375,7 +379,7 @@ func (RoomService) GetTimesFromStartAtAndEntAt(startAt string, endAt string) ([]
 }
 
 //ルームIDからルームの名前を取得する
-func (RoomService) GetRoomName(roomID int64) (string, error) {
+func (RoomService) GetRoomNameByRoomID(roomID int64) (string, error) {
 	room := model.Room{}
 	_, err := DbEngine.Table("room").Where("id=?", roomID).Get(&room)
 	if err != nil {
@@ -451,4 +455,41 @@ func (RoomService) GetLogsFromStartAtAndEntAt(startAt string, endAt string) ([]m
 		return nil, err
 	}
 	return logs, nil
+}
+
+//BOTにメッセージを送信する
+func (RoomService) SendMessage(message string) error {
+
+	requestBody := &model.RequestBody{
+		Text: message,
+	}
+
+	jsonString, err := json.Marshal(requestBody)
+	if err != nil {
+		panic("Error")
+	}
+
+	endpoint := "https://hooks.slack.com/services/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"
+	req, err := http.NewRequest("POST", endpoint, bytes.NewBuffer(jsonString))
+	if err != nil {
+		panic("Error")
+	}
+
+	req.Header.Set("Content-Type", "application/json")
+
+	client := new(http.Client)
+	resp, err := client.Do(req)
+	if err != nil {
+		panic("Error")
+	}
+	defer resp.Body.Close()
+
+	byteArray, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		panic("Error")
+	}
+
+	fmt.Printf("%#v", string(byteArray))
+
+	return nil
 }

@@ -25,12 +25,12 @@ func Stayer(c *gin.Context) {
 
 	for _, stayer := range allStayer {
 
-		userName, err := UserService.GetUserName(stayer.UserID)
+		userName, err := UserService.GetUserNameByUserID(stayer.UserID)
 		if err != nil {
 			c.String(http.StatusInternalServerError, "Server Error")
 			return
 		}
-		roomName, err := RoomService.GetRoomName(stayer.RoomID)
+		roomName, err := RoomService.GetRoomNameByRoomID(stayer.RoomID)
 		if err != nil {
 			c.String(http.StatusInternalServerError, "Server Error")
 			return
@@ -91,12 +91,12 @@ func Log(c *gin.Context) {
 
 	for _, log := range pageLog {
 
-		userName, err := UserService.GetUserName(log.UserID)
+		userName, err := UserService.GetUserNameByUserID(log.UserID)
 		if err != nil {
 			c.String(http.StatusInternalServerError, "Server Error")
 			return
 		}
-		roomName, err := RoomService.GetRoomName(log.RoomID)
+		roomName, err := RoomService.GetRoomNameByRoomID(log.RoomID)
 		if err != nil {
 			c.String(http.StatusInternalServerError, "Server Error")
 			return

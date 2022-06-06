@@ -32,7 +32,7 @@ func (UserService) GetAllUser() ([]model.User, error) {
 }
 
 //IDから名前を取得する
-func (UserService) GetUserName(userID int64) (string, error) {
+func (UserService) GetUserNameByUserID(userID int64) (string, error) {
 	user := model.User{}
 	_, err := DbEngine.Table("user").Where("id=?", userID).Get(&user)
 	if err != nil {
@@ -166,7 +166,7 @@ func (UserService) GetSameTimeUser(logs []model.Log) ([]model.SimultaneousStayUs
 
 		names := make([]model.Name, 0)
 		for _, uniqueUserID := range uniqueUserIDs {
-			userName, err := UserService.GetUserName(uniqueUserID)
+			userName, err := UserService.GetUserNameByUserID(uniqueUserID)
 			if err != nil {
 				fmt.Println(err.Error())
 			}
