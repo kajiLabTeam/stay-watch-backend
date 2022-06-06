@@ -97,12 +97,21 @@ func (RoomService) InsertEndAt(userID int64) error {
 	return nil
 }
 
-func (RoomService) GetSimultaneousList(userID int64) ([]model.SimulataneousStayLogGetResponse, error) {
+//指定したuserと現在の日付から指定した日付以内のログを取得する
+func (RoomService) GetLogByUserAndDate(userID int64, date int64) ([]model.Log, error) {
 	currentTime := time.Now()
 	logs := make([]model.Log, 0)
+	err := DbEngine.Table("log").Asc("start_at").Where("user_id=?", userID).And("start_at>=?", currentTime.AddDate(0, 0, -int(date)).Format("2006-01-02 15:04:05")).Find(&logs)
+	if err != nil {
+		log.Fatal(err.Error())
+		return nil, err
+	}
+	return logs, nil
+}
 
-	//指定したuserの14日以内のログを取得
-	err := DbEngine.Table("log").Where("user_id=?", userID).And("start_at >= ?", currentTime.Add(time.Hour*-24*14).Format("2006-01-02 15:04:05")).Find(&logs)
+func (RoomService) GetSimultaneousList(userID int64) ([]model.SimulataneousStayLogGetResponse, error) {
+	RoomService := RoomService{}
+	logs, err := RoomService.GetLogByUserAndDate(userID, 14)
 	if err != nil {
 		log.Fatal(err.Error())
 		return nil, err
@@ -146,7 +155,6 @@ func (RoomService) GetSimultaneousList(userID int64) ([]model.SimulataneousStayL
 	}
 
 	UserService := UserService{}
-	RoomService := RoomService{}
 
 	simulataneousStayLogsGetResponse := make([]model.SimulataneousStayLogGetResponse, 0)
 	roomsGetResponse := make([]model.RoomGetResponse, 0)
