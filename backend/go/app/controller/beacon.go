@@ -52,7 +52,7 @@ func Beacon(c *gin.Context) {
 		if isExist && targetUserRssi > int(pastStayer.Rssi) {
 			//同じ部屋にいる場合は更新
 			if beaconRoom.RoomID == pastStayer.RoomID {
-				fmt.Println("同じ部屋にいる場合は更新 強くなる")
+				fmt.Println("同じ部屋にいる場合は更新 RSSI強くなる")
 				err := RoomService.UpdateStayer(&model.Stayer{
 					UserID: pastStayer.UserID,
 					RoomID: pastStayer.RoomID,
@@ -73,6 +73,22 @@ func Beacon(c *gin.Context) {
 				err = RoomService.InsertEndAt(pastStayer.UserID)
 				if err != nil {
 					fmt.Println(err)
+				}
+
+				pastStayerUserName, err := UserService.GetUserNameByUserID(pastStayer.UserID)
+				if err != nil {
+					c.String(http.StatusInternalServerError, "Server Error")
+					return
+				}
+				pastRoomName, err := RoomService.GetRoomNameByRoomID(pastStayer.RoomID)
+				if err != nil {
+					c.String(http.StatusInternalServerError, "Server Error")
+					return
+				}
+				err = RoomService.SendMessage(fmt.Sprintf("%sさんが%sから退室しました", pastStayerUserName, pastRoomName))
+				if err != nil {
+					c.String(http.StatusInternalServerError, "Server Error")
+					return
 				}
 			}
 		}
@@ -108,6 +124,22 @@ func Beacon(c *gin.Context) {
 			err = RoomService.InsertEndAt(pastStayer.UserID)
 			if err != nil {
 				fmt.Println(err)
+			}
+
+			pastStayerUserName, err := UserService.GetUserNameByUserID(pastStayer.UserID)
+			if err != nil {
+				c.String(http.StatusInternalServerError, "Server Error")
+				return
+			}
+			pastRoomName, err := RoomService.GetRoomNameByRoomID(pastStayer.RoomID)
+			if err != nil {
+				c.String(http.StatusInternalServerError, "Server Error")
+				return
+			}
+			err = RoomService.SendMessage(fmt.Sprintf("%sさんが%sから退室しました", pastStayerUserName, pastRoomName))
+			if err != nil {
+				c.String(http.StatusInternalServerError, "Server Error")
+				return
 			}
 		}
 
@@ -152,6 +184,23 @@ func Beacon(c *gin.Context) {
 				return
 			}
 
+			currentUserName, err := UserService.GetUserNameByUserID(currentUserID)
+			if err != nil {
+				c.String(http.StatusInternalServerError, "Server Error")
+				return
+			}
+
+			currentRoomName, err := RoomService.GetRoomNameByRoomID(beaconRoom.RoomID)
+			if err != nil {
+				c.String(http.StatusInternalServerError, "Server Error")
+				return
+			}
+
+			err = RoomService.SendMessage(fmt.Sprintf("%sさんが%sに入室しました", currentUserName, currentRoomName))
+			if err != nil {
+				c.String(http.StatusInternalServerError, "Server Error")
+				return
+			}
 		}
 	}
 

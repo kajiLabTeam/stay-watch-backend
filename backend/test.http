@@ -42,6 +42,10 @@ content-type: application/json
 
 {
     "Beacons":[
+        {
+            "uuid": "e7d61ea3f8dd49c88f2ff2484c07ac0e",
+            "rssi": -50
+        }
     ],
     "roomID": 1
 }
