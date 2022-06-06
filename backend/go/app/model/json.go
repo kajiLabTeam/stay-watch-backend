@@ -63,3 +63,7 @@ type Name struct {
 	ID   int64  `json:"id"`
 	Name string `json:"name"`
 }
+
+type RequestBody struct {
+	Text string `json:"text"`
+}

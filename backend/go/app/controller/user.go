@@ -131,6 +131,11 @@ func SimultaneousStayUserList(c *gin.Context) {
 	RoomService := service.RoomService{}
 
 	logs, err := RoomService.GetLogByUserAndDate(userIDInt64, 14)
+	if err != nil {
+		c.String(http.StatusInternalServerError, "Server Error")
+		return
+	}
+
 	simultaneousStayUserGetResponses, err := UserService.GetSameTimeUser(logs)
 	if err != nil {
 		c.String(http.StatusInternalServerError, "Server Error")
