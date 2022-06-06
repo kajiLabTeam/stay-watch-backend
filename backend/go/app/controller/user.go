@@ -5,6 +5,7 @@ import (
 	"Stay_watch/service"
 	"fmt"
 	"net/http"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 )
@@ -33,7 +34,7 @@ func Register(c *gin.Context) {
 	})
 }
 
-func List(c *gin.Context) {
+func UserList(c *gin.Context) {
 
 	UserService := service.UserService{}
 	users, err := UserService.GetAllUser()
@@ -102,5 +103,26 @@ func Attendance(c *gin.Context) {
 	c.JSON(200, gin.H{
 		"status": "ok",
 	})
+}
 
+func SimultaneousStayUserList(c *gin.Context) {
+	userID := c.Param("user_id")
+	//int64に変換
+	userIDInt64, err := strconv.ParseInt(userID, 10, 64)
+	if err != nil {
+		c.String(http.StatusInternalServerError, "Server Error")
+		return
+	}
+
+	UserService := service.UserService{}
+	RoomService := service.RoomService{}
+
+	logs, err := RoomService.GetLogByUserAndDate(userIDInt64, 14)
+	simultaneousStayUserGetResponses, err := UserService.GetSameTimeUser(logs)
+	if err != nil {
+		c.String(http.StatusInternalServerError, "Server Error")
+		return
+	}
+
+	c.JSON(200, simultaneousStayUserGetResponses)
 }
