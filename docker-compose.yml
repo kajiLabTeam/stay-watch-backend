@@ -13,28 +13,25 @@ services:
       WAIT_HOSTS: vol_mysql
       MYSQL_ROOT_HOST: "%"
     ports:
-      - "$PORT:8080"
-    networks:
-      - vol_network
+      - "${GOLANG_PORT}:8080"
   vol_mysql:
     container_name: vol_mysql
     build: ./mysql
     volumes:
       - ./mysql/db:/docker-entrypoint-initdb.d
     ports:
-      - "33066:3306"
+      - "${MYSQL_PORT}:3306"
     environment:
       MYSQL_ROOT_PASSWORD: root
       MYSQL_DATABASE: app
       MYSQL_USER: gopher
-      MYSQL_PASSWORD: setsetset
-    networks:
-      - vol_network
-
+      MYSQL_PASSWORD: setsetset   
     cap_add:
       - SYS_NICE
     # ports:
     #   - 33060:3306
 networks:
-  vol_network:
-    external: true
+  default:
+    external:
+      name: ${NETWORK}
+    

@@ -1,3 +1,5 @@
+include .env
+
 # コンテナ名
 CONTAINER_NAME = vol_mysql
 # データベース名
@@ -30,6 +32,9 @@ dev:
 	
 dev-d:
 	docker-compose up -d
+
+network:
+	docker network create $(NETWORK)
 
 
 
