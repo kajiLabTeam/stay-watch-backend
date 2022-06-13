@@ -13,16 +13,21 @@ dump:
 	docker exec -it $(CONTAINER_NAME) mysqldump $(DB_NAME) > backup.sql
 # データベースをリストア
 restore:
-	docker exec -i $(CONTAINER_NAME) mysql $(DB_NAME) < backup.sql
+	docker exec -i $(CONTAINER_NAME) mysql $(DB_NAME) < mysql/backup/backup.sql
+
 reloadgolang:
 	docker-compose rm -fsv vol_golang
 	docker-compose up -d vol_golang
+
 down:
 	docker-compose down
+
 vol_mysql:
 	docker-compose exec vol_mysql bash
+
 dev:
 	docker-compose up 
+	
 dev-d:
 	docker-compose up -d
 
