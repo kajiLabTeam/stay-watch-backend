@@ -24,6 +24,7 @@ reloadgolang:
 down:
 	docker-compose down
 
+##composeでexecするときはservice名だからenvを使用しない
 vol_mysql:
 	docker-compose exec vol_mysql bash
 
