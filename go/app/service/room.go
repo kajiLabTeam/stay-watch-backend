@@ -466,13 +466,13 @@ func (RoomService) SendMessage(message string) error {
 
 	jsonString, err := json.Marshal(requestBody)
 	if err != nil {
-		panic("Error")
+		log.Fatal(err.Error())
 	}
 
 	endpoint := "https://hooks.slack.com/services/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"
 	req, err := http.NewRequest("POST", endpoint, bytes.NewBuffer(jsonString))
 	if err != nil {
-		panic("Error")
+		log.Fatal(err.Error())
 	}
 
 	req.Header.Set("Content-Type", "application/json")
@@ -480,13 +480,13 @@ func (RoomService) SendMessage(message string) error {
 	client := new(http.Client)
 	resp, err := client.Do(req)
 	if err != nil {
-		panic("Error")
+		log.Fatal(err.Error())
 	}
 	defer resp.Body.Close()
 
 	byteArray, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		panic("Error")
+		log.Fatal(err.Error())
 	}
 
 	fmt.Printf("%#v", string(byteArray))
