@@ -30,11 +30,11 @@ vol_mysql:
 dev:
 	docker-compose up 
 	
-dev-d:
+dev -d:
 	docker-compose up -d
 
 network:
-	docker network create $(NETWORK)
+	docker network create vol_network
 
 
 
