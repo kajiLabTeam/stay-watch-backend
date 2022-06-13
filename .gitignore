@@ -219,3 +219,7 @@ $RECYCLE.BIN/
 
 # Windows shortcuts
 *.lnk
+
+
+
+credentials/
