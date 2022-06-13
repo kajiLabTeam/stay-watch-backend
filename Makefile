@@ -16,11 +16,9 @@ dump:
 # データベースをリストア
 restore:
 	docker exec -i $(DB_CONTAINER_NAME) mysql $(DB_NAME) < mysql/backup/backup.sql
-
 reloadgolang:
 	docker-compose rm -fsv vol_golang
 	docker-compose up -d vol_golang
-
 down:
 	docker-compose down
 
