@@ -1,7 +1,7 @@
 version: "3"
 services:
   vol_golang:
-    container_name: vol_golang
+    container_name: ${golang_container_name}
     build: ./go
     volumes:
       - ./go/app:/app
@@ -15,7 +15,7 @@ services:
     ports:
       - "${GOLANG_PORT}:8080"
   vol_mysql:
-    container_name: vol_mysql
+    container_name: ${mysql_container_name}
     build: ./mysql
     volumes:
       - ./mysql/db:/docker-entrypoint-initdb.d
@@ -33,5 +33,5 @@ services:
 networks:
   default:
     external:
-      name: ${NETWORK}
+      name: vol_network
     
