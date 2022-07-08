@@ -137,5 +137,4 @@ func main() {
 // 			UserService.RegisterAttendance(userID, currenDay, false)
 // 		}
 // 	}
-
 // }
