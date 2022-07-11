@@ -1,6 +1,6 @@
-# @baseURL= http://localhost:8082
+@baseURL= http://localhost:8082
 # @baseURL= https://go-staywatch.kajilab.tk
-@baseURL= https://go-staywatch-test.kajilab.tk
+# @baseURL= https://go-staywatch-test.kajilab.tk
 
 
 
@@ -11,7 +11,12 @@ Get {{baseURL}}/room/v1/log
 Get {{baseURL}}/user/v1/list
 
 ###
-GET https://hooks.slack.com/services/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
+POST  https://hooks.slack.com/services/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
+content-type: application/json
+
+{
+    "text":"test"
+}
 
 ###
 Get {{baseURL}}/room/v1/list/simultaneous/1
@@ -19,7 +24,7 @@ Get {{baseURL}}/room/v1/list/simultaneous/1
 ###
 Get {{baseURL}}/user/v1/list/simultaneous/2
 
-### 
+###
 POST {{baseURL}}/room/v1/beacon HTTP/1.1
 content-type: application/json
 
@@ -28,14 +33,6 @@ content-type: application/json
         {
             "uuid": "e7d61ea3f8dd49c88f2ff2484c07ac01",
             "rssi": -50
-        },
-        {
-            "uuid": "e7d61ea3f8dd49c88f2ff2484c07ac02",
-            "rssi": -50
-        },
-        {
-            "uuid": "e7d61ea3f8dd49c88f2ff2484c07ac00",
-            "rssi": -50
         }
     ],
     "roomID": 1
@@ -48,21 +45,23 @@ content-type: application/json
 
 {
     "Beacons":[
-        {
-            "uuid": "e7d61ea3f8dd49c88f2ff2484c07ac0e",
-            "rssi": -50
-        }
     ],
     "roomID": 1
 }
 
 
-### 
-POST https://hooks.slack.com/services/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
 
+//無駄なコロンをつけるとエラーになるので注意
+//例
+# {
+#     "meetingID":"2",
+# }
+###
+POST {{baseURL}}/user/v1/attendance HTTP/1.1
 content-type: application/json
+
 {
-    "text": "これは、チャンネル内のテキスト行です。そしてもう1つテキスト行があります。",
+    "meetingID":2
 }
 
 

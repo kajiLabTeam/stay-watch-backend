@@ -31,6 +31,21 @@ func (UserService) GetAllUser() ([]model.User, error) {
 	return users, nil
 }
 
+//全てのユーザネームを取得する
+func (UserService) GetAllUserName() ([]string, error) {
+	users := make([]model.User, 0)
+	err := DbEngine.Find(&users)
+	if err != nil {
+		log.Fatal(err.Error())
+		return nil, err
+	}
+	names := make([]string, 0)
+	for _, user := range users {
+		names = append(names, user.Name)
+	}
+	return names, nil
+}
+
 //IDから名前を取得する
 func (UserService) GetUserNameByUserID(userID int64) (string, error) {
 	user := model.User{}
