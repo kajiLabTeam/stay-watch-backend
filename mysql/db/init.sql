@@ -11,7 +11,7 @@ CREATE TABLE IF NOT EXISTS user
 
 INSERT INTO user (uid, name) VALUES ('e7d61ea3f8dd49c88f2ff2484c07ac00', 'kaji');
 INSERT INTO user (uid, name) VALUES ('e7d61ea3f8dd49c88f2ff2484c07ac01', 'ogane');
-INSERT INTO user (uid, name) VALUES ('e7d61ea3f8dd49c88f2ff2484c07ac02', 'Miyagawa-san');
+INSERT INTO user (uid, name) VALUES ('e7d61ea3f8dd49c88f2ff2484c07ac02', 'miyagawa-san');
 INSERT INTO user (uid, name) VALUES ('e7d61ea3f8dd49c88f2ff2484c07ac03', 'ayato');
 INSERT INTO user (uid, name) VALUES ('e7d61ea3f8dd49c88f2ff2484c07ac04', 'ken');
 INSERT INTO user (uid, name) VALUES ('e7d61ea3f8dd49c88f2ff2484c07ac05', 'suzaki');
@@ -24,7 +24,7 @@ INSERT INTO user (uid, name) VALUES ('e7d61ea3f8dd49c88f2ff2484c07ac0b', 'rui');
 INSERT INTO user (uid, name) VALUES ('e7d61ea3f8dd49c88f2ff2484c07ac0c', 'ukai');
 INSERT INTO user (uid, name) VALUES ('e7d61ea3f8dd49c88f2ff2484c07ac0d', 'terada');
 INSERT INTO user (uid, name) VALUES ('e7d61ea3f8dd49c88f2ff2484c07ac0e', 'toyama');
-INSERT INTO user (uid, name) VALUES ('e7d61ea3f8dd49c88f2ff2484c07ac0f', 'shamoto');
+INSERT INTO user (uid, name) VALUES ('e7d61ea3f8dd49c88f2ff2484c07ac0f', 'shamo');
 INSERT INTO user (uid, name) VALUES ('e7d61ea3f8dd49c88f2ff2484c07ac10', 'isiguro');
 INSERT INTO user (uid, name) VALUES ('e7d61ea3f8dd49c88f2ff2484c07ac11', 'ao');
 INSERT INTO user (uid, name) VALUES ('e7d61ea3f8dd49c88f2ff2484c07ac12', 'fuma');
@@ -40,6 +40,8 @@ INSERT INTO user (uid, name) VALUES ('e7d61ea3f8dd49c88f2ff2484c07ac1b', 'makino
 
 
 
+
+
 CREATE TABLE IF NOT EXISTS log
 (
   id int(11) primary key AUTO_INCREMENT,
@@ -49,6 +51,41 @@ CREATE TABLE IF NOT EXISTS log
   user_id   int(11),
   rssi      int(11)
 );
+
+
+-- INSERT INTO log (room_id, start_at, end_at, user_id, rssi) VALUES (1, '2022-07-07 00:00:00', '2022-07-08 00:00:00', 1, -50);
+-- INSERT INTO log (room_id, start_at, end_at, user_id, rssi) VALUES (1, '2022-07-07 00:00:00', '2022-07-08 00:00:00', 2, -50);
+-- INSERT INTO log (room_id, start_at, end_at, user_id, rssi) VALUES (1, '2022-07-07 00:00:00', '2022-07-08 00:00:00', 3, -50);
+-- INSERT INTO log (room_id, start_at, end_at, user_id, rssi) VALUES (1, '2022-07-07 00:00:00', '2022-07-08 00:00:00', 4, -50);
+-- INSERT INTO log (room_id, start_at, end_at, user_id, rssi) VALUES (1, '2022-07-07 00:00:00', '2022-07-08 00:00:00', 5, -50);
+-- INSERT INTO log (room_id, start_at, end_at, user_id, rssi) VALUES (1, '2022-07-07 00:00:00', '2022-07-08 00:00:00', 6, -50);
+-- INSERT INTO log (room_id, start_at, end_at, user_id, rssi) VALUES (1, '2022-07-07 00:00:00', '2022-07-08 00:00:00', 7, -50);
+-- INSERT INTO log (room_id, start_at, end_at, user_id, rssi) VALUES (1, '2022-07-07 00:00:00', '2022-07-08 00:00:00', 8, -50);
+-- INSERT INTO log (room_id, start_at, end_at, user_id, rssi) VALUES (1, '2022-07-07 00:00:00', '2022-07-08 00:00:00', 9, -50);
+-- INSERT INTO log (room_id, start_at, end_at, user_id, rssi) VALUES (1, '2022-07-07 00:00:00', '2022-07-08 00:00:00', 10, -50);
+-- INSERT INTO log (room_id, start_at, end_at, user_id, rssi) VALUES (1, '2022-07-07 00:00:00', '2022-07-08 00:00:00', 11, -50);
+-- INSERT INTO log (room_id, start_at, end_at, user_id, rssi) VALUES (1, '2022-07-07 00:00:00', '2022-07-08 00:00:00', 12, -50);
+-- INSERT INTO log (room_id, start_at, end_at, user_id, rssi) VALUES (1, '2022-07-07 00:00:00', '2022-07-08 00:00:00', 13, -50);
+-- INSERT INTO log (room_id, start_at, end_at, user_id, rssi) VALUES (1, '2022-07-07 00:00:00', '2022-07-08 00:00:00', 14, -50);
+-- INSERT INTO log (room_id, start_at, end_at, user_id, rssi) VALUES (1, '2022-07-07 00:00:00', '2022-07-08 00:00:00', 15, -50);
+-- INSERT INTO log (room_id, start_at, end_at, user_id, rssi) VALUES (1, '2022-07-07 00:00:00', '2022-07-08 00:00:00', 16, -50);
+-- INSERT INTO log (room_id, start_at, end_at, user_id, rssi) VALUES (1, '2022-07-07 00:00:00', '2022-07-08 00:00:00', 17, -50);
+-- INSERT INTO log (room_id, start_at, end_at, user_id, rssi) VALUES (1, '2022-07-07 00:00:00', '2022-07-08 00:00:00', 18, -50);
+-- INSERT INTO log (room_id, start_at, end_at, user_id, rssi) VALUES (1, '2022-07-07 00:00:00', '2022-07-08 00:00:00', 19, -50);
+-- INSERT INTO log (room_id, start_at, end_at, user_id, rssi) VALUES (1, '2022-07-07 00:00:00', '2022-07-08 00:00:00', 20, -50);
+-- INSERT INTO log (room_id, start_at, end_at, user_id, rssi) VALUES (1, '2022-07-07 00:00:00', '2022-07-08 00:00:00', 21, -50);
+-- INSERT INTO log (room_id, start_at, end_at, user_id, rssi) VALUES (1, '2022-07-07 00:00:00', '2022-07-08 00:00:00', 22, -50);
+-- INSERT INTO log (room_id, start_at, end_at, user_id, rssi) VALUES (1, '2022-07-07 00:00:00', '2022-07-08 00:00:00', 23, -50);
+-- INSERT INTO log (room_id, start_at, end_at, user_id, rssi) VALUES (1, '2022-07-07 00:00:00', '2022-07-08 00:00:00', 24, -50);
+-- INSERT INTO log (room_id, start_at, end_at, user_id, rssi) VALUES (1, '2022-07-07 00:00:00', '2022-07-08 00:00:00', 25, -50);
+-- INSERT INTO log (room_id, start_at, end_at, user_id, rssi) VALUES (1, '2022-07-07 00:00:00', '2022-07-08 00:00:00', 26, -50);
+-- INSERT INTO log (room_id, start_at, end_at, user_id, rssi) VALUES (1, '2022-07-07 00:00:00', '2022-07-08 00:00:00', 27, -50);
+-- INSERT INTO log (room_id, start_at, end_at, user_id, rssi) VALUES (1, '2022-07-07 00:00:00', '2022-07-08 00:00:00', 28, -50);
+
+
+
+
+
 
 
 

@@ -3,12 +3,8 @@ package service
 import (
 	"Stay_watch/model"
 	"Stay_watch/util"
-	"bytes"
-	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"log"
-	"net/http"
 	"time"
 )
 
@@ -18,8 +14,7 @@ func (RoomService) SetLog(Log *model.Log) error {
 
 	_, err := DbEngine.Table("log").Insert(Log)
 	if err != nil {
-		log.Fatal(err.Error())
-		return err
+		return fmt.Errorf(" failed: %w", err)
 	}
 	return nil
 }
@@ -29,8 +24,7 @@ func (RoomService) GetStayer(stayer *model.Stayer) (error, bool) {
 	affected, err := DbEngine.Get(stayer)
 
 	if err != nil {
-		log.Fatal(err.Error())
-		return err, false
+		return fmt.Errorf(" failed: %w", err), false
 	}
 
 	if affected == true {
@@ -44,8 +38,8 @@ func (RoomService) GetAllStayer() ([]model.Stayer, error) {
 	stayers := make([]model.Stayer, 0)
 	err := DbEngine.Find(&stayers)
 	if err != nil {
-		log.Fatal(err.Error())
-		return nil, err
+
+		return nil, fmt.Errorf(" failed: %w", err)
 	}
 	return stayers, nil
 }
@@ -55,8 +49,7 @@ func (RoomService) GetStayerByRoomID(roomID int64) ([]model.Stayer, error) {
 	stayers := make([]model.Stayer, 0)
 	err := DbEngine.Table("stayer").Where("room_id=?", roomID).Find(&stayers)
 	if err != nil {
-		log.Fatal(err.Error())
-		return nil, err
+		return nil, fmt.Errorf(" failed: %w", err)
 	}
 	return stayers, nil
 }
@@ -65,8 +58,7 @@ func (RoomService) SetStayer(stayer *model.Stayer) error {
 
 	_, err := DbEngine.Table("stayer").Insert(stayer)
 	if err != nil {
-		log.Fatal(err.Error())
-		return err
+		return fmt.Errorf(" failed: %w", err)
 	}
 	return nil
 }
@@ -75,8 +67,7 @@ func (RoomService) UpdateStayer(stayer *model.Stayer) error {
 
 	_, err := DbEngine.Table("stayer").Where("user_id=?", stayer.UserID).Update(stayer)
 	if err != nil {
-		log.Fatal(err.Error())
-		return err
+		return fmt.Errorf(" failed: %w", err)
 	}
 	return nil
 }
@@ -85,8 +76,7 @@ func (RoomService) DeleteStayer(userID int64) error {
 
 	_, err := DbEngine.Table("stayer").Where("user_id=?", userID).Delete(model.Stayer{})
 	if err != nil {
-		log.Fatal(err.Error())
-		return err
+		return fmt.Errorf(" failed: %w", err)
 	}
 	return nil
 }
@@ -95,8 +85,7 @@ func (RoomService) InsertEndAt(userID int64) error {
 	currentTime := time.Now()
 	_, err := DbEngine.Table("log").Desc("start_at").Limit(1).Where("user_id=?", userID).Update(map[string]string{"end_at": currentTime.Format("2006-01-02 15:04:05")})
 	if err != nil {
-		log.Fatal(err.Error())
-		return err
+		return fmt.Errorf(" failed: %w", err)
 	}
 	return nil
 }
@@ -107,8 +96,18 @@ func (RoomService) GetLogByUserAndDate(userID int64, date int64) ([]model.Log, e
 	logs := make([]model.Log, 0)
 	err := DbEngine.Table("log").Asc("start_at").Where("user_id=?", userID).And("start_at>=?", currentTime.AddDate(0, 0, -int(date)).Format("2006-01-02 15:04:05")).Find(&logs)
 	if err != nil {
-		log.Fatal(err.Error())
-		return nil, err
+		return nil, fmt.Errorf(" failed: %w", err)
+	}
+	return logs, nil
+}
+
+//現在の日付から指定した日付以内のログを取得する
+func (RoomService) GetLogByDate(date int64) ([]model.Log, error) {
+	currentTime := time.Now()
+	logs := make([]model.Log, 0)
+	err := DbEngine.Table("log").Asc("start_at").Where("start_at>=?", currentTime.AddDate(0, 0, -int(date)).Format("2006-01-02 15:04:05")).Find(&logs)
+	if err != nil {
+		return nil, fmt.Errorf(" failed: %w", err)
 	}
 	return logs, nil
 }
@@ -117,8 +116,7 @@ func (RoomService) GetSimultaneousList(userID int64) ([]model.SimulataneousStayL
 	RoomService := RoomService{}
 	logs, err := RoomService.GetLogByUserAndDate(userID, 14)
 	if err != nil {
-		log.Fatal(err.Error())
-		return nil, err
+		return nil, fmt.Errorf(" failed: %w", err)
 	}
 
 	dates := make([]string, 0)
@@ -154,8 +152,7 @@ func (RoomService) GetSimultaneousList(userID int64) ([]model.SimulataneousStayL
 	sameDayAndRoomlogs := make([]model.Log, 0)
 	err = DbEngine.Table("log").Where(dateSql).And(roomSql).OrderBy("date_format(start_at,'%Y-%m-%d') ,room_id ").Find(&sameDayAndRoomlogs)
 	if err != nil {
-		log.Fatal(err.Error())
-		return nil, err
+		return nil, fmt.Errorf(" failed: %w", err)
 	}
 
 	UserService := UserService{}
@@ -176,15 +173,13 @@ func (RoomService) GetSimultaneousList(userID int64) ([]model.SimulataneousStayL
 			stayTime.ID = sameDayAndRoomlog.ID
 			userName, err := UserService.GetUserNameByUserID(sameDayAndRoomlog.UserID)
 			if err != nil {
-				log.Fatal(err.Error())
-				return nil, err
+				return nil, fmt.Errorf(" failed: %w", err)
 			}
 			stayTime.UserName = userName
 
 			locationTime, err := util.ConvertDatetimeToLocationTime(sameDayAndRoomlog.StartAt, "Asia/Tokyo")
 			if err != nil {
-				log.Fatal(err.Error())
-				return nil, err
+				return nil, fmt.Errorf(" failed: %w", err)
 			}
 			unixMilli := util.TimeToUnixMilli(locationTime)
 			stayTime.StartAt = unixMilli
@@ -208,8 +203,7 @@ func (RoomService) GetSimultaneousList(userID int64) ([]model.SimulataneousStayL
 			roomGetResponse.ID = sameDayAndRoomlog.RoomID
 			roomName, err := RoomService.GetRoomNameByRoomID(sameDayAndRoomlog.RoomID)
 			if err != nil {
-				log.Fatal(err.Error())
-				return nil, err
+				return nil, fmt.Errorf("failed: %w", err)
 			}
 			roomGetResponse.Name = roomName
 			roomGetResponse.StayTimes = stayTimes
@@ -427,17 +421,6 @@ func (RoomService) GetLogsByPage(page int) ([]model.Log, error) {
 	return logs, nil
 }
 
-//日付ごとのログを取得する
-func (RoomService) GetLogByDate(date string) ([]model.Log, error) {
-	logs := make([]model.Log, 0)
-	err := DbEngine.Where("start_at like ?", date+"%").Find(&logs)
-	if err != nil {
-		log.Fatal(err.Error())
-		return nil, err
-	}
-	return logs, nil
-}
-
 //指定した時間のログを取得する
 func (RoomService) GetLogsFromStartAtAndEntAt(startAt string, endAt string) ([]model.Log, error) {
 	logs := make([]model.Log, 0)
@@ -455,41 +438,4 @@ func (RoomService) GetLogsFromStartAtAndEntAt(startAt string, endAt string) ([]m
 		return nil, err
 	}
 	return logs, nil
-}
-
-//BOTにメッセージを送信する
-func (RoomService) SendMessage(message string) error {
-
-	requestBody := &model.RequestBody{
-		Text: message,
-	}
-
-	jsonString, err := json.Marshal(requestBody)
-	if err != nil {
-		log.Fatal(err.Error())
-	}
-
-	endpoint := "https://hooks.slack.com/services/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"
-	req, err := http.NewRequest("POST", endpoint, bytes.NewBuffer(jsonString))
-	if err != nil {
-		log.Fatal(err.Error())
-	}
-
-	req.Header.Set("Content-Type", "application/json")
-
-	client := new(http.Client)
-	resp, err := client.Do(req)
-	if err != nil {
-		log.Fatal(err.Error())
-	}
-	defer resp.Body.Close()
-
-	byteArray, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		log.Fatal(err.Error())
-	}
-
-	fmt.Printf("%#v", string(byteArray))
-
-	return nil
 }

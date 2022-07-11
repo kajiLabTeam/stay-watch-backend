@@ -4,7 +4,6 @@ import (
 	"Stay_watch/model"
 	"Stay_watch/service"
 	"fmt"
-	"log"
 	"net/http"
 	"time"
 
@@ -25,6 +24,7 @@ func Beacon(c *gin.Context) {
 
 	RoomService := service.RoomService{}
 	UserService := service.UserService{}
+	BotService := service.BotService{}
 	//事前にStayerテーブルのデータを取得する
 	pastAllStayer, err := RoomService.GetAllStayer()
 
@@ -85,7 +85,7 @@ func Beacon(c *gin.Context) {
 					c.String(http.StatusInternalServerError, "Server Error")
 					return
 				}
-				err = RoomService.SendMessage(fmt.Sprintf("%sさんが%sから退室しました", pastStayerUserName, pastRoomName))
+				err = BotService.SendMessage(fmt.Sprintf("%sさんが%sから退室しました", pastStayerUserName, pastRoomName), "B03J95EL3ME/9MLCZ8VTkEFGDVwTxkqYLKyj")
 				if err != nil {
 					c.String(http.StatusInternalServerError, "Server Error")
 					return
@@ -136,7 +136,7 @@ func Beacon(c *gin.Context) {
 				c.String(http.StatusInternalServerError, "Server Error")
 				return
 			}
-			err = RoomService.SendMessage(fmt.Sprintf("%sさんが%sから退室しました", pastStayerUserName, pastRoomName))
+			err = BotService.SendMessage(fmt.Sprintf("%sさんが%sから退室しました", pastStayerUserName, pastRoomName), "B03J95EL3ME/9MLCZ8VTkEFGDVwTxkqYLKyj")
 			if err != nil {
 				c.String(http.StatusInternalServerError, "Server Error")
 				return
@@ -155,9 +155,9 @@ func Beacon(c *gin.Context) {
 
 		currentTime := time.Now()
 		//もし火曜日だったら
-		if currentTime.Weekday() == time.Tuesday {
+		if currentTime.Weekday() == time.Monday {
 			//8時から12時の時
-			if currentTime.Hour() >= 8 && currentTime.Hour() < 12 {
+			if currentTime.Hour() >= 5 && currentTime.Hour() < 12 {
 				UserService.TemporarilySavedAttendance(currentUserID, 1)
 			}
 		}
@@ -179,7 +179,6 @@ func Beacon(c *gin.Context) {
 
 			err = RoomService.SetLog(&model.Log{RoomID: beaconRoom.RoomID, StartAt: currentTime.Format("2006-01-02 15:04:05"), EndAt: "2016-01-01 00:00:00", UserID: currentUserID, Rssi: currentStayer.Rssi})
 			if err != nil {
-				log.Fatal(err)
 				c.String(http.StatusBadRequest, "Bad Request")
 				return
 			}
@@ -196,7 +195,7 @@ func Beacon(c *gin.Context) {
 				return
 			}
 
-			err = RoomService.SendMessage(fmt.Sprintf("%sさんが%sに入室しました", currentUserName, currentRoomName))
+			err = BotService.SendMessage(fmt.Sprintf("%sさんが%sに入室しました", currentUserName, currentRoomName), "B03J95EL3ME/9MLCZ8VTkEFGDVwTxkqYLKyj")
 			if err != nil {
 				c.String(http.StatusInternalServerError, "Server Error")
 				return

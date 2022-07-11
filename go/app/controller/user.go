@@ -75,6 +75,7 @@ func UserList(c *gin.Context) {
 			Tags: tags,
 		})
 	}
+
 	c.JSON(200, userInformationGetResponse)
 }
 
@@ -82,10 +83,15 @@ func Attendance(c *gin.Context) {
 
 	//構造体定義
 	type Meeting struct {
-		ID string `json:"meetingID"`
+		ID int64 `json:"meetingID"`
 	}
 	var meeting Meeting
-	c.Bind(&meeting)
+	err := c.Bind(&meeting)
+
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
 
 	fmt.Println(meeting.ID)
 	UserService := service.UserService{}
@@ -98,14 +104,25 @@ func Attendance(c *gin.Context) {
 
 	isExist := true
 	flagCount := 0
-	for _, v := range allAttendancesTmp {
-		if v.Flag == 0 {
-			flagCount++
+	if meeting.ID == 2 {
+		for i := 0; i < 16; i++ {
+			if allAttendancesTmp[i].Flag == 0 {
+				flagCount++
+			}
+		}
+		if flagCount == 16 {
+			isExist = false
 		}
 	}
-
-	if len(allAttendancesTmp) == flagCount {
-		isExist = false
+	if meeting.ID == 1 {
+		for i := 16; i < 28; i++ {
+			if allAttendancesTmp[i].Flag == 0 {
+				flagCount++
+			}
+		}
+		if flagCount == 12 {
+			isExist = false
+		}
 	}
 
 	ExcelService := service.ExcelService{}
