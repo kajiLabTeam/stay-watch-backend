@@ -155,9 +155,9 @@ func Beacon(c *gin.Context) {
 
 		currentTime := time.Now()
 		//もし火曜日だったら
-		if currentTime.Weekday() == time.Monday {
+		if currentTime.Weekday() == time.Tuesday {
 			//8時から12時の時
-			if currentTime.Hour() >= 5 && currentTime.Hour() < 12 {
+			if currentTime.Hour() >= 7 && currentTime.Hour() < 12 {
 				UserService.TemporarilySavedAttendance(currentUserID, 1)
 			}
 		}
