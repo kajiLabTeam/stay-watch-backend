@@ -133,3 +133,14 @@ func SimultaneousList(c *gin.Context) {
 
 	c.JSON(http.StatusOK, SimultaneousList)
 }
+
+func LogGantt(c *gin.Context) {
+
+	RoomService := service.RoomService{}
+	GanttLogs, err := RoomService.GetGanttLog()
+	if err != nil {
+		c.String(http.StatusInternalServerError, "Server Error")
+		return
+	}
+	c.JSON(http.StatusOK, GanttLogs)
+}
