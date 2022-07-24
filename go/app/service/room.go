@@ -112,6 +112,85 @@ func (RoomService) GetLogByDate(date int64) ([]model.Log, error) {
 	return logs, nil
 }
 
+func (RoomService) GetGanttLog() ([]model.SimulataneousStayLogGetResponse, error) {
+	RoomService := RoomService{}
+	UserService := UserService{}
+	//1週間以内のログを取得
+	logs, err := RoomService.GetLogByDate(7)
+	if err != nil {
+		return nil, err
+	}
+
+	dates := make([]string, 0)
+	roomIDs := make([]int64, 0)
+	for _, log := range logs {
+		dates = append(dates, log.StartAt[:10])
+		roomIDs = append(roomIDs, log.RoomID)
+	}
+	util := util.Util{}
+	uniqueDates := util.SliceUniqueString(dates)
+	uniqueRoomIDs := util.SliceUniqueNumber(roomIDs)
+
+	simulataneousStayLogsGetResponse := make([]model.SimulataneousStayLogGetResponse, 0)
+
+	for index, dates := range uniqueDates {
+		simulataneousStayLogGetResponse := model.SimulataneousStayLogGetResponse{}
+		simulataneousStayLogGetResponse.Date = dates
+		simulataneousStayLogGetResponse.ID = int64(index)
+		roomsGetResponse := make([]model.RoomGetResponse, 0)
+		for _, roomID := range uniqueRoomIDs {
+
+			roomGetResponse := model.RoomGetResponse{}
+			roomGetResponse.ID = roomID
+			roomGetResponse.Name, err = RoomService.GetRoomNameByRoomID(roomID)
+			if err != nil {
+				return nil, err
+			}
+			sortlogs := make([]model.Log, 0)
+			err := DbEngine.Table("log").Where("room_id=?", roomID).And("start_at like ?", dates+"%").Find(&sortlogs)
+			if err != nil {
+				return nil, fmt.Errorf(" failed: %w", err)
+			}
+
+			stayTimes := make([]model.StayTime, 0)
+			for _, log := range sortlogs {
+				stayTime := model.StayTime{}
+				locationTime, err := util.ConvertDatetimeToLocationTime(log.StartAt, "Asia/Tokyo")
+				if err != nil {
+					return nil, err
+				}
+				unixMilli := util.TimeToUnixMilli(locationTime)
+				stayTime.StartAt = unixMilli
+
+				locationTime, err = util.ConvertDatetimeToLocationTime(log.EndAt, "Asia/Tokyo")
+				if err != nil {
+					return nil, err
+				}
+				unixMilli = util.TimeToUnixMilli(locationTime)
+				stayTime.EndAt = unixMilli
+
+				userName, err := UserService.GetUserNameByUserID(log.UserID)
+				if err != nil {
+					return nil, err
+				}
+				stayTime.UserName = userName
+				stayTime.Color = "green"
+				stayTime.ID = log.ID
+				stayTimes = append(stayTimes, stayTime)
+			}
+			roomGetResponse.StayTimes = stayTimes
+			roomsGetResponse = append(roomsGetResponse, roomGetResponse)
+		}
+		simulataneousStayLogGetResponse.Rooms = roomsGetResponse
+		simulataneousStayLogsGetResponse = append(simulataneousStayLogsGetResponse, simulataneousStayLogGetResponse)
+	}
+
+	fmt.Println(simulataneousStayLogsGetResponse)
+
+	return simulataneousStayLogsGetResponse, nil
+
+}
+
 func (RoomService) GetSimultaneousList(userID int64) ([]model.SimulataneousStayLogGetResponse, error) {
 	RoomService := RoomService{}
 	logs, err := RoomService.GetLogByUserAndDate(userID, 14)

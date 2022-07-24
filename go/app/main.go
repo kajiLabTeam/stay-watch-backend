@@ -35,6 +35,7 @@ func main() {
 		{
 			v1.GET("/stayer", controller.Stayer)
 			v1.GET("/log", controller.Log)
+			v1.GET("/log/gantt", controller.LogGantt)
 			v1.POST("/beacon", controller.Beacon)
 			v1.GET("/list/simultaneous/:user_id", controller.SimultaneousList)
 		}
