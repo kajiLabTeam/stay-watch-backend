@@ -18,6 +18,16 @@ content-type: application/json
     "text":"test"
 }
 
+
+###
+POST  https://hooks.slack.com/services/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
+content-type: application/json
+
+{
+    "text":"test"
+}
+
+
 ###
 Get {{baseURL}}/room/v1/list/simultaneous/1
 
@@ -32,7 +42,11 @@ content-type: application/json
     "Beacons":[
         {
             "uuid": "e7d61ea3f8dd49c88f2ff2484c07ac0e",
-            "rssi": -35
+            "rssi": -20
+        },
+        {
+            "uuid": "e7d61ea3f8dd49c88f2ff2484c07ac08",
+            "rssi": -20
         }
     ],
     "roomID": 3

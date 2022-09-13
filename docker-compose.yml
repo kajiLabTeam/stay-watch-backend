@@ -11,7 +11,7 @@ services:
       - "main.go"
     environment:
       WAIT_HOSTS: vol_mysql
-      MYSQL_ROOT_HOST: "%"      
+      MYSQL_ROOT_HOST: "%"
     ports:
       - "${GOLANG_PORT}:8080"
     env_file:
@@ -27,7 +27,7 @@ services:
       MYSQL_ROOT_PASSWORD: root
       MYSQL_DATABASE: app
       MYSQL_USER: gopher
-      MYSQL_PASSWORD: setsetset   
+      MYSQL_PASSWORD: setsetset
     cap_add:
       - SYS_NICE
     # ports:
@@ -36,4 +36,3 @@ networks:
   default:
     external:
       name: vol_network
-    
