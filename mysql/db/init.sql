@@ -24,7 +24,7 @@ INSERT INTO user (uid, name,email,role) VALUES ('e7d61ea3f8dd49c88f2ff2484c07ac0
 INSERT INTO user (uid, name,email,role) VALUES ('e7d61ea3f8dd49c88f2ff2484c07ac0b', 'rui',null,null);
 INSERT INTO user (uid, name,email,role) VALUES ('e7d61ea3f8dd49c88f2ff2484c07ac0c', 'ukai',null,null);
 INSERT INTO user (uid, name,email,role) VALUES ('e7d61ea3f8dd49c88f2ff2484c07ac0d', 'terada',null,null);
-INSERT INTO user (uid, name,email,role) VALUES ('e7d61ea3f8dd49c88f2ff2484c07ac0e', 'toyama',null,null);
+INSERT INTO user (uid, name,email,role) VALUES ('e7d61ea3f8dd49c88f2ff2484c07ac0e', 'toyama','tatu2425@gmail.com',2);
 INSERT INTO user (uid, name,email,role) VALUES ('e7d61ea3f8dd49c88f2ff2484c07ac0f', 'shamo',null,null);
 INSERT INTO user (uid, name,email,role) VALUES ('e7d61ea3f8dd49c88f2ff2484c07ac10', 'isiguro',null,null);
 INSERT INTO user (uid, name,email,role) VALUES ('e7d61ea3f8dd49c88f2ff2484c07ac11', 'ao',null,null);
