@@ -1,5 +1,5 @@
-@baseURL= http://localhost:8082
-# @baseURL= https://go-staywatch.kajilab.tk
+# @baseURL= http://localhost:8082
+@baseURL= https://go-staywatch.kajilab.tk
 # @baseURL= https://go-staywatch-test.kajilab.tk
 
 
@@ -81,4 +81,11 @@ content-type: application/json
 
 ###
 GET {{baseURL}}/room/v1/log/gantt HTTP/1.1
+content-type: application/json
 
+
+
+
+###
+GET {{baseURL}}/user/v1/check
+content-type: application/json
