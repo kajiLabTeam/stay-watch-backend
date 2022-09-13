@@ -1,9 +1,11 @@
 package model
 
 type User struct {
-	ID   int64  `json:"ID" xorm:"id"`
-	UUID string `json:"uuid" xorm:"uid"`
-	Name string `json:"name" xorm:"name"`
+	ID    int64  `json:"ID" xorm:"id"`
+	UUID  string `json:"uuid" xorm:"uid"`
+	Name  string `json:"name" xorm:"name"`
+	Email string `json:"email" xorm:"email"`
+	Role  int64  `json:"role" xorm:"role"`
 }
 
 type Log struct {
