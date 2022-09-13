@@ -5,14 +5,47 @@ import (
 	"Stay_watch/util"
 	"fmt"
 	"log"
+	"strconv"
 )
 
 type UserService struct{}
 
+//新しいuuidを生成する
+func (UserService) NewUUID() string {
+
+	//dbから一番最後に登録されたuuidを取得する
+	user := model.User{}
+	_, err := DbEngine.Table("user").Desc("id").Get(&user)
+	if err != nil {
+		log.Fatal(err.Error())
+		return ""
+	}
+	uuid := user.UUID
+	fowardTarget := uuid[0:28]
+	backTarget := uuid[28:]
+	//10進数に変換
+	targetInt, _ := strconv.ParseInt(backTarget, 16, 64)
+	targetInt = targetInt + 1
+	//16新数に変換
+	targetHex := strconv.FormatInt(targetInt, 16)
+
+	return fowardTarget + targetHex
+
+}
+
 //ユーザ登録処理
 func (UserService) RegisterUser(user *model.User) error {
-
 	_, err := DbEngine.Table("user").Insert(user)
+	if err != nil {
+		log.Fatal(err.Error())
+		return err
+	}
+	return nil
+}
+
+//ユーザのアップデート
+func (UserService) UpdateUser(user *model.User) error {
+	_, err := DbEngine.Table("user").Where("id=?", user.ID).Update(user)
 	if err != nil {
 		log.Fatal(err.Error())
 		return err
@@ -197,4 +230,15 @@ func (UserService) GetSameTimeUser(logs []model.Log) ([]model.SimultaneousStayUs
 		})
 	}
 	return simultaneousStayUserGetResponses, nil
+}
+
+//emailからユーザを取得する
+func (UserService) GetUserByEmail(email string) (model.User, error) {
+	user := model.User{}
+	_, err := DbEngine.Table("user").Where("email=?", email).Get(&user)
+	if err != nil {
+		log.Fatal(err.Error())
+		return user, err
+	}
+	return user, nil
 }
