@@ -2,7 +2,6 @@ package main
 
 import (
 	controller "Stay_watch/controller"
-	"Stay_watch/service"
 	"time"
 
 	"github.com/gin-contrib/cors"
@@ -44,23 +43,25 @@ func main() {
 	{
 		v1 := userEngine.Group("/v1")
 		{
+			v1.GET("/check", controller.Check)
 			v1.GET("/list", controller.UserList)
 			v1.GET("/detail", controller.Detail)
 			v1.GET("/list/simultaneous/:user_id", controller.SimultaneousStayUserList)
-			v1.POST("/register", controller.Register)
+			v1.POST("/registration", controller.Register)
 			v1.POST("/attendance", controller.Attendance)
 		}
 	}
 	engine.Run(":8080")
 
-	BotService := service.BotService{}
-	//2週間に一度定期的実行
-	ticker := time.NewTicker(time.Hour * 24 * 14)
-	defer ticker.Stop()
-	for {
-		select {
-		case <-ticker.C:
-			BotService.NotifyOutOfBattery()
-		}
-	}
+	// BotService := service.BotService{}
+	// //2週間に一度定期的実行
+	// ticker := time.NewTicker(time.Hour * 24 * 14)
+	// defer ticker.Stop()
+	// for {
+	// 	select {
+	// 	case <-ticker.C:
+	// 		BotService.NotifyOutOfBattery()
+	// 	}
+	// }
+
 }
