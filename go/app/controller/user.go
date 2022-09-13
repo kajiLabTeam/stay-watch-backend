@@ -18,15 +18,52 @@ func Detail(c *gin.Context) {
 
 func Register(c *gin.Context) {
 
-	user := model.User{}
-	c.BindJSON(&user)
+	RegistrationUserForm := model.User{}
+	c.BindJSON(&RegistrationUserForm)
+	fmt.Println(RegistrationUserForm)
+	UserService := service.UserService{}
+	//userIDがないなら新規登録
+	if RegistrationUserForm.ID == 0 {
+		user := model.User{
+			Name:  RegistrationUserForm.Name,
+			Email: RegistrationUserForm.Email,
+			Role:  RegistrationUserForm.Role,
+			UUID:  UserService.NewUUID(),
+		}
+		err := UserService.RegisterUser(&user)
+		if err != nil {
+			c.String(http.StatusInternalServerError, "Server Error")
+			return
+		}
+	}
+	//userIDがあるなら更新
+	if RegistrationUserForm.ID != 0 {
+		//userNameが空なので、userIDからuserNameを取得する
+		userName, err := UserService.GetUserNameByUserID(RegistrationUserForm.ID)
+		if err != nil {
+			c.String(http.StatusInternalServerError, "Server Error")
+			return
+		}
 
-	userService := service.UserService{}
+		uuid, err := UserService.GetUserUUIDByUserID(RegistrationUserForm.ID)
+		if err != nil {
+			c.String(http.StatusInternalServerError, "Server Error")
+			return
+		}
 
-	err := userService.RegisterUser(&user)
-	if err != nil {
-		c.String(http.StatusInternalServerError, "Server Error")
-		return
+		user := model.User{
+			ID:    RegistrationUserForm.ID,
+			Name:  userName,
+			Email: RegistrationUserForm.Email,
+			Role:  RegistrationUserForm.Role,
+			UUID:  uuid,
+		}
+		err = UserService.UpdateUser(&user)
+
+		if err != nil {
+			c.String(http.StatusInternalServerError, "Server Error")
+			return
+		}
 	}
 
 	c.JSON(200, gin.H{
@@ -48,7 +85,6 @@ func UserList(c *gin.Context) {
 	for _, user := range users {
 
 		tags := make([]model.Tag, 0)
-
 		tagsID, err := UserService.GetUserTagsID(user.ID)
 		if err != nil {
 			c.String(http.StatusInternalServerError, "Server Error")
@@ -152,7 +188,6 @@ func SimultaneousStayUserList(c *gin.Context) {
 		c.String(http.StatusInternalServerError, "Server Error")
 		return
 	}
-
 	simultaneousStayUserGetResponses, err := UserService.GetSameTimeUser(logs)
 	if err != nil {
 		c.String(http.StatusInternalServerError, "Server Error")
@@ -160,4 +195,32 @@ func SimultaneousStayUserList(c *gin.Context) {
 	}
 
 	c.JSON(200, simultaneousStayUserGetResponses)
+}
+
+func Check(c *gin.Context) {
+	firebaseUserInfo, err := verifyCheck(c.Request)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	UserService := service.UserService{}
+	user, err := UserService.GetUserByEmail(firebaseUserInfo["Email"])
+	if err != nil {
+		c.String(http.StatusInternalServerError, "Server Error")
+		return
+	}
+	fmt.Println(user)
+
+	//メールアドレスが存在しない場合はUserは存在しないのでリクエスト失敗
+	if (user == model.User{}) {
+		c.JSON(404, gin.H{
+			"status": "not found",
+		})
+		return
+	}
+
+	c.JSON(200,
+		user.Role,
+	)
 }

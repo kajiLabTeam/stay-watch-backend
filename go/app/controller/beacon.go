@@ -32,7 +32,6 @@ func Beacon(c *gin.Context) {
 
 		isExist := false
 		targetUserRssi := -200
-
 		for _, currentStayer := range beaconRoom.Beacons {
 
 			pastUUID, er := UserService.GetUserUUIDByUserID(pastStayer.UserID)
@@ -45,7 +44,6 @@ func Beacon(c *gin.Context) {
 				targetUserRssi = int(currentStayer.Rssi)
 				isExist = true
 			}
-
 		}
 
 		//RSSIが以前より強い場合
