@@ -4,39 +4,40 @@ use app;
 CREATE TABLE IF NOT EXISTS user
 (
   id        int(11) PRIMARY KEY AUTO_INCREMENT,
-  uid     VARCHAR(255),
-  name      VARCHAR(50)
+  uid       VARCHAR(255),
+  name      VARCHAR(50),
+  email     VARCHAR(50),
+  role      int(11)
 );
 
-
-INSERT INTO user (uid, name) VALUES ('e7d61ea3f8dd49c88f2ff2484c07ac00', 'kaji');
-INSERT INTO user (uid, name) VALUES ('e7d61ea3f8dd49c88f2ff2484c07ac01', 'ogane');
-INSERT INTO user (uid, name) VALUES ('e7d61ea3f8dd49c88f2ff2484c07ac02', 'miyagawa-san');
-INSERT INTO user (uid, name) VALUES ('e7d61ea3f8dd49c88f2ff2484c07ac03', 'ayato');
-INSERT INTO user (uid, name) VALUES ('e7d61ea3f8dd49c88f2ff2484c07ac04', 'ken');
-INSERT INTO user (uid, name) VALUES ('e7d61ea3f8dd49c88f2ff2484c07ac05', 'suzaki');
-INSERT INTO user (uid, name) VALUES ('e7d61ea3f8dd49c88f2ff2484c07ac06', 'akito');
-INSERT INTO user (uid, name) VALUES ('e7d61ea3f8dd49c88f2ff2484c07ac07', 'fueta');
-INSERT INTO user (uid, name) VALUES ('e7d61ea3f8dd49c88f2ff2484c07ac08', 'kameda');
-INSERT INTO user (uid, name) VALUES ('e7d61ea3f8dd49c88f2ff2484c07ac09', 'maruyama');
-INSERT INTO user (uid, name) VALUES ('e7d61ea3f8dd49c88f2ff2484c07ac0a', 'ohashi');
-INSERT INTO user (uid, name) VALUES ('e7d61ea3f8dd49c88f2ff2484c07ac0b', 'rui');
-INSERT INTO user (uid, name) VALUES ('e7d61ea3f8dd49c88f2ff2484c07ac0c', 'ukai');
-INSERT INTO user (uid, name) VALUES ('e7d61ea3f8dd49c88f2ff2484c07ac0d', 'terada');
-INSERT INTO user (uid, name) VALUES ('e7d61ea3f8dd49c88f2ff2484c07ac0e', 'toyama');
-INSERT INTO user (uid, name) VALUES ('e7d61ea3f8dd49c88f2ff2484c07ac0f', 'shamo');
-INSERT INTO user (uid, name) VALUES ('e7d61ea3f8dd49c88f2ff2484c07ac10', 'isiguro');
-INSERT INTO user (uid, name) VALUES ('e7d61ea3f8dd49c88f2ff2484c07ac11', 'ao');
-INSERT INTO user (uid, name) VALUES ('e7d61ea3f8dd49c88f2ff2484c07ac12', 'fuma');
-INSERT INTO user (uid, name) VALUES ('e7d61ea3f8dd49c88f2ff2484c07ac13', 'ueji');
-INSERT INTO user (uid, name) VALUES ('e7d61ea3f8dd49c88f2ff2484c07ac14', 'oiwa');
-INSERT INTO user (uid, name) VALUES ('e7d61ea3f8dd49c88f2ff2484c07ac15', 'togawa');
-INSERT INTO user (uid, name) VALUES ('e7d61ea3f8dd49c88f2ff2484c07ac16', 'yada');
-INSERT INTO user (uid, name) VALUES ('e7d61ea3f8dd49c88f2ff2484c07ac17', 'yokoyama');
-INSERT INTO user (uid, name) VALUES ('e7d61ea3f8dd49c88f2ff2484c07ac18', 'kazuo');
-INSERT INTO user (uid, name) VALUES ('e7d61ea3f8dd49c88f2ff2484c07ac19', 'sakai');
-INSERT INTO user (uid, name) VALUES ('e7d61ea3f8dd49c88f2ff2484c07ac1a', 'iwaguti');
-INSERT INTO user (uid, name) VALUES ('e7d61ea3f8dd49c88f2ff2484c07ac1b', 'makino');
+INSERT INTO user (uid, name,email,role) VALUES ('e7d61ea3f8dd49c88f2ff2484c07ac00', 'kaji',null,null);
+INSERT INTO user (uid, name,email,role) VALUES ('e7d61ea3f8dd49c88f2ff2484c07ac01', 'ogane',null,null);
+INSERT INTO user (uid, name,email,role) VALUES ('e7d61ea3f8dd49c88f2ff2484c07ac02', 'miyagawa-san',null,null);
+INSERT INTO user (uid, name,email,role) VALUES ('e7d61ea3f8dd49c88f2ff2484c07ac03', 'ayato',null,null);
+INSERT INTO user (uid, name,email,role) VALUES ('e7d61ea3f8dd49c88f2ff2484c07ac04', 'ken',null,null);
+INSERT INTO user (uid, name,email,role) VALUES ('e7d61ea3f8dd49c88f2ff2484c07ac05', 'suzaki',null,null);
+INSERT INTO user (uid, name,email,role) VALUES ('e7d61ea3f8dd49c88f2ff2484c07ac06', 'akito',null,null);
+INSERT INTO user (uid, name,email,role) VALUES ('e7d61ea3f8dd49c88f2ff2484c07ac07', 'fueta',null,null);
+INSERT INTO user (uid, name,email,role) VALUES ('e7d61ea3f8dd49c88f2ff2484c07ac08', 'kameda',null,null);
+INSERT INTO user (uid, name,email,role) VALUES ('e7d61ea3f8dd49c88f2ff2484c07ac09', 'maruyama',null,null);
+INSERT INTO user (uid, name,email,role) VALUES ('e7d61ea3f8dd49c88f2ff2484c07ac0a', 'ohashi',null,null);
+INSERT INTO user (uid, name,email,role) VALUES ('e7d61ea3f8dd49c88f2ff2484c07ac0b', 'rui',null,null);
+INSERT INTO user (uid, name,email,role) VALUES ('e7d61ea3f8dd49c88f2ff2484c07ac0c', 'ukai',null,null);
+INSERT INTO user (uid, name,email,role) VALUES ('e7d61ea3f8dd49c88f2ff2484c07ac0d', 'terada',null,null);
+INSERT INTO user (uid, name,email,role) VALUES ('e7d61ea3f8dd49c88f2ff2484c07ac0e', 'toyama',null,null);
+INSERT INTO user (uid, name,email,role) VALUES ('e7d61ea3f8dd49c88f2ff2484c07ac0f', 'shamo',null,null);
+INSERT INTO user (uid, name,email,role) VALUES ('e7d61ea3f8dd49c88f2ff2484c07ac10', 'isiguro',null,null);
+INSERT INTO user (uid, name,email,role) VALUES ('e7d61ea3f8dd49c88f2ff2484c07ac11', 'ao',null,null);
+INSERT INTO user (uid, name,email,role) VALUES ('e7d61ea3f8dd49c88f2ff2484c07ac12', 'fuma',null,null);
+INSERT INTO user (uid, name,email,role) VALUES ('e7d61ea3f8dd49c88f2ff2484c07ac13', 'ueji',null,null);
+INSERT INTO user (uid, name,email,role) VALUES ('e7d61ea3f8dd49c88f2ff2484c07ac14', 'oiwa',null,null);
+INSERT INTO user (uid, name,email,role) VALUES ('e7d61ea3f8dd49c88f2ff2484c07ac15', 'togawa',null,null);
+INSERT INTO user (uid, name,email,role) VALUES ('e7d61ea3f8dd49c88f2ff2484c07ac16', 'yada',null,null);
+INSERT INTO user (uid, name,email,role) VALUES ('e7d61ea3f8dd49c88f2ff2484c07ac17', 'yokoyama',null,null);
+INSERT INTO user (uid, name,email,role) VALUES ('e7d61ea3f8dd49c88f2ff2484c07ac18', 'kazuo',null,null);
+INSERT INTO user (uid, name,email,role) VALUES ('e7d61ea3f8dd49c88f2ff2484c07ac19', 'sakai',null,null);
+INSERT INTO user (uid, name,email,role) VALUES ('e7d61ea3f8dd49c88f2ff2484c07ac1a', 'iwaguti',null,null);
+INSERT INTO user (uid, name,email,role) VALUES ('e7d61ea3f8dd49c88f2ff2484c07ac1b', 'makino',null,null);
 
 
 
