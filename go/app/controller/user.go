@@ -66,6 +66,9 @@ func Register(c *gin.Context) {
 		}
 	}
 
+	mailService := service.MailService{}
+	mailService.SendMail("滞在ウォッチユーザ登録の完了のお知らせ", "ユーザ登録が完了したので滞在ウォッチを閲覧することが可能になりました\n一度プロジェクトをリセットしたので再度ログインお願いします。\nアプリドメイン\nhttps://stay-watch-go.kajilab.tk/", RegistrationUserForm.Email)
+
 	c.JSON(200, gin.H{
 		"status": "ok",
 	})
