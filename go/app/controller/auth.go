@@ -19,7 +19,7 @@ func verifyCheck(r *http.Request) (map[string]string, error) {
 	}
 
 	opt := option.WithCredentialsFile("/app/credentials/firebase.json")
-	conf := &firebase.Config{ProjectID: "stay-watch"}
+	conf := &firebase.Config{ProjectID: "stay-watch-a616f"}
 	//OAuth2.0更新トークン対応用
 	app, err := firebase.NewApp(ctx, conf, opt)
 	//OAuth2.0を用いない場合はconfをnilにする
