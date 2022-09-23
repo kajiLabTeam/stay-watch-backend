@@ -239,6 +239,6 @@ func (UserService) GetUserByEmail(email string) (model.User, error) {
 	if err != nil {
 		log.Fatal(err.Error())
 		return user, err
-	}
+	}	
 	return user, nil
 }

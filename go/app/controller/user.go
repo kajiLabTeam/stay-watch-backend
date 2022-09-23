@@ -201,6 +201,9 @@ func Check(c *gin.Context) {
 	firebaseUserInfo, err := verifyCheck(c.Request)
 	if err != nil {
 		fmt.Println(err)
+		c.JSON(401, gin.H{
+			"status": "invalid token",
+		})
 		return
 	}
 
@@ -214,8 +217,8 @@ func Check(c *gin.Context) {
 
 	//メールアドレスが存在しない場合はUserは存在しないのでリクエスト失敗
 	if (user == model.User{}) {
-		c.JSON(404, gin.H{
-			"status": "not found",
+		c.JSON(403, gin.H{
+			"status": "権限がありません 管理者にユーザ追加を依頼してください",
 		})
 		return
 	}
