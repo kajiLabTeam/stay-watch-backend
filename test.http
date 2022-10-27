@@ -1,5 +1,5 @@
-# @baseURL= http://localhost:8082
-@baseURL= https://go-staywatch.kajilab.tk
+@baseURL= http://localhost:8082
+# @baseURL= https://go-staywatch.kajilab.tk
 # @baseURL= https://go-staywatch-test.kajilab.tk
 
 
@@ -42,14 +42,14 @@ content-type: application/json
     "Beacons":[
         {
             "uuid": "e7d61ea3f8dd49c88f2ff2484c07ac0e",
-            "rssi": -20
+            "rssi": -60
         },
         {
             "uuid": "e7d61ea3f8dd49c88f2ff2484c07ac08",
-            "rssi": -20
+            "rssi": -75
         }
     ],
-    "roomID": 3
+    "roomID": 1
 }
 
 
