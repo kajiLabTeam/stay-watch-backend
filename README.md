@@ -17,7 +17,7 @@ slackのprj_staywatchを参照
 
 ネットワーク作成
 ```
-docker create --network vol_network
+docker network create vol_network
 ```
 
 
