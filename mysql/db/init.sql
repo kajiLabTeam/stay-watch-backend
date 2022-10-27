@@ -92,6 +92,7 @@ CREATE TABLE IF NOT EXISTS log
 
 CREATE TABLE IF NOT EXISTS stayer
 (
+  id int(11) primary key AUTO_INCREMENT,
   user_id        int(11),
   room_id     int(11),
   rssi      int(11)
