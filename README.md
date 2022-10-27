@@ -26,6 +26,24 @@ go+mysqlのコンテナ起動
 make dev
 ```
 
+mysqlコンテナの入り方
+```
+make vol_mysql
+```
+
+mysql ログイン
+```
+mysql -uroot -proot
+```
+
+
+データベース名を指定
+```
+use app;
+```
+
+
+
 
 
 
