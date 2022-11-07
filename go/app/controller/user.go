@@ -39,20 +39,20 @@ func Register(c *gin.Context) {
 	//userIDがあるなら更新
 	if RegistrationUserForm.ID != 0 {
 		//userNameが空なので、userIDからuserNameを取得する
-		userName, err := UserService.GetUserNameByUserID(RegistrationUserForm.ID)
+		userName, err := UserService.GetUserNameByUserID(int64(RegistrationUserForm.ID))
 		if err != nil {
 			c.String(http.StatusInternalServerError, "Server Error")
 			return
 		}
 
-		uuid, err := UserService.GetUserUUIDByUserID(RegistrationUserForm.ID)
+		uuid, err := UserService.GetUserUUIDByUserID(int64(RegistrationUserForm.ID))
 		if err != nil {
 			c.String(http.StatusInternalServerError, "Server Error")
 			return
 		}
 
 		user := model.User{
-			ID:    RegistrationUserForm.ID,
+			// ID:    RegistrationUserForm.id,
 			Name:  userName,
 			Email: RegistrationUserForm.Email,
 			Role:  RegistrationUserForm.Role,
@@ -88,7 +88,7 @@ func UserList(c *gin.Context) {
 	for _, user := range users {
 
 		tags := make([]model.Tag, 0)
-		tagsID, err := UserService.GetUserTagsID(user.ID)
+		tagsID, err := UserService.GetUserTagsID(int64(user.Model.ID))
 		if err != nil {
 			c.String(http.StatusInternalServerError, "Server Error")
 			return
@@ -109,7 +109,7 @@ func UserList(c *gin.Context) {
 		}
 
 		userInformationGetResponse = append(userInformationGetResponse, model.UserInformationGetResponse{
-			ID:   user.ID,
+			ID:   int64(user.ID),
 			Name: user.Name,
 			Tags: tags,
 		})

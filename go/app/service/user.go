@@ -173,7 +173,7 @@ func (UserService) GetUserIDByUUID(uuid string) (int64, error) {
 		log.Fatal(err.Error())
 		return 0, err
 	}
-	return user.ID, nil
+	return int64(user.ID), nil
 }
 
 //指定されたログリストと同じ時間にいたユーザを取得する
@@ -182,7 +182,7 @@ func (UserService) GetSameTimeUser(logs []model.Log) ([]model.SimultaneousStayUs
 	fmt.Println(logs)
 	dates := make([]string, 0)
 	for _, log := range logs {
-		dates = append(dates, log.StartAt[:10])
+		dates = append(dates, log.StartAt.Format("2006-01-02"))
 		//時間が被るログを取得
 		err := DbEngine.Table("log").Asc("start_at").Where("start_at >= ?", log.StartAt).And("start_at <= ?", log.EndAt).Or(
 			"end_at >= ? and end_at <= ?", log.StartAt, log.EndAt).Or(
@@ -206,7 +206,7 @@ func (UserService) GetSameTimeUser(logs []model.Log) ([]model.SimultaneousStayUs
 
 		userIDs := make([]int64, 0)
 		for _, log := range targetLogs {
-			if log.StartAt[:10] == date {
+			if log.StartAt.Format("2006-01-02") == date {
 				userIDs = append(userIDs, log.UserID)
 			}
 		}

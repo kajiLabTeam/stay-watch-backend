@@ -79,3 +79,13 @@ type RegistrationUserForm struct {
 	TargetName  string `json:"targetName"`
 	TargetRole  int64  `json:"targetRole"`
 }
+
+type BeaconRoom struct {
+	Beacons []*Beacon `json:"beacons"`
+	RoomID  int64     `json:"roomID"`
+}
+
+type Beacon struct {
+	Uuid string `json:"uuid" form:"uuid"`
+	Rssi int64  `json:"rssi" form:"rssi"`
+}

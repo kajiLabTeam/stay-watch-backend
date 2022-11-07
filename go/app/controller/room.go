@@ -103,11 +103,11 @@ func Log(c *gin.Context) {
 		}
 
 		logGetResponse = append(logGetResponse, model.LogGetResponse{
-			ID:      log.ID,
+			ID:      int64(log.ID),
 			Name:    userName,
 			Room:    roomName,
-			StartAt: log.StartAt,
-			EndAt:   log.EndAt,
+			StartAt: log.StartAt.Format("2006-01-02"),
+			EndAt:   log.EndAt.Format("2006-01-02"),
 		})
 	}
 	c.JSON(200, logGetResponse)
