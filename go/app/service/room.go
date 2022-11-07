@@ -12,22 +12,17 @@ type RoomService struct{}
 
 func (RoomService) SetLog(Log *model.Log) error {
 
-	_, err := DbEngine.Table("log").Insert(Log)
-	if err != nil {
-		return fmt.Errorf(" failed: %w", err)
+	result := DbEngine.Create(&Log)
+	if result.Error != nil {
+		return fmt.Errorf(" failed: %w", result.Error)
 	}
 	return nil
 }
 
 //該当ユーザが存在するか確認
-func (RoomService) GetStayer(stayer *model.Stayer) (error, bool) {
-	affected, err := DbEngine.Get(stayer)
-
-	if err != nil {
-		return fmt.Errorf(" failed: %w", err), false
-	}
-
-	if affected == true {
+func (RoomService) GetStayer(userID int64) (error, bool) {
+	result := DbEngine.Table("stayer").Where("user_id=?", userID).Take(&model.Stayer{})
+	if result.RowsAffected != 0 {
 		return nil, true
 	}
 	return nil, false
@@ -56,37 +51,45 @@ func (RoomService) GetStayerByRoomID(roomID int64) ([]model.Stayer, error) {
 
 func (RoomService) SetStayer(stayer *model.Stayer) error {
 
-	_, err := DbEngine.Table("stayer").Insert(stayer)
-	if err != nil {
-		return fmt.Errorf(" failed: %w", err)
+	result := DbEngine.Create(&stayer)
+	if result.Error != nil {
+		return fmt.Errorf(" failed: %w", result.Error)
 	}
 	return nil
 }
 
 func (RoomService) UpdateStayer(stayer *model.Stayer) error {
 
-	_, err := DbEngine.Table("stayer").Where("user_id=?", stayer.UserID).Update(stayer)
-	if err != nil {
-		return fmt.Errorf(" failed: %w", err)
+	result := DbEngine.Model(&model.Stayer{}).Where("user_id=?", stayer.UserID).Updates(&stayer)
+
+	if result.Error != nil {
+		return fmt.Errorf(" failed: %w", result.Error)
 	}
+
 	return nil
 }
 
 func (RoomService) DeleteStayer(userID int64) error {
 
-	_, err := DbEngine.Table("stayer").Where("user_id=?", userID).Delete(model.Stayer{})
-	if err != nil {
-		return fmt.Errorf(" failed: %w", err)
+	result := DbEngine.Where("user_id=?", userID).Delete(&model.Stayer{})
+	if result.Error != nil {
+		return fmt.Errorf(" failed: %w", result.Error)
 	}
 	return nil
 }
 
 func (RoomService) InsertEndAt(userID int64) error {
 	currentTime := time.Now()
-	_, err := DbEngine.Table("log").Desc("start_at").Limit(1).Where("user_id=?", userID).Update(map[string]string{"end_at": currentTime.Format("2006-01-02 15:04:05")})
-	if err != nil {
-		return fmt.Errorf(" failed: %w", err)
+	// _, err := DbEngine.Table("log").Desc("start_at").Limit(1).Where("user_id=?", userID).Update(map[string]string{"end_at": currentTime.Format("2006-01-02 15:04:05")})
+	// if err != nil {
+	// 	return fmt.Errorf(" failed: %w", err)
+	// }
+
+	result := DbEngine.Last(&model.Log{}).Where("user_id=? ", userID).Update("end_at", currentTime.Format("2006-01-02 15:04:05"))
+	if result.Error != nil {
+		return fmt.Errorf(" failed: %w", result.Error)
 	}
+
 	return nil
 }
 
@@ -124,7 +127,9 @@ func (RoomService) GetGanttLog() ([]model.SimulataneousStayLogGetResponse, error
 	dates := make([]string, 0)
 	roomIDs := make([]int64, 0)
 	for _, log := range logs {
-		dates = append(dates, log.StartAt[:10])
+		dates = append(dates,
+			log.StartAt.Format("2006-01-02"))
+
 		roomIDs = append(roomIDs, log.RoomID)
 	}
 	util := util.Util{}
@@ -155,14 +160,15 @@ func (RoomService) GetGanttLog() ([]model.SimulataneousStayLogGetResponse, error
 			stayTimes := make([]model.StayTime, 0)
 			for _, log := range sortlogs {
 				stayTime := model.StayTime{}
-				locationTime, err := util.ConvertDatetimeToLocationTime(log.StartAt, "Asia/Tokyo")
+				locationTime, err := util.ConvertDatetimeToLocationTime(log.StartAt.Format("2006-01-02 15:04:05"), "Asia/Tokyo")
 				if err != nil {
 					return nil, err
 				}
 				unixMilli := util.TimeToUnixMilli(locationTime)
 				stayTime.StartAt = unixMilli
 
-				locationTime, err = util.ConvertDatetimeToLocationTime(log.EndAt, "Asia/Tokyo")
+				locationTime, err = util.ConvertDatetimeToLocationTime(log.EndAt.Format("2006-01-02 15:04:05"), "Asia/Tokyo")
+
 				if err != nil {
 					return nil, err
 				}
@@ -175,7 +181,7 @@ func (RoomService) GetGanttLog() ([]model.SimulataneousStayLogGetResponse, error
 				}
 				stayTime.UserName = userName
 				stayTime.Color = "green"
-				stayTime.ID = log.ID
+				stayTime.ID = int64(log.ID)
 				stayTimes = append(stayTimes, stayTime)
 			}
 			roomGetResponse.StayTimes = stayTimes
@@ -201,7 +207,7 @@ func (RoomService) GetSimultaneousList(userID int64) ([]model.SimulataneousStayL
 	dates := make([]string, 0)
 	roomIDs := make([]int64, 0)
 	for _, log := range logs {
-		dates = append(dates, log.StartAt[:10])
+		dates = append(dates, log.StartAt.Format("2006-01-02"))
 		roomIDs = append(roomIDs, log.RoomID)
 	}
 
@@ -249,21 +255,22 @@ func (RoomService) GetSimultaneousList(userID int64) ([]model.SimulataneousStayL
 
 		//最後のindexの時
 		if index == len(sameDayAndRoomlogs)-1 {
-			stayTime.ID = sameDayAndRoomlog.ID
+			stayTime.ID = int64(sameDayAndRoomlog.ID)
 			userName, err := UserService.GetUserNameByUserID(sameDayAndRoomlog.UserID)
 			if err != nil {
 				return nil, fmt.Errorf(" failed: %w", err)
 			}
 			stayTime.UserName = userName
 
-			locationTime, err := util.ConvertDatetimeToLocationTime(sameDayAndRoomlog.StartAt, "Asia/Tokyo")
+			locationTime, err := util.ConvertDatetimeToLocationTime(sameDayAndRoomlog.StartAt.Format("2006-01-02 15:04:05"), "Asia/Tokyo")
 			if err != nil {
 				return nil, fmt.Errorf(" failed: %w", err)
 			}
 			unixMilli := util.TimeToUnixMilli(locationTime)
 			stayTime.StartAt = unixMilli
 
-			locationTime, err = util.ConvertDatetimeToLocationTime(sameDayAndRoomlog.EndAt, "Asia/Tokyo")
+			locationTime, err = util.ConvertDatetimeToLocationTime(sameDayAndRoomlog.EndAt.Format("2006-01-02 15:04:05"), "Asia/Tokyo")
+
 			if err != nil {
 				log.Fatal(err.Error())
 				return nil, err
@@ -292,14 +299,14 @@ func (RoomService) GetSimultaneousList(userID int64) ([]model.SimulataneousStayL
 			//後でuniqueDateのindexに置き換えるかも
 			simulataneousStayLogGetResponse.ID = int64(dateCount)
 			dateCount++
-			simulataneousStayLogGetResponse.Date = sameDayAndRoomlog.StartAt[:10]
+			simulataneousStayLogGetResponse.Date = sameDayAndRoomlog.StartAt.Format("2006-01-02")
 			simulataneousStayLogGetResponse.Rooms = roomsGetResponse
 			simulataneousStayLogsGetResponse = append(simulataneousStayLogsGetResponse, simulataneousStayLogGetResponse)
 			roomsGetResponse = nil
 		} else {
-			if sameDayAndRoomlog.StartAt[:10] == sameDayAndRoomlogs[index+1].StartAt[:10] {
+			if sameDayAndRoomlog.StartAt.Format("2006-01-02") == sameDayAndRoomlogs[index+1].StartAt.Format("2006-01-02") {
 				if sameDayAndRoomlog.RoomID == sameDayAndRoomlogs[index+1].RoomID {
-					stayTime.ID = sameDayAndRoomlog.ID
+					stayTime.ID = int64(sameDayAndRoomlog.ID)
 					userName, err := UserService.GetUserNameByUserID(sameDayAndRoomlog.UserID)
 					if err != nil {
 						log.Fatal(err.Error())
@@ -307,7 +314,7 @@ func (RoomService) GetSimultaneousList(userID int64) ([]model.SimulataneousStayL
 					}
 					stayTime.UserName = userName
 
-					locationTime, err := util.ConvertDatetimeToLocationTime(sameDayAndRoomlog.StartAt, "Asia/Tokyo")
+					locationTime, err := util.ConvertDatetimeToLocationTime(sameDayAndRoomlog.StartAt.Format("2006-01-02"), "Asia/Tokyo")
 					if err != nil {
 						log.Fatal(err.Error())
 						return nil, err
@@ -315,7 +322,7 @@ func (RoomService) GetSimultaneousList(userID int64) ([]model.SimulataneousStayL
 					unixMilli := util.TimeToUnixMilli(locationTime)
 					stayTime.StartAt = unixMilli
 
-					locationTime, err = util.ConvertDatetimeToLocationTime(sameDayAndRoomlog.EndAt, "Asia/Tokyo")
+					locationTime, err = util.ConvertDatetimeToLocationTime(sameDayAndRoomlog.StartAt.Format("2006-01-02"), "Asia/Tokyo")
 					if err != nil {
 						log.Fatal(err.Error())
 						return nil, err
@@ -331,7 +338,7 @@ func (RoomService) GetSimultaneousList(userID int64) ([]model.SimulataneousStayL
 					}
 					stayTimes = append(stayTimes, stayTime)
 				} else {
-					stayTime.ID = sameDayAndRoomlog.ID
+					stayTime.ID = int64(sameDayAndRoomlog.ID)
 					userName, err := UserService.GetUserNameByUserID(sameDayAndRoomlog.UserID)
 					if err != nil {
 						log.Fatal(err.Error())
@@ -339,7 +346,7 @@ func (RoomService) GetSimultaneousList(userID int64) ([]model.SimulataneousStayL
 					}
 					stayTime.UserName = userName
 
-					locationTime, err := util.ConvertDatetimeToLocationTime(sameDayAndRoomlog.StartAt, "Asia/Tokyo")
+					locationTime, err := util.ConvertDatetimeToLocationTime(sameDayAndRoomlog.StartAt.Format("2006-01-02"), "Asia/Tokyo")
 					if err != nil {
 						log.Fatal(err.Error())
 						return nil, err
@@ -347,7 +354,7 @@ func (RoomService) GetSimultaneousList(userID int64) ([]model.SimulataneousStayL
 					unixMilli := util.TimeToUnixMilli(locationTime)
 					stayTime.StartAt = unixMilli
 
-					locationTime, err = util.ConvertDatetimeToLocationTime(sameDayAndRoomlog.EndAt, "Asia/Tokyo")
+					locationTime, err = util.ConvertDatetimeToLocationTime(sameDayAndRoomlog.StartAt.Format("2006-01-02"), "Asia/Tokyo")
 					if err != nil {
 						log.Fatal(err.Error())
 						return nil, err
@@ -375,7 +382,7 @@ func (RoomService) GetSimultaneousList(userID int64) ([]model.SimulataneousStayL
 					stayTimes = nil
 				}
 			} else {
-				stayTime.ID = sameDayAndRoomlog.ID
+				stayTime.ID = int64(sameDayAndRoomlog.ID)
 				userName, err := UserService.GetUserNameByUserID(sameDayAndRoomlog.UserID)
 				if err != nil {
 					log.Fatal(err.Error())
@@ -383,7 +390,7 @@ func (RoomService) GetSimultaneousList(userID int64) ([]model.SimulataneousStayL
 				}
 				stayTime.UserName = userName
 
-				locationTime, err := util.ConvertDatetimeToLocationTime(sameDayAndRoomlog.StartAt, "Asia/Tokyo")
+				locationTime, err := util.ConvertDatetimeToLocationTime(sameDayAndRoomlog.StartAt.Format("2006-01-02"), "Asia/Tokyo")
 				if err != nil {
 					log.Fatal(err.Error())
 					return nil, err
@@ -391,7 +398,7 @@ func (RoomService) GetSimultaneousList(userID int64) ([]model.SimulataneousStayL
 				unixMilli := util.TimeToUnixMilli(locationTime)
 				stayTime.StartAt = unixMilli
 
-				locationTime, err = util.ConvertDatetimeToLocationTime(sameDayAndRoomlog.EndAt, "Asia/Tokyo")
+				locationTime, err = util.ConvertDatetimeToLocationTime(sameDayAndRoomlog.StartAt.Format("2006-01-02"), "Asia/Tokyo")
 				if err != nil {
 					log.Fatal(err.Error())
 					return nil, err
@@ -421,7 +428,7 @@ func (RoomService) GetSimultaneousList(userID int64) ([]model.SimulataneousStayL
 				//後でuniqueDateのindexに置き換えるかも
 				simulataneousStayLogGetResponse.ID = int64(dateCount)
 				dateCount++
-				simulataneousStayLogGetResponse.Date = sameDayAndRoomlog.StartAt[:10]
+				simulataneousStayLogGetResponse.Date = sameDayAndRoomlog.StartAt.Format("2006-01-02")
 				simulataneousStayLogGetResponse.Rooms = roomsGetResponse
 				simulataneousStayLogsGetResponse = append(simulataneousStayLogsGetResponse, simulataneousStayLogGetResponse)
 				roomsGetResponse = nil

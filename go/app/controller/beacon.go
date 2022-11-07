@@ -1,20 +1,19 @@
 package controller
 
 import (
-	"Stay_watch/model"
-	"Stay_watch/service"
 	"fmt"
 	"net/http"
 	"time"
 
+	"Stay_watch/model"
+	"Stay_watch/service"
+
 	"github.com/gin-gonic/gin"
 )
 
-//ビーコン情報を受け取る
+// ビーコン情報を受け取る
 func Beacon(c *gin.Context) {
-
 	beaconRoom := model.BeaconRoom{}
-
 	err := c.Bind(&beaconRoom)
 	if err != nil {
 		fmt.Println("err=", err)
@@ -25,7 +24,7 @@ func Beacon(c *gin.Context) {
 	RoomService := service.RoomService{}
 	UserService := service.UserService{}
 	BotService := service.BotService{}
-	//事前にStayerテーブルのデータを取得する
+	// 事前にStayerテーブルのデータを取得する
 	pastAllStayer, err := RoomService.GetAllStayer()
 
 	for _, pastStayer := range pastAllStayer {
@@ -39,16 +38,16 @@ func Beacon(c *gin.Context) {
 				c.String(http.StatusInternalServerError, "Server Error")
 				return
 			}
-			//1つ前のstgayerテーブルにもいた場合
+			// 1つ前のstgayerテーブルにもいた場合
 			if pastUUID == currentStayer.Uuid {
 				targetUserRssi = int(currentStayer.Rssi)
 				isExist = true
 			}
 		}
 
-		//RSSIが以前より強い場合
+		// RSSIが以前より強い場合
 		if isExist && targetUserRssi > int(pastStayer.Rssi) {
-			//同じ部屋にいる場合は更新
+			// 同じ部屋にいる場合は更新
 			if beaconRoom.RoomID == pastStayer.RoomID {
 				fmt.Println("同じ部屋にいる場合は更新 RSSI強くなる")
 				err := RoomService.UpdateStayer(&model.Stayer{
@@ -62,12 +61,12 @@ func Beacon(c *gin.Context) {
 				}
 			} else {
 				fmt.Println("別の部屋にいる場合は削除")
-				//別の部屋の場合Stayerテーブルから削除する
+				// 別の部屋の場合Stayerテーブルから削除する
 				err := RoomService.DeleteStayer(pastStayer.UserID)
 				if err != nil {
 					fmt.Println(err)
 				}
-				//logテーブルのendAtを更新する
+				// logテーブルのendAtを更新する
 				err = RoomService.InsertEndAt(pastStayer.UserID)
 				if err != nil {
 					fmt.Println(err)
@@ -108,17 +107,17 @@ func Beacon(c *gin.Context) {
 		// 	}
 		// }
 
-		//以前いた部屋のデータに存在しない場合 {Beacons:[] ,RoomID:1}
+		// 以前いた部屋のデータに存在しない場合 {Beacons:[] ,RoomID:1}
 		if !isExist && pastStayer.RoomID == beaconRoom.RoomID {
 			fmt.Println("以前いた部屋のデータに存在しない場合")
 
-			//Stayerテーブルから削除する
+			// Stayerテーブルから削除する
 			err := RoomService.DeleteStayer(pastStayer.UserID)
 			if err != nil {
 				fmt.Println(err)
 			}
 
-			//logテーブルのendAtを更新する
+			// logテーブルのendAtを更新する
 			err = RoomService.InsertEndAt(pastStayer.UserID)
 			if err != nil {
 				fmt.Println(err)
@@ -152,21 +151,21 @@ func Beacon(c *gin.Context) {
 		}
 
 		currentTime := time.Now()
-		//もし火曜日だったら
+		// もし火曜日だったら
 		if currentTime.Weekday() == time.Tuesday {
-			//8時から12時の時
+			// 8時から12時の時
 			if currentTime.Hour() >= 7 && currentTime.Hour() < 12 {
 				UserService.TemporarilySavedAttendance(currentUserID, 1)
 			}
 		}
 
-		//stayerテーブルを検索して該当ユーザがいるか確認する
-		err, stayerFlag := RoomService.GetStayer(&model.Stayer{UserID: currentUserID})
+		// stayerテーブルを検索して該当ユーザがいるか確認する
+		err, stayerFlag := RoomService.GetStayer(currentUserID)
 		if err != nil {
 			c.String(http.StatusBadRequest, "Bad Request")
 			return
 		}
-		//該当ユーザがいない場合はstayerテーブルとlogテーブルに新規に追加する
+		// 該当ユーザがいない場合はstayerテーブルとlogテーブルに新規に追加する
 		if !stayerFlag {
 			err = RoomService.SetStayer(&model.Stayer{UserID: currentUserID, RoomID: beaconRoom.RoomID, Rssi: currentStayer.Rssi})
 			if err != nil {
@@ -174,8 +173,14 @@ func Beacon(c *gin.Context) {
 				return
 			}
 			currentTime := time.Now()
+			endAt, err := time.Parse("2006-01-02 15:04:05", "2016-01-01 00:00:00")
+			if err != nil {
+				fmt.Println(err)
+				c.String(http.StatusBadRequest, "Bad Request")
+				return
+			}
 
-			err = RoomService.SetLog(&model.Log{RoomID: beaconRoom.RoomID, StartAt: currentTime.Format("2006-01-02 15:04:05"), EndAt: "2016-01-01 00:00:00", UserID: currentUserID, Rssi: currentStayer.Rssi})
+			err = RoomService.SetLog(&model.Log{RoomID: beaconRoom.RoomID, StartAt: currentTime, EndAt: endAt, UserID: currentUserID, Rssi: currentStayer.Rssi})
 			if err != nil {
 				c.String(http.StatusBadRequest, "Bad Request")
 				return
