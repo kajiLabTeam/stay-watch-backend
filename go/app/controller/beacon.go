@@ -26,6 +26,11 @@ func Beacon(c *gin.Context) {
 	BotService := service.BotService{}
 	// 事前にStayerテーブルのデータを取得する
 	pastAllStayer, err := RoomService.GetAllStayer()
+	if err != nil {
+		fmt.Errorf("failed: %w", err)
+		c.String(http.StatusInternalServerError, "Server Error")
+		return
+	}
 
 	for _, pastStayer := range pastAllStayer {
 

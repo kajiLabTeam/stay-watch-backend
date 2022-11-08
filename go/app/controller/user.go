@@ -5,7 +5,6 @@ import (
 	"Stay_watch/service"
 	"fmt"
 	"net/http"
-	"strconv"
 
 	"github.com/gin-gonic/gin"
 )
@@ -102,7 +101,7 @@ func UserList(c *gin.Context) {
 				return
 			}
 			tag := model.Tag{
-				ID:   tagID,
+
 				Name: tagName,
 			}
 			tags = append(tags, tag)
@@ -174,31 +173,31 @@ func Attendance(c *gin.Context) {
 	})
 }
 
-func SimultaneousStayUserList(c *gin.Context) {
-	userID := c.Param("user_id")
-	//int64に変換
-	userIDInt64, err := strconv.ParseInt(userID, 10, 64)
-	if err != nil {
-		c.String(http.StatusInternalServerError, "Server Error")
-		return
-	}
+// func SimultaneousStayUserList(c *gin.Context) {
+// 	userID := c.Param("user_id")
+// 	//int64に変換
+// 	userIDInt64, err := strconv.ParseInt(userID, 10, 64)
+// 	if err != nil {
+// 		c.String(http.StatusInternalServerError, "Server Error")
+// 		return
+// 	}
 
-	UserService := service.UserService{}
-	RoomService := service.RoomService{}
+// 	UserService := service.UserService{}
+// 	RoomService := service.RoomService{}
 
-	logs, err := RoomService.GetLogByUserAndDate(userIDInt64, 14)
-	if err != nil {
-		c.String(http.StatusInternalServerError, "Server Error")
-		return
-	}
-	simultaneousStayUserGetResponses, err := UserService.GetSameTimeUser(logs)
-	if err != nil {
-		c.String(http.StatusInternalServerError, "Server Error")
-		return
-	}
+// 	logs, err := RoomService.GetLogByUserAndDate(userIDInt64, 14)
+// 	if err != nil {
+// 		c.String(http.StatusInternalServerError, "Server Error")
+// 		return
+// 	}
+// 	simultaneousStayUserGetResponses, err := UserService.GetSameTimeUser(logs)
+// 	if err != nil {
+// 		c.String(http.StatusInternalServerError, "Server Error")
+// 		return
+// 	}
 
-	c.JSON(200, simultaneousStayUserGetResponses)
-}
+// 	c.JSON(200, simultaneousStayUserGetResponses)
+// }
 
 func Check(c *gin.Context) {
 	firebaseUserInfo, err := verifyCheck(c.Request)

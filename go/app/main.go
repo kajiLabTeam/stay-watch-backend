@@ -36,7 +36,7 @@ func main() {
 			v1.GET("/log", controller.Log)
 			v1.GET("/log/gantt", controller.LogGantt)
 			v1.POST("/beacon", controller.Beacon)
-			v1.GET("/list/simultaneous/:user_id", controller.SimultaneousList)
+			// v1.GET("/list/simultaneous/:user_id", controller.SimultaneousList)
 		}
 	}
 	userEngine := engine.Group("/user")
@@ -46,11 +46,12 @@ func main() {
 			v1.GET("/check", controller.Check)
 			v1.GET("/list", controller.UserList)
 			v1.GET("/detail", controller.Detail)
-			v1.GET("/list/simultaneous/:user_id", controller.SimultaneousStayUserList)
+			// v1.GET("/list/simultaneous/:user_id", controller.SimultaneousStayUserList)
 			v1.POST("/registration", controller.Register)
 			v1.POST("/attendance", controller.Attendance)
 		}
 	}
+
 	engine.Run(":8080")
 
 	// BotService := service.BotService{}

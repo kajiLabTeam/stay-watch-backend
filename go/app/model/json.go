@@ -1,11 +1,16 @@
 package model
 
 type StayerGetResponse struct {
-	ID     int64  `json:"id"`
-	Name   string `json:"name"`
-	Room   string `json:"room"`
-	RoomID int    `json:"roomID"`
-	Tags   []Tag  `json:"tags"`
+	ID     int64            `json:"id"`
+	Name   string           `json:"name"`
+	Room   string           `json:"room"`
+	RoomID int              `json:"roomID"`
+	Tags   []TagGetResponse `json:"tags"`
+}
+
+type TagGetResponse struct {
+	ID   int64  `json:"id"`
+	Name string `json:"name"`
 }
 
 type LogGetResponse struct {
