@@ -37,21 +37,21 @@ type Stayer struct {
 }
 
 type Tag struct {
-	ID   int64  `json:"id" xorm:"id"`
-	Name string `json:"name" xorm:"name"`
+	gorm.Model
+	Name string
 }
 
 type TagMap struct {
-	ID     int64  `json:"ID" xorm:"id"`
-	UserID int64  `json:"userID" xorm:"user_id"`
-	TagID  string `json:"tagID" xorm:"tag_id"`
+	gorm.Model
+	UserID int64
+	TagID  string
 }
 
 type Attendance struct {
-	ID     int64  `json:"ID" xorm:"id"`
-	UserID int64  `json:"userID" xorm:"user_id"`
-	Date   string `json:"date" xorm:"date"`
-	Flag   bool   `json:"exit" xorm:"flag"`
+	gorm.Model
+	UserID int64
+	Date   string
+	Flag   bool
 }
 
 type AttendanceTmp struct {
