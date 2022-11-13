@@ -1,8 +1,10 @@
-@baseURL= http://localhost:8082
+@baseURL= http://localhost:8080
 # @baseURL= https://go-staywatch.kajilab.tk
 # @baseURL= https://go-staywatch-test.kajilab.tk
 
 
+###
+Get {{baseURL}}/room/v1/stayer
 
 ###
 Get {{baseURL}}/room/v1/log
@@ -59,6 +61,7 @@ content-type: application/json
 
 {
     "Beacons":[
+      
     ],
     "roomID": 1
 }
@@ -82,7 +85,6 @@ content-type: application/json
 ###
 GET {{baseURL}}/room/v1/log/gantt HTTP/1.1
 content-type: application/json
-
 
 
 

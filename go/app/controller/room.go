@@ -18,10 +18,11 @@ func Stayer(c *gin.Context) {
 	//Stayerテーブルから全てのデータを取得する
 	allStayer, err := RoomService.GetAllStayer()
 	if err != nil {
+
+		fmt.Printf("failed: Cannnot get stayer %v", err)
 		c.String(http.StatusInternalServerError, "Server Error")
 		return
 	}
-	fmt.Println("ok")
 
 	stayerGetResponse := []model.StayerGetResponse{}
 

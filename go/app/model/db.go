@@ -44,7 +44,7 @@ type Tag struct {
 type TagMap struct {
 	gorm.Model
 	UserID int64
-	TagID  string
+	TagID  int64
 }
 
 type Attendance struct {

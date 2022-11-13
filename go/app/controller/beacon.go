@@ -27,7 +27,7 @@ func Beacon(c *gin.Context) {
 	// 事前にStayerテーブルのデータを取得する
 	pastAllStayer, err := RoomService.GetAllStayer()
 	if err != nil {
-		fmt.Errorf("failed: %w", err)
+		fmt.Printf("failed: Cannnot get stayer %v", err)
 		c.String(http.StatusInternalServerError, "Server Error")
 		return
 	}
@@ -40,6 +40,7 @@ func Beacon(c *gin.Context) {
 
 			pastUUID, er := UserService.GetUserUUIDByUserID(pastStayer.UserID)
 			if er != nil {
+				fmt.Printf("failed: Cannnot get user uuid %v", er)
 				c.String(http.StatusInternalServerError, "Server Error")
 				return
 			}
@@ -61,6 +62,7 @@ func Beacon(c *gin.Context) {
 					Rssi:   int64(targetUserRssi),
 				})
 				if err != nil {
+					fmt.Printf("failed: Cannnot update stayer %v", err)
 					c.String(http.StatusInternalServerError, "Server Error")
 					return
 				}
@@ -69,26 +71,31 @@ func Beacon(c *gin.Context) {
 				// 別の部屋の場合Stayerテーブルから削除する
 				err := RoomService.DeleteStayer(pastStayer.UserID)
 				if err != nil {
-					fmt.Println(err)
+					fmt.Println("failed: Cannnot delete stayer")
+					c.String(http.StatusInternalServerError, "Server Error")
 				}
 				// logテーブルのendAtを更新する
 				err = RoomService.InsertEndAt(pastStayer.UserID)
 				if err != nil {
-					fmt.Println(err)
+					fmt.Println("failed: Cannnot update endAt")
+					c.String(http.StatusInternalServerError, "Server Error")
 				}
 
 				pastStayerUserName, err := UserService.GetUserNameByUserID(pastStayer.UserID)
 				if err != nil {
+					fmt.Println("failed: Cannnot get user name")
 					c.String(http.StatusInternalServerError, "Server Error")
 					return
 				}
 				pastRoomName, err := RoomService.GetRoomNameByRoomID(pastStayer.RoomID)
 				if err != nil {
+					fmt.Println("failed: Cannnot get room name")
 					c.String(http.StatusInternalServerError, "Server Error")
 					return
 				}
 				err = BotService.SendMessage(fmt.Sprintf("%sさんが%sから退室しました", pastStayerUserName, pastRoomName), "B03J95EL3ME/9MLCZ8VTkEFGDVwTxkqYLKyj")
 				if err != nil {
+					fmt.Println("failed: Cannnot send message")
 					c.String(http.StatusInternalServerError, "Server Error")
 					return
 				}
@@ -130,16 +137,19 @@ func Beacon(c *gin.Context) {
 
 			pastStayerUserName, err := UserService.GetUserNameByUserID(pastStayer.UserID)
 			if err != nil {
+				fmt.Println("failed: Cannnot get user name")
 				c.String(http.StatusInternalServerError, "Server Error")
 				return
 			}
 			pastRoomName, err := RoomService.GetRoomNameByRoomID(pastStayer.RoomID)
 			if err != nil {
+				fmt.Println("failed: Cannnot get room name")
 				c.String(http.StatusInternalServerError, "Server Error")
 				return
 			}
 			err = BotService.SendMessage(fmt.Sprintf("%sさんが%sから退室しました", pastStayerUserName, pastRoomName), "B03J95EL3ME/9MLCZ8VTkEFGDVwTxkqYLKyj")
 			if err != nil {
+				fmt.Println("failed: Cannnot send message")
 				c.String(http.StatusInternalServerError, "Server Error")
 				return
 			}
@@ -151,6 +161,7 @@ func Beacon(c *gin.Context) {
 
 		currentUserID, err := UserService.GetUserIDByUUID(currentStayer.Uuid)
 		if err != nil {
+			fmt.Println("failed: Cannnot get user id")
 			c.String(http.StatusInternalServerError, "Server Error")
 			return
 		}
@@ -167,6 +178,7 @@ func Beacon(c *gin.Context) {
 		// stayerテーブルを検索して該当ユーザがいるか確認する
 		err, stayerFlag := RoomService.GetStayer(currentUserID)
 		if err != nil {
+			fmt.Println("failed: Cannnot get stayer")
 			c.String(http.StatusBadRequest, "Bad Request")
 			return
 		}
@@ -174,37 +186,42 @@ func Beacon(c *gin.Context) {
 		if !stayerFlag {
 			err = RoomService.SetStayer(&model.Stayer{UserID: currentUserID, RoomID: beaconRoom.RoomID, Rssi: currentStayer.Rssi})
 			if err != nil {
+				fmt.Println("failed: Cannnot set stayer")
 				c.String(http.StatusBadRequest, "Bad Request")
 				return
 			}
 			currentTime := time.Now()
 			endAt, err := time.Parse("2006-01-02 15:04:05", "2016-01-01 00:00:00")
 			if err != nil {
-				fmt.Println(err)
+				fmt.Println("failed: Cannnot parse time")
 				c.String(http.StatusBadRequest, "Bad Request")
 				return
 			}
 
 			err = RoomService.SetLog(&model.Log{RoomID: beaconRoom.RoomID, StartAt: currentTime, EndAt: endAt, UserID: currentUserID, Rssi: currentStayer.Rssi})
 			if err != nil {
+				fmt.Println("failed: Cannnot set log")
 				c.String(http.StatusBadRequest, "Bad Request")
 				return
 			}
 
 			currentUserName, err := UserService.GetUserNameByUserID(currentUserID)
 			if err != nil {
+				fmt.Println("failed: Cannnot get user name")
 				c.String(http.StatusInternalServerError, "Server Error")
 				return
 			}
 
 			currentRoomName, err := RoomService.GetRoomNameByRoomID(beaconRoom.RoomID)
 			if err != nil {
+				fmt.Println("failed: Cannnot get room name")
 				c.String(http.StatusInternalServerError, "Server Error")
 				return
 			}
 
 			err = BotService.SendMessage(fmt.Sprintf("%sさんが%sに入室しました", currentUserName, currentRoomName), "B03J95EL3ME/9MLCZ8VTkEFGDVwTxkqYLKyj")
 			if err != nil {
+				fmt.Println("failed: Cannnot send message")
 				c.String(http.StatusInternalServerError, "Server Error")
 				return
 			}

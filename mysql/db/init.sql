@@ -1,3 +1,4 @@
+
 -- use app;
 
 
@@ -10,34 +11,34 @@
 --   role      int(11)
 -- );
 
--- INSERT INTO user (uid, name,email,role) VALUES ('e7d61ea3f8dd49c88f2ff2484c07ac00', 'kaji',null,null);
--- INSERT INTO user (uid, name,email,role) VALUES ('e7d61ea3f8dd49c88f2ff2484c07ac01', 'ogane',null,null);
--- INSERT INTO user (uid, name,email,role) VALUES ('e7d61ea3f8dd49c88f2ff2484c07ac02', 'miyagawa-san',null,null);
--- INSERT INTO user (uid, name,email,role) VALUES ('e7d61ea3f8dd49c88f2ff2484c07ac03', 'ayato',null,null);
--- INSERT INTO user (uid, name,email,role) VALUES ('e7d61ea3f8dd49c88f2ff2484c07ac04', 'ken',null,null);
--- INSERT INTO user (uid, name,email,role) VALUES ('e7d61ea3f8dd49c88f2ff2484c07ac05', 'suzaki',null,null);
--- INSERT INTO user (uid, name,email,role) VALUES ('e7d61ea3f8dd49c88f2ff2484c07ac06', 'akito',null,null);
--- INSERT INTO user (uid, name,email,role) VALUES ('e7d61ea3f8dd49c88f2ff2484c07ac07', 'fueta',null,null);
--- INSERT INTO user (uid, name,email,role) VALUES ('e7d61ea3f8dd49c88f2ff2484c07ac08', 'kameda',null,null);
--- INSERT INTO user (uid, name,email,role) VALUES ('e7d61ea3f8dd49c88f2ff2484c07ac09', 'maruyama',null,null);
--- INSERT INTO user (uid, name,email,role) VALUES ('e7d61ea3f8dd49c88f2ff2484c07ac0a', 'ohashi',null,null);
--- INSERT INTO user (uid, name,email,role) VALUES ('e7d61ea3f8dd49c88f2ff2484c07ac0b', 'rui',null,null);
--- INSERT INTO user (uid, name,email,role) VALUES ('e7d61ea3f8dd49c88f2ff2484c07ac0c', 'ukai',null,null);
--- INSERT INTO user (uid, name,email,role) VALUES ('e7d61ea3f8dd49c88f2ff2484c07ac0d', 'terada',null,null);
--- INSERT INTO user (uid, name,email,role) VALUES ('e7d61ea3f8dd49c88f2ff2484c07ac0e', 'toyama','tatu2425@gmail.com',2);
--- INSERT INTO user (uid, name,email,role) VALUES ('e7d61ea3f8dd49c88f2ff2484c07ac0f', 'shamo',null,null);
--- INSERT INTO user (uid, name,email,role) VALUES ('e7d61ea3f8dd49c88f2ff2484c07ac10', 'isiguro',null,null);
--- INSERT INTO user (uid, name,email,role) VALUES ('e7d61ea3f8dd49c88f2ff2484c07ac11', 'ao',null,null);
--- INSERT INTO user (uid, name,email,role) VALUES ('e7d61ea3f8dd49c88f2ff2484c07ac12', 'fuma',null,null);
--- INSERT INTO user (uid, name,email,role) VALUES ('e7d61ea3f8dd49c88f2ff2484c07ac13', 'ueji',null,null);
--- INSERT INTO user (uid, name,email,role) VALUES ('e7d61ea3f8dd49c88f2ff2484c07ac14', 'oiwa',null,null);
--- INSERT INTO user (uid, name,email,role) VALUES ('e7d61ea3f8dd49c88f2ff2484c07ac15', 'togawa',null,null);
--- INSERT INTO user (uid, name,email,role) VALUES ('e7d61ea3f8dd49c88f2ff2484c07ac16', 'yada',null,null);
--- INSERT INTO user (uid, name,email,role) VALUES ('e7d61ea3f8dd49c88f2ff2484c07ac17', 'yokoyama',null,null);
--- INSERT INTO user (uid, name,email,role) VALUES ('e7d61ea3f8dd49c88f2ff2484c07ac18', 'kazuo',null,null);
--- INSERT INTO user (uid, name,email,role) VALUES ('e7d61ea3f8dd49c88f2ff2484c07ac19', 'sakai',null,null);
--- INSERT INTO user (uid, name,email,role) VALUES ('e7d61ea3f8dd49c88f2ff2484c07ac1a', 'iwaguti',null,null);
--- INSERT INTO user (uid, name,email,role) VALUES ('e7d61ea3f8dd49c88f2ff2484c07ac1b', 'makino',null,null);
+-- INSERT INTO users (uuid, name,email,role) VALUES ('e7d61ea3f8dd49c88f2ff2484c07ac00', 'kaji',null,null);
+-- INSERT INTO users (uuid, name,email,role) VALUES ('e7d61ea3f8dd49c88f2ff2484c07ac01', 'ogane',null,null);
+-- INSERT INTO users (uuid, name,email,role) VALUES ('e7d61ea3f8dd49c88f2ff2484c07ac02', 'miyagawa-san',null,null);
+-- INSERT INTO users (uuid, name,email,role) VALUES ('e7d61ea3f8dd49c88f2ff2484c07ac03', 'ayato',null,null);
+-- INSERT INTO users (uuid, name,email,role) VALUES ('e7d61ea3f8dd49c88f2ff2484c07ac04', 'ken',null,null);
+-- INSERT INTO users (uuid, name,email,role) VALUES ('e7d61ea3f8dd49c88f2ff2484c07ac05', 'suzaki',null,null);
+-- INSERT INTO users (uuid, name,email,role) VALUES ('e7d61ea3f8dd49c88f2ff2484c07ac06', 'akito',null,null);
+-- INSERT INTO users (uuid, name,email,role) VALUES ('e7d61ea3f8dd49c88f2ff2484c07ac07', 'fueta',null,null);
+-- INSERT INTO users (uuid, name,email,role) VALUES ('e7d61ea3f8dd49c88f2ff2484c07ac08', 'kameda',null,null);
+-- INSERT INTO users (uuid, name,email,role) VALUES ('e7d61ea3f8dd49c88f2ff2484c07ac09', 'maruyama',null,null);
+-- INSERT INTO users (uuid, name,email,role) VALUES ('e7d61ea3f8dd49c88f2ff2484c07ac0a', 'ohashi',null,null);
+-- INSERT INTO users (uuid, name,email,role) VALUES ('e7d61ea3f8dd49c88f2ff2484c07ac0b', 'rui',null,null);
+-- INSERT INTO users (uuid, name,email,role) VALUES ('e7d61ea3f8dd49c88f2ff2484c07ac0c', 'shamo',null,null);
+-- INSERT INTO users (uuid, name,email,role) VALUES ('e7d61ea3f8dd49c88f2ff2484c07ac0d', 'terada',null,null);
+-- INSERT INTO users (uuid, name,email,role) VALUES ('e7d61ea3f8dd49c88f2ff2484c07ac0e', 'toyama','tatu2425@gmail.com',2);
+-- INSERT INTO users (uuid, name,email,role) VALUES ('e7d61ea3f8dd49c88f2ff2484c07ac0f', 'ukai',null,null);
+-- INSERT INTO users (uuid, name,email,role) VALUES ('e7d61ea3f8dd49c88f2ff2484c07ac10', 'isiguro',null,null);
+-- INSERT INTO users (uuid, name,email,role) VALUES ('e7d61ea3f8dd49c88f2ff2484c07ac11', 'ao',null,null);
+-- INSERT INTO users (uuid, name,email,role) VALUES ('e7d61ea3f8dd49c88f2ff2484c07ac12', 'fuma',null,null);
+-- INSERT INTO users (uuid, name,email,role) VALUES ('e7d61ea3f8dd49c88f2ff2484c07ac13', 'ueji',null,null);
+-- INSERT INTO users (uuid, name,email,role) VALUES ('e7d61ea3f8dd49c88f2ff2484c07ac14', 'oiwa',null,null);
+-- INSERT INTO users (uuid, name,email,role) VALUES ('e7d61ea3f8dd49c88f2ff2484c07ac15', 'togawa',null,null);
+-- INSERT INTO users (uuid, name,email,role) VALUES ('e7d61ea3f8dd49c88f2ff2484c07ac16', 'yada',null,null);
+-- INSERT INTO users (uuid, name,email,role) VALUES ('e7d61ea3f8dd49c88f2ff2484c07ac17', 'yokoyama',null,null);
+-- INSERT INTO users (uuid, name,email,role) VALUES ('e7d61ea3f8dd49c88f2ff2484c07ac18', 'kazuo',null,null);
+-- INSERT INTO users (uuid, name,email,role) VALUES ('e7d61ea3f8dd49c88f2ff2484c07ac19', 'sakai',null,null);
+-- INSERT INTO users (uuid, name,email,role) VALUES ('e7d61ea3f8dd49c88f2ff2484c07ac1a', 'iwaguti',null,null);
+-- INSERT INTO users (uuid, name,email,role) VALUES ('e7d61ea3f8dd49c88f2ff2484c07ac1b', 'makino',null,null);
 
 
 
@@ -54,7 +55,7 @@
 -- );
 
 
--- -- INSERT INTO log (room_id, start_at, end_at, user_id, rssi) VALUES (1, '2022-07-07 00:00:00', '2022-07-08 00:00:00', 1, -50);
+-- INSERT INTO log (room_id, start_at, end_at, user_id, rssi) VALUES (1, '2022-07-07 00:00:00', '2022-07-08 00:00:00', 1, -50);
 -- -- INSERT INTO log (room_id, start_at, end_at, user_id, rssi) VALUES (1, '2022-07-07 00:00:00', '2022-07-08 00:00:00', 2, -50);
 -- -- INSERT INTO log (room_id, start_at, end_at, user_id, rssi) VALUES (1, '2022-07-07 00:00:00', '2022-07-08 00:00:00', 3, -50);
 -- -- INSERT INTO log (room_id, start_at, end_at, user_id, rssi) VALUES (1, '2022-07-07 00:00:00', '2022-07-08 00:00:00', 4, -50);
@@ -106,11 +107,11 @@
 --   name      VARCHAR(50)
 -- );
 
--- INSERT INTO room (name) VALUES ('梶研-学生部屋');
--- INSERT INTO room (name) VALUES ('梶研-スマートルーム');
--- INSERT INTO room (name) VALUES ('梶研-院生室');
--- INSERT INTO room (name) VALUES ('梶研-FA部屋');
--- INSERT INTO room (name) VALUES ('梶研-先生部屋');
+-- INSERT INTO rooms (name) VALUES ('梶研-学生部屋');
+-- INSERT INTO rooms (name) VALUES ('梶研-スマートルーム');
+-- INSERT INTO rooms (name) VALUES ('梶研-院生室');
+-- INSERT INTO rooms (name) VALUES ('梶研-FA部屋');
+-- INSERT INTO rooms (name) VALUES ('梶研-先生部屋');
 
 
 -- CREATE TABLE IF NOT EXISTS tag
