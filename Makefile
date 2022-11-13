@@ -24,6 +24,9 @@ down:
 
 ##composeでexecするときはservice名だからenvを使用しない
 vol_mysql:
+	docker-compose up vol_mysql
+
+ex_vol_mysql:
 	docker-compose exec vol_mysql bash
 
 network:
@@ -38,8 +41,9 @@ prod:
 	docker-compose up -d vol_mysql
 	sleep 120
 	docker-compose up -d vol_golang
-
-
+	
+network:
+	docker network create vol_network
 
 
 

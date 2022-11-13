@@ -12,7 +12,7 @@ import (
 
 type BotService struct{}
 
-//BOTにメッセージを送信する
+// BOTにメッセージを送信する
 func (BotService) SendMessage(message string, channelID string) error {
 
 	requestBody := &model.RequestBody{
@@ -49,7 +49,7 @@ func (BotService) SendMessage(message string, channelID string) error {
 	return nil
 }
 
-//Botに電池切れのメッセージを送信する
+// Botに電池切れのメッセージを送信する
 func (BotService) NotifyOutOfBattery() error {
 	RoomService := RoomService{}
 	UserService := UserService{}

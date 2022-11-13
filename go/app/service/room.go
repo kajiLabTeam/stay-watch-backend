@@ -26,7 +26,7 @@ func (RoomService) SetLog(Log *model.Log) error {
 	return nil
 }
 
-//該当ユーザが存在するか確認
+// 該当ユーザが存在するか確認
 func (RoomService) GetStayer(userID int64) (error, bool) {
 	DbEngine := connect()
 	closer, err := DbEngine.DB()
@@ -34,14 +34,14 @@ func (RoomService) GetStayer(userID int64) (error, bool) {
 		return err, false
 	}
 	defer closer.Close()
-	result := DbEngine.Table("stayer").Where("user_id=?", userID).Take(&model.Stayer{})
+	result := DbEngine.Table("stayers").Where("user_id=?", userID).Take(&model.Stayer{})
 	if result.RowsAffected != 0 {
 		return nil, true
 	}
 	return nil, false
 }
 
-//滞在者全体を取得する
+// 滞在者全体を取得する
 func (RoomService) GetAllStayer() ([]model.Stayer, error) {
 	DbEngine := connect()
 	closer, err := DbEngine.DB()
@@ -49,15 +49,12 @@ func (RoomService) GetAllStayer() ([]model.Stayer, error) {
 		return nil, err
 	}
 	defer closer.Close()
-	fmt.Println("GetAllStayer")
-	fmt.Println(DbEngine)
 	stayers := make([]model.Stayer, 0)
 	result := DbEngine.Table("stayers").Find(&stayers)
 	if result.Error != nil {
+		fmt.Printf("failed: %v", result.Error)
 		return nil, result.Error
 	}
-	fmt.Println("okokokoko")
-	fmt.Println(stayers)
 
 	return stayers, nil
 }
@@ -148,7 +145,7 @@ func (RoomService) InsertEndAt(userID int64) error {
 	return nil
 }
 
-//指定したuserと現在の日付から指定した日付以内のログを取得する
+// 指定したuserと現在の日付から指定した日付以内のログを取得する
 func (RoomService) GetLogByUserAndDate(userID int64, date int64) ([]model.Log, error) {
 	// currentTime := time.Now()
 	logs := make([]model.Log, 0)
@@ -159,7 +156,7 @@ func (RoomService) GetLogByUserAndDate(userID int64, date int64) ([]model.Log, e
 	return logs, nil
 }
 
-//現在の日付から指定した日付以内のログを取得する
+// 現在の日付から指定した日付以内のログを取得する
 func (RoomService) GetLogByDate(date int64) ([]model.Log, error) {
 	// currentTime := time.Now()
 	logs := make([]model.Log, 0)
@@ -522,7 +519,7 @@ func (RoomService) GetTimesFromStartAtAndEntAt(startAt string, endAt string) ([]
 	return times, nil
 }
 
-//ルームIDからルームの名前を取得する
+// ルームIDからルームの名前を取得する
 func (RoomService) GetRoomNameByRoomID(roomID int64) (string, error) {
 	DbEngine := connect()
 	closer, err := DbEngine.DB()
@@ -534,13 +531,13 @@ func (RoomService) GetRoomNameByRoomID(roomID int64) (string, error) {
 	room := model.Room{}
 	result := DbEngine.Take(&room).Where("room_id = ?", roomID)
 	if result.Error != nil {
-		fmt.Errorf("failed to get room name by room id: %v", result.Error)
+		fmt.Printf("Cannot get room: %v", result.Error)
 		return "", result.Error
 	}
 	return room.Name, nil
 }
 
-//全てのログを取得する
+// 全てのログを取得する
 func (RoomService) GetAllLog() ([]model.Log, error) {
 	DbEngine := connect()
 	closer, err := DbEngine.DB()
@@ -558,7 +555,7 @@ func (RoomService) GetAllLog() ([]model.Log, error) {
 	return logs, nil
 }
 
-//最新30件のログを取得する
+// 最新30件のログを取得する
 func (RoomService) GetLatestLogs() ([]model.Log, error) {
 	DbEngine := connect()
 	closer, err := DbEngine.DB()
@@ -578,7 +575,7 @@ func (RoomService) GetLatestLogs() ([]model.Log, error) {
 	return logs, nil
 }
 
-//pageごとに30件のログを取得する
+// pageごとに30件のログを取得する
 func (RoomService) GetLogsByPage(page int) ([]model.Log, error) {
 	DbEngine := connect()
 	closer, err := DbEngine.DB()
@@ -595,14 +592,14 @@ func (RoomService) GetLogsByPage(page int) ([]model.Log, error) {
 	logs := make([]model.Log, 0)
 	result := DbEngine.Order("id desc").Limit(30).Offset(page).Find(&logs)
 	if result.Error != nil {
-		fmt.Errorf("failed to get logs by page: %v", result.Error)
+		fmt.Printf("Cannot get logs: %v", result.Error)
 		return nil, result.Error
 	}
 
 	return logs, nil
 }
 
-//指定した時間のログを取得する
+// 指定した時間のログを取得する
 func (RoomService) GetLogsFromStartAtAndEntAt(startAt string, endAt string) ([]model.Log, error) {
 	DbEngine := connect()
 	closer, err := DbEngine.DB()
@@ -622,7 +619,7 @@ func (RoomService) GetLogsFromStartAtAndEntAt(startAt string, endAt string) ([]m
 	// err = DbEngine.Where("start_at>=? and start_at<=?", startAtTime, endAtTime).Find(&logs)
 	result := DbEngine.Where("start_at>=? and start_at<=?", startAtTime, endAtTime).Find(&logs)
 	if result.Error != nil {
-		fmt.Errorf("failed to get logs from start at and end at: %v", result.Error)
+		fmt.Printf("failed to get logs from startAt and endAt: %v", result.Error)
 		return nil, result.Error
 	}
 
