@@ -555,7 +555,6 @@ func connect() *gorm.DB {
 	if strings.HasSuffix(os.Args[0], ".test") {
 		envPath = "../../../.env"
 	}
-	fmt.Println(envPath)
 	err := godotenv.Load(
 		envPath,
 	)
@@ -567,7 +566,6 @@ func connect() *gorm.DB {
 	if os.Getenv("ENVIRONMENT") == "dev" {
 		dsn = "root:root@tcp(localhost:33066)/app?charset=utf8mb4&parseTime=true&loc=Asia%2FTokyo"
 	}
-	fmt.Println(dsn)
 
 	gormDB, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
 	if err != nil {

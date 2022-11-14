@@ -18,7 +18,6 @@ func Detail(c *gin.Context) {
 func CreateUser(c *gin.Context) {
 	RegistrationUserForm := model.RegistrationUserForm{}
 	c.BindJSON(&RegistrationUserForm)
-	fmt.Println(RegistrationUserForm)
 	UserService := service.UserService{}
 	//userIDがないなら新規登録
 	if RegistrationUserForm.TargetID == 0 {
