@@ -133,7 +133,6 @@ func (UserService) GetUserTagsID(userID int64) ([]int64, error) {
 		return nil, err
 	}
 	defer closer.Close()
-	fmt.Println("タグID取得")
 	tags := make([]int64, 0)
 	result := DbEngine.Table("tag_maps").Where("user_id=?", userID).Select("tag_id").Find(&tags)
 	if result.Error != nil {
@@ -152,7 +151,7 @@ func (UserService) GetTagName(tagID int64) (string, error) {
 		return "", err
 	}
 	defer closer.Close()
-	fmt.Println("タグ名取得")
+
 	tag := model.Tag{}
 	result := DbEngine.Where("id=?", tagID).Take(&tag)
 	if result.Error != nil {
