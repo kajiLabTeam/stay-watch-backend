@@ -6,7 +6,8 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"io"
+
 	"net/http"
 )
 
@@ -39,7 +40,8 @@ func (BotService) SendMessage(message string, channelID string) error {
 	}
 	defer resp.Body.Close()
 
-	byteArray, err := ioutil.ReadAll(resp.Body)
+	byteArray, err := io.ReadAll(resp.Body)
+
 	if err != nil {
 		return fmt.Errorf(" failed: %w", err)
 	}
