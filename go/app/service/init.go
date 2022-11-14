@@ -4,6 +4,7 @@ import (
 	"Stay_watch/model"
 	"fmt"
 	"os"
+	"strings"
 
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/joho/godotenv"
@@ -18,7 +19,6 @@ func init() {
 		return
 	}
 	defer closer.Close()
-
 	db.AutoMigrate(&model.User{}, &model.Log{}, &model.Room{}, &model.Stayer{}, &model.Tag{}, &model.TagMap{})
 
 	var count int64
@@ -550,8 +550,14 @@ func init() {
 
 func connect() *gorm.DB {
 
+	envPath := "../../.env"
+	//test実行時はtest用のenvを読み込むJ
+	if strings.HasSuffix(os.Args[0], ".test") {
+		envPath = "../../../.env"
+	}
+	fmt.Println(envPath)
 	err := godotenv.Load(
-		"../../.env",
+		envPath,
 	)
 	if err != nil {
 		fmt.Println("Error loading .env file")

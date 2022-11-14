@@ -37,10 +37,9 @@ func Beacon(c *gin.Context) {
 		isExist := false
 		targetUserRssi := -200
 		for _, currentStayer := range beaconRoom.Beacons {
-
-			pastUUID, er := UserService.GetUserUUIDByUserID(pastStayer.UserID)
-			if er != nil {
-				fmt.Printf("failed: Cannnot get user uuid %v", er)
+			pastUUID, err := UserService.GetUserUUIDByUserID(pastStayer.UserID)
+			if err != nil {
+				fmt.Printf("failed: Cannnot get user uuid %v", err)
 				c.String(http.StatusInternalServerError, "Server Error")
 				return
 			}

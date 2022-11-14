@@ -108,8 +108,8 @@ func Log(c *gin.Context) {
 			ID:      int64(log.ID),
 			Name:    userName,
 			Room:    roomName,
-			StartAt: log.StartAt.Format("2006-01-02"),
-			EndAt:   log.EndAt.Format("2006-01-02"),
+			StartAt: log.StartAt.Format("2006-01-02 15:04:05"),
+			EndAt:   log.EndAt.Format("2006-01-02 15:04:05"),
 		})
 	}
 	c.JSON(200, logGetResponse)
