@@ -22,9 +22,9 @@ type LogGetResponse struct {
 }
 
 type UserInformationGetResponse struct {
-	ID   int64  `json:"id"`
-	Name string `json:"name"`
-	Tags []Tag  `json:"tags"`
+	ID   int64            `json:"id"`
+	Name string           `json:"name"`
+	Tags []TagGetResponse `json:"tags"`
 }
 
 type UserDetailInformationGetResponse struct {

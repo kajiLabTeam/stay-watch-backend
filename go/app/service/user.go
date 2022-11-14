@@ -13,18 +13,17 @@ func (UserService) NewUUID() string {
 
 	//dbから一番最後に登録されたuuidを取得する
 	user := model.User{}
-	// _, err := DbEngine.Table("user").Desc("id").Get(&user)
-	// if err != nil {
-	// 	log.Fatal(err.Error())
-	// 	return ""
-	// }
-	// result:=DbEngine.Table("user").Desc("id").Get(&user)
 	DbEngine := connect()
 	closer, err := DbEngine.DB()
 	if err != nil {
 		return ""
 	}
 	defer closer.Close()
+	result := DbEngine.Last(&user)
+	if result.Error != nil {
+		fmt.Printf("uuid取得失敗 %v", result.Error)
+		return ""
+	}
 
 	uuid := user.UUID
 	fowardTarget := uuid[0:28]

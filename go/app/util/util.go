@@ -33,7 +33,7 @@ func (Util) SliceUniqueNumber(target []int64) (unique []int64) {
 	return unique
 }
 
-//配列の中に特定の文字列が含まれているか
+// 配列の中に特定の文字列が含まれているか
 func (Util) ArrayStringContains(target []string, str string) bool {
 	for _, v := range target {
 		if v == str {
@@ -43,7 +43,7 @@ func (Util) ArrayStringContains(target []string, str string) bool {
 	return false
 }
 
-//引数datetime文字列とタイムゾーン文字列を受け取りTime型に変換する関数
+// 引数datetime文字列とタイムゾーン文字列を受け取りTime型に変換する関数
 func (Util) ConvertDatetimeToLocationTime(datetime string, timezone string) (time.Time, error) {
 	jst, _ := time.LoadLocation(timezone)
 	locationTime, err := time.ParseInLocation("2006-01-02 15:04:05", datetime, jst)

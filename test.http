@@ -4,13 +4,13 @@
 
 
 ###
-Get {{baseURL}}/room/v1/stayer
+Get {{baseURL}}/v1/stayers
 
 ###
 Get {{baseURL}}/room/v1/log
 
 ###
-Get {{baseURL}}/user/v1/list
+Get {{baseURL}}/v1/users
 
 ###
 POST  https://hooks.slack.com/services/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
@@ -37,13 +37,13 @@ Get {{baseURL}}/room/v1/list/simultaneous/1
 Get {{baseURL}}/user/v1/list/simultaneous/2
 
 ###
-POST {{baseURL}}/room/v1/beacon HTTP/1.1
+POST {{baseURL}}/v1/stayers HTTP/1.1
 content-type: application/json
 
 {
     "Beacons":[
         {
-            "uuid": "e7d61ea3f8dd49c88f2ff2484c07ac0e",
+            "uuid": "e7d61ea3f8dd49c88f2ff2484c07ac00",
             "rssi": -60
         },
         {

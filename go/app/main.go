@@ -2,6 +2,7 @@ package main
 
 import (
 	controller "Stay_watch/controller"
+	"log"
 	"time"
 
 	"github.com/gin-contrib/cors"
@@ -10,6 +11,36 @@ import (
 )
 
 func main() {
+
+	log.Println("Start Server")
+	SetUpServer().Run(":8080")
+
+	// userEngine := engine.Group("/user")
+	// {
+	// 	v1 := userEngine.Group("/v1")
+	// 	{
+	// 		v1.GET("/check", controller.Check)
+	// 		v1.GET("/list", controller.UserList)
+	// 		v1.GET("/detail", controller.Detail)
+	// 		// v1.GET("/list/simultaneous/:user_id", controller.SimultaneousStayUserList)
+	// 		v1.POST("/registration", controller.Register)
+	// 	}
+	// }
+
+	// BotService := service.BotService{}
+	// //2週間に一度定期的実行
+	// ticker := time.NewTicker(time.Hour * 24 * 14)
+	// defer ticker.Stop()
+	// for {
+	// 	select {
+	// 	case <-ticker.C:
+	// 		BotService.NotifyOutOfBattery()
+	// 	}
+	// }
+}
+
+func SetUpServer() *gin.Engine {
+
 	engine := gin.Default()
 	// ミドルウェア
 	// engine.Use(middleware.RecordUaAndTime)
@@ -28,41 +59,18 @@ func main() {
 		AllowCredentials: true,
 		MaxAge:           24 * time.Hour,
 	}))
-	roomEngine := engine.Group("/room")
+
+	versionEngine := engine.Group("/v1")
 	{
-		v1 := roomEngine.Group("/v1")
-		{
-			v1.GET("/stayer", controller.Stayer)
-			v1.GET("/log", controller.Log)
-			v1.GET("/log/gantt", controller.LogGantt)
-			v1.POST("/beacon", controller.Beacon)
-			// v1.GET("/list/simultaneous/:user_id", controller.SimultaneousList)
-		}
-	}
-	userEngine := engine.Group("/user")
-	{
-		v1 := userEngine.Group("/v1")
-		{
-			v1.GET("/check", controller.Check)
-			v1.GET("/list", controller.UserList)
-			v1.GET("/detail", controller.Detail)
-			// v1.GET("/list/simultaneous/:user_id", controller.SimultaneousStayUserList)
-			v1.POST("/registration", controller.Register)
-			v1.POST("/attendance", controller.Attendance)
-		}
+		versionEngine.GET("/stayers", controller.Stayer)
+		versionEngine.POST("/stayers", controller.Beacon)
+		versionEngine.GET("/logs", controller.Log)
+		versionEngine.GET("/logs/gantt", controller.LogGantt)
+		versionEngine.GET("/users", controller.UserList)
+		versionEngine.POST("/users", controller.CreateUser)
+		versionEngine.GET("/check", controller.Check)
+		versionEngine.POST("/attendance", controller.Attendance)
 	}
 
-	engine.Run(":8080")
-
-	// BotService := service.BotService{}
-	// //2週間に一度定期的実行
-	// ticker := time.NewTicker(time.Hour * 24 * 14)
-	// defer ticker.Stop()
-	// for {
-	// 	select {
-	// 	case <-ticker.C:
-	// 		BotService.NotifyOutOfBattery()
-	// 	}
-	// }
-
+	return engine
 }

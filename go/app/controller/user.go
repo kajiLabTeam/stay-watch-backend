@@ -15,36 +15,38 @@ func Detail(c *gin.Context) {
 	})
 }
 
-func Register(c *gin.Context) {
-
-	RegistrationUserForm := model.User{}
+func CreateUser(c *gin.Context) {
+	RegistrationUserForm := model.RegistrationUserForm{}
 	c.BindJSON(&RegistrationUserForm)
 	fmt.Println(RegistrationUserForm)
 	UserService := service.UserService{}
 	//userIDがないなら新規登録
-	if RegistrationUserForm.ID == 0 {
+	if RegistrationUserForm.TargetID == 0 {
 		user := model.User{
-			Name:  RegistrationUserForm.Name,
-			Email: RegistrationUserForm.Email,
-			Role:  RegistrationUserForm.Role,
+			Name:  RegistrationUserForm.TargetName,
+			Email: RegistrationUserForm.TargetEmail,
+			Role:  RegistrationUserForm.TargetRole,
 			UUID:  UserService.NewUUID(),
 		}
+
 		err := UserService.RegisterUser(&user)
 		if err != nil {
+			fmt.Printf("Cannnot register user: %v", err)
 			c.String(http.StatusInternalServerError, "Server Error")
 			return
 		}
 	}
+
 	//userIDがあるなら更新
-	if RegistrationUserForm.ID != 0 {
+	if RegistrationUserForm.TargetID != 0 {
 		//userNameが空なので、userIDからuserNameを取得する
-		userName, err := UserService.GetUserNameByUserID(int64(RegistrationUserForm.ID))
+		userName, err := UserService.GetUserNameByUserID(int64(RegistrationUserForm.TargetID))
 		if err != nil {
 			c.String(http.StatusInternalServerError, "Server Error")
 			return
 		}
 
-		uuid, err := UserService.GetUserUUIDByUserID(int64(RegistrationUserForm.ID))
+		uuid, err := UserService.GetUserUUIDByUserID(int64(RegistrationUserForm.TargetID))
 		if err != nil {
 			c.String(http.StatusInternalServerError, "Server Error")
 			return
@@ -53,8 +55,8 @@ func Register(c *gin.Context) {
 		user := model.User{
 			// ID:    RegistrationUserForm.id,
 			Name:  userName,
-			Email: RegistrationUserForm.Email,
-			Role:  RegistrationUserForm.Role,
+			Email: RegistrationUserForm.TargetEmail,
+			Role:  RegistrationUserForm.TargetRole,
 			UUID:  uuid,
 		}
 		err = UserService.UpdateUser(&user)
@@ -66,9 +68,9 @@ func Register(c *gin.Context) {
 	}
 
 	mailService := service.MailService{}
-	mailService.SendMail("滞在ウォッチユーザ登録の完了のお知らせ", "ユーザ登録が完了したので滞在ウォッチを閲覧することが可能になりました\n一度プロジェクトをリセットしたので再度ログインお願いします。\nアプリドメイン\nhttps://stay-watch-go.kajilab.tk/", RegistrationUserForm.Email)
+	mailService.SendMail("滞在ウォッチユーザ登録の完了のお知らせ", "ユーザ登録が完了したので滞在ウォッチを閲覧することが可能になりました\n一度プロジェクトをリセットしたので再度ログインお願いします。\nアプリドメイン\nhttps://stay-watch-go.kajilab.tk/", RegistrationUserForm.TargetEmail)
 
-	c.JSON(200, gin.H{
+	c.JSON(http.StatusCreated, gin.H{
 		"status": "ok",
 	})
 }
@@ -86,7 +88,7 @@ func UserList(c *gin.Context) {
 
 	for _, user := range users {
 
-		tags := make([]model.Tag, 0)
+		tags := make([]model.TagGetResponse, 0)
 		tagsID, err := UserService.GetUserTagsID(int64(user.Model.ID))
 		if err != nil {
 			c.String(http.StatusInternalServerError, "Server Error")
@@ -100,8 +102,8 @@ func UserList(c *gin.Context) {
 				c.String(http.StatusInternalServerError, "Server Error")
 				return
 			}
-			tag := model.Tag{
-
+			tag := model.TagGetResponse{
+				ID:   tagID,
 				Name: tagName,
 			}
 			tags = append(tags, tag)
@@ -114,7 +116,7 @@ func UserList(c *gin.Context) {
 		})
 	}
 
-	c.JSON(200, userInformationGetResponse)
+	c.JSON(http.StatusOK, userInformationGetResponse)
 }
 
 func Attendance(c *gin.Context) {
@@ -168,7 +170,7 @@ func Attendance(c *gin.Context) {
 		ExcelService.WriteExcel(allAttendancesTmp, meeting.ID)
 	}
 
-	c.JSON(200, gin.H{
+	c.JSON(http.StatusOK, gin.H{
 		"status": "ok",
 	})
 }
@@ -203,7 +205,7 @@ func Check(c *gin.Context) {
 	firebaseUserInfo, err := verifyCheck(c.Request)
 	if err != nil {
 		fmt.Println(err)
-		c.JSON(401, gin.H{
+		c.JSON(http.StatusUnauthorized, gin.H{
 			"status": "invalid token",
 		})
 		return
@@ -219,13 +221,13 @@ func Check(c *gin.Context) {
 
 	//メールアドレスが存在しない場合はUserは存在しないのでリクエスト失敗
 	if (user == model.User{}) {
-		c.JSON(403, gin.H{
+		c.JSON(http.StatusForbidden, gin.H{
 			"status": "権限がありません 管理者にユーザ追加を依頼してください",
 		})
 		return
 	}
 
-	c.JSON(200,
+	c.JSON(http.StatusOK,
 		user,
 	)
 }
