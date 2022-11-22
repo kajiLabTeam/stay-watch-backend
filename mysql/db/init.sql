@@ -82,7 +82,7 @@
 -- -- INSERT INTO log (room_id, start_at, end_at, user_id, rssi) VALUES (1, '2022-07-07 00:00:00', '2022-07-08 00:00:00', 25, -50);
 -- -- INSERT INTO log (room_id, start_at, end_at, user_id, rssi) VALUES (1, '2022-07-07 00:00:00', '2022-07-08 00:00:00', 26, -50);
 -- -- INSERT INTO log (room_id, start_at, end_at, user_id, rssi) VALUES (1, '2022-07-07 00:00:00', '2022-07-08 00:00:00', 27, -50);
--- -- INSERT INTO log (room_id, start_at, end_at, user_id, rssi) VALUES (1, '2022-07-07 00:00:00', '2022-07-08 00:00:00', 28, -50);
+
 
 
 
