@@ -14,10 +14,10 @@ jobs:
         ports:
           - 33066:33066
         env:
-          MYSQL_ROOT_PASSWORD: root_password
-          MYSQL_DATABASE: foo
-          MYSQL_USER: user1
-          MYSQL_PASSWORD: user1_password
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: app
+          MYSQL_USER: gopher
+          MYSQL_PASSWORD: setsetset
         options: >-
           --health-cmd "mysqladmin ping"
           --health-interval 10s
