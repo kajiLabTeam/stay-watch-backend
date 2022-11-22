@@ -22,6 +22,28 @@ jobs:
 
   test:
     runs-on: ubuntu-latest
+    services:
+      db:
+        image: mysql:8.0
+        ports:
+          - 33066:33066
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: app
+          MYSQL_USER: gopher
+          MYSQL_PASSWORD: setsetset
+        options: >-
+          --health-cmd "mysqladmin ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    steps:
+      - name: Show Docker containers
+        run: docker ps -a
+      - name: Show databases for root user
+        run: mysql --protocol=tcp -h localhost -P 3306 -u root -proot_password -e "SHOW DATABASES"
+      - name: Show databases for user1
+        run: mysql --protocol=tcp -h localhost -P 3306 -u user1 -puser1_password -e "SHOW DATABASES"
     steps:
       - uses: actions/checkout@v3
 
