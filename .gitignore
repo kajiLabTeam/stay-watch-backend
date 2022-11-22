@@ -177,7 +177,7 @@ Temporary Items
 docs/_book
 
 # TODO: where does this rule come from?
-test/
+# test/
 
 
 ### https://raw.github.com/github/gitignore/218a941be92679ce67d0484547e3e142b2f5f6f0/Global/VisualStudioCode.gitignore
