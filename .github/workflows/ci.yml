@@ -2,6 +2,9 @@ name: Go package
 
 on: [push]
 
+env:
+  ENVIRONMENT: dev
+
 jobs:
   build:
     runs-on: ubuntu-latest
