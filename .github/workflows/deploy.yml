@@ -31,8 +31,6 @@ jobs:
     steps:
       - name: update
         run: sudo apt update
-      - name: install sudo
-        run: apt install sudo
       - name: install module
         run: sudo apt install wget ssh openssh-server openssh-client
       - name: wget cloudflared
