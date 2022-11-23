@@ -24,9 +24,8 @@ jobs:
         uses: rtCamp/action-slack-notify@v2
         env:
           SLACK_WEBHOOK: https://hooks.slack.com/services/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
-          SLACK_TITLE: 'GitHub Actions Notification'
+          SLACK_TITLE: 'GitHub'
           SLACK_USERNAME: 'GitHub Actions'
-          SLACK_ICON_EMOJI: ':github:'
           SLACK_COLOR: '#FF0000'
 
   test:
@@ -67,7 +66,6 @@ jobs:
         if: always()
         env:
           SLACK_WEBHOOK: https://hooks.slack.com/services/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
-          SLACK_ICON_EMOJI: ':github:'
           SLACK_COLOR: ${{ job.status }} # (3)
           SLACK_TITLE: Job Result
-          SLACK_USERNAME: Job Result Bot
+          SLACK_USERNAME: GitHub
