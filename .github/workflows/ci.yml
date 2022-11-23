@@ -29,8 +29,8 @@ jobs:
         env:
           MYSQL_ROOT_PASSWORD: root
           MYSQL_DATABASE: app
-          MYSQL_USER: gopher
-          MYSQL_PASSWORD: setsetset
+          MYSQL_USER: user1
+          MYSQL_PASSWORD: user
           MYSQL_ROOT_HOST: '%'
         options: >-
           --health-cmd "mysqladmin ping"
@@ -42,8 +42,8 @@ jobs:
         run: docker ps -a
       - name: Show databases for root user
         run: mysql --protocol=tcp -h localhost -P 33066 -u root -proot -e "SHOW DATABASES"
-      - name: Show databases for gopher
-        run: mysql --protocol=tcp -h localhost -P 33066 -u gopher -psetsetset -e "SHOW DATABASES"
+      - name: Show databases for user1
+        run: mysql --protocol=tcp -h localhost -P 33066 -u user1 -puser1 -e "SHOW DATABASES"
       - uses: actions/checkout@v3
       - name: Set up Go
         uses: actions/setup-go@v3
@@ -52,3 +52,27 @@ jobs:
       - name: Test
         run: go test -v
         working-directory: ./go/app/test
+  job-with-mysql-8_0:
+    runs-on: ubuntu-20.04
+    services:
+      db:
+        image: mysql:8.0
+        ports:
+          - 3306:3306
+        env:
+          MYSQL_ROOT_PASSWORD: root_password
+          MYSQL_DATABASE: foo
+          MYSQL_USER: user1
+          MYSQL_PASSWORD: user1_password
+        options: >-
+          --health-cmd "mysqladmin ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    steps:
+      - name: Show Docker containers
+        run: docker ps -a
+      - name: Show databases for root user
+        run: mysql --protocol=tcp -h localhost -P 3306 -u root -proot_password -e "SHOW DATABASES"
+      - name: Show databases for user1
+        run: mysql --protocol=tcp -h localhost -P 3306 -u user1 -puser1_password -e "SHOW DATABASES"
