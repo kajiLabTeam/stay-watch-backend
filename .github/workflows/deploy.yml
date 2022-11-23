@@ -30,7 +30,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: update
-        run: apt update
+        run: sudo apt update
       - name: install sudo
         run: apt install sudo
       - name: install module
