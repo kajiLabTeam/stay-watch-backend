@@ -40,7 +40,7 @@ jobs:
       - name: chmod cloudflared
         run: chmod +x cloudflared
       - name: move cloudflared
-        run: mv cloudflared /usr/bin
+        run: sudo mv cloudflared /usr/bin
       - name: ssh directory
         run: mkdir -p ~/.ssh
       - name: ssh config
