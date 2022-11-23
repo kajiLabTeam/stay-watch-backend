@@ -43,7 +43,7 @@ jobs:
       - name: Show databases for root user
         run: mysql --protocol=tcp -h localhost -P 33066 -u root -proot -e "SHOW DATABASES"
       - name: Show databases for user1
-        run: mysql --protocol=tcp -h localhost -P 33066 -u user1 -puser1 -e "SHOW DATABASES"
+        run: mysql --protocol=tcp -h localhost -P 33066 -u user1 -puser -e "SHOW DATABASES"
       - uses: actions/checkout@v3
       - name: Set up Go
         uses: actions/setup-go@v3
