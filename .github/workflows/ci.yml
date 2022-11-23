@@ -1,71 +1,71 @@
-# name: CI
+name: CI
 
-# on: [push]
+on: [push]
 
-# env:
-#   ENVIRONMENT: dev
+env:
+  ENVIRONMENT: dev
 
-# jobs:
-#   build:
-#     runs-on: ubuntu-latest
-#     steps:
-#       - uses: actions/checkout@v3
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
 
-#       - name: Set up Go
-#         uses: actions/setup-go@v3
-#         with:
-#           go-version: 1.19
-#       - name: Build
-#         run: go build -v
-#         working-directory: ./go/app
-#       ##失敗したら通知
-#       - name: Slack Notification
-#         if: failure()
-#         uses: rtCamp/action-slack-notify@v2
-#         env:
-#           SLACK_WEBHOOK: https://hooks.slack.com/services/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
-#           SLACK_TITLE: 'GitHub'
-#           SLACK_USERNAME: 'GitHub Actions'
-#           SLACK_COLO JR: '#FF0000'
+      - name: Set up Go
+        uses: actions/setup-go@v3
+        with:
+          go-version: 1.19
+      - name: Build
+        run: go build -v
+        working-directory: ./go/app
+      ##失敗したら通知
+      - name: Slack Notification
+        if: failure()
+        uses: rtCamp/action-slack-notify@v2
+        env:
+          SLACK_WEBHOOK: https://hooks.slack.com/services/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
+          SLACK_TITLE: 'GitHub'
+          SLACK_USERNAME: 'GitHub Actions'
+          SLACK_COLO JR: '#FF0000'
 
-#   test:
-#     runs-on: ubuntu-latest
-#     services:
-#       db:
-#         image: mysql:8.0
-#         ports:
-#           - 33066:3306
-#         env:
-#           MYSQL_ROOT_PASSWORD: root
-#           MYSQL_DATABASE: app
-#           MYSQL_USER: user1
-#           MYSQL_PASSWORD: user
-#           MYSQL_ROOT_HOST: '%'
-#         options: >-
-#           --health-cmd "mysqladmin ping"
-#           --health-interval 10s
-#           --health-timeout 5s
-#           --health-retries 5
-#     steps:
-#       - name: Show Docker containers
-#         run: docker ps -a
-#       - name: Show databases for root user
-#         run: mysql --protocol=tcp -h localhost -P 33066 -u root -proot -e "SHOW DATABASES"
-#       - name: Show databases for user1
-#         run: mysql --protocol=tcp -h localhost -P 33066 -u user1 -puser -e "SHOW DATABASES"
-#       - uses: actions/checkout@v3
-#       - name: Set up Go
-#         uses: actions/setup-go@v3
-#         with:
-#           go-version: 1.19
-#       - name: Test
-#         run: go test -v
-#         working-directory: ./go/app/test
-#       - name: Slack NotificationJ
-#         uses: rtCamp/action-slack-notify@v2
-#         if: always()
-#         env:
-#           SLACK_WEBHOOK: https://hooks.slack.com/services/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
-#           SLACK_COLOR: ${{ job.status }} # (3)
-#           SLACK_TITLE: Job Result
-#           SLACK_USERNAME: GitHub
+  test:
+    runs-on: ubuntu-latest
+    services:
+      db:
+        image: mysql:8.0
+        ports:
+          - 33066:3306
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: app
+          MYSQL_USER: user1
+          MYSQL_PASSWORD: user
+          MYSQL_ROOT_HOST: '%'
+        options: >-
+          --health-cmd "mysqladmin ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    steps:
+      - name: Show Docker containers
+        run: docker ps -a
+      - name: Show databases for root user
+        run: mysql --protocol=tcp -h localhost -P 33066 -u root -proot -e "SHOW DATABASES"
+      - name: Show databases for user1
+        run: mysql --protocol=tcp -h localhost -P 33066 -u user1 -puser -e "SHOW DATABASES"
+      - uses: actions/checkout@v3
+      - name: Set up Go
+        uses: actions/setup-go@v3
+        with:
+          go-version: 1.19
+      - name: Test
+        run: go test -v
+        working-directory: ./go/app/test
+      - name: Slack NotificationJ
+        uses: rtCamp/action-slack-notify@v2
+        if: always()
+        env:
+          SLACK_WEBHOOK: https://hooks.slack.com/services/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
+          SLACK_COLOR: ${{ job.status }} # (3)
+          SLACK_TITLE: Job Result
+          SLACK_USERNAME: GitHub
