@@ -31,6 +31,7 @@ jobs:
           MYSQL_DATABASE: app
           MYSQL_USER: gopher
           MYSQL_PASSWORD: setsetset
+          bind-address: 127.0.0.1
         options: >-
           --health-cmd "mysqladmin ping"
           --health-interval 10s
