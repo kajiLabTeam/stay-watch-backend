@@ -3,7 +3,7 @@ name: Slack Notification Demo
 jobs:
   slackNotification:
     name: Slack Notification
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     steps:
       - uses: actions/checkout@v2
       - name: Slack Notification
