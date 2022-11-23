@@ -52,27 +52,12 @@ jobs:
       - name: Test
         run: go test -v
         working-directory: ./go/app/test
-  job-with-mysql-8_0:
-    runs-on: ubuntu-20.04
-    services:
-      db:
-        image: mysql:8.0
-        ports:
-          - 33066:3306
+      - name: Slack NotificationJ
+        uses: rtCamp/action-slack-notify@v2
+        if: always()
         env:
-          MYSQL_ROOT_PASSWORD: root_password
-          MYSQL_DATABASE: foo
-          MYSQL_USER: user1
-          MYSQL_PASSWORD: user1_password
-        options: >-
-          --health-cmd "mysqladmin ping"
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-    steps:
-      - name: Show Docker containers
-        run: docker ps -a
-      - name: Show databases for root user
-        run: mysql --protocol=tcp -h localhost -P 33066 -u root -proot_password -e "SHOW DATABASES"
-      - name: Show databases for user1
-        run: mysql --protocol=tcp -h localhost -P 33066 -u user1 -puser1_password -e "SHOW DATABASES"
+          SLACK_WEBHOOK: https://hooks.slack.com/services/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
+          SLACK_COLOR: ${{ job.status }} # (3)
+          SLACK_MESSAGE: 'Job Result: ${{ job.status }}' # (4)
+          SLACK_TITLE: Job Result
+          SLACK_USERNAME: Job Result Bot
