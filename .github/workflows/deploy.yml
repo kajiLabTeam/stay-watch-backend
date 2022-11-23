@@ -40,18 +40,20 @@ jobs:
       - name: chmod cloudflared
         run: chmod +x cloudflared
       - name: move cloudflared
-        run: sudo mv cloudflared /usr/bin
+        run: sudo mv cloudflared /usr/bin/
       - name: ssh directory
         run: mkdir -p ~/.ssh
       - name: ssh config
         run: echo "Host ssh-server.kajilab.tk\nHostName ssh-server.kajilab.tk\nUser kjlb\nProxyCommand /usr/bin/cloudflared access ssh --hostname %h\nHost *\nIPQoS cs1" >> ~/.ssh/config
+      - name: display config
+        run: cat ~/.ssh/config
       - name: ssh key
-        run: echo "${{ secrets.SSH_KEY }}" >> ~/.ssh/id_rsa
+        run: echo ${{ secrets.SSH_KEY }} >> ~/.ssh/id_rsa
       - name: display ssh key
         run: cat ~/.ssh/id_rsa
       - name: chmod ssh key
         run: chmod 600 ~/.ssh/id_rsa
-      - name: ssh
-        run: ssh ssh-server.kajilab.tk
+      # - name: ssh
+      #   run: ssh ssh-server.kajilab.tk
       - name: mkdir deploy
         run: mkdir -p ~/deploy
