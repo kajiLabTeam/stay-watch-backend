@@ -25,7 +25,7 @@ jobs:
       db:
         image: mysql:8.0
         ports:
-          - 33066:33066
+          - 33066:3306
         env:
           MYSQL_ROOT_PASSWORD: root
           MYSQL_DATABASE: app
