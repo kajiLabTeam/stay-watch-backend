@@ -1,4 +1,4 @@
-name: Go package
+name: CI
 
 on: [push]
 
@@ -26,7 +26,7 @@ jobs:
           SLACK_WEBHOOK: https://hooks.slack.com/services/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
           SLACK_TITLE: 'GitHub'
           SLACK_USERNAME: 'GitHub Actions'
-          SLACK_COLOR: '#FF0000'
+          SLACK_COLO JR: '#FF0000'
 
   test:
     runs-on: ubuntu-latest
