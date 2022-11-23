@@ -6,20 +6,19 @@ env:
   ENVIRONMENT: dev
 
 jobs:
-  build:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
+  # build:
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - uses: actions/checkout@v3
 
-      - name: Set up Go
-        uses: actions/setup-go@v3
-        with:
-          go-version: 1.19
+  #     - name: Set up Go
+  #       uses: actions/setup-go@v3
+  #       with:
+  #         go-version: 1.19
 
-      - name: Build
-        run: go build -v
-        working-directory: ./go/app
-
+  #     - name: Build
+  #       run: go build -v
+  #       working-directory: ./go/app
   test:
     runs-on: ubuntu-latest
     services:
@@ -40,10 +39,10 @@ jobs:
     steps:
       - name: Show Docker containers
         run: docker ps -a
-      # - name: Show databases for root user
-      #   run: mysql --protocol=tcp -h localhost -P 33066 -u root -proot -e "SHOW DATABASES"
-      # - name: Show databases for gopher
-      #   run: mysql --protocol=tcp -h localhost -P 33066 -u gopher -psetsetset -e "SHOW DATABASES"
+      - name: Show databases for root user
+        run: mysql --protocol=tcp -h localhost -P 33066 -u root -proot -e "SHOW DATABASES"
+      - name: Show databases for gopher
+        run: mysql --protocol=tcp -h localhost -P 33066 -u gopher -psetsetset -e "SHOW DATABASES"
       - uses: actions/checkout@v3
       - name: Set up Go
         uses: actions/setup-go@v3
