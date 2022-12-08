@@ -201,9 +201,9 @@ func Attendance(c *gin.Context) {
 // }
 
 func Check(c *gin.Context) {
+
 	firebaseUserInfo, err := verifyCheck(c.Request)
 	if err != nil {
-		fmt.Println(err)
 		c.JSON(http.StatusUnauthorized, gin.H{
 			"status": "invalid token",
 		})
@@ -213,6 +213,7 @@ func Check(c *gin.Context) {
 	UserService := service.UserService{}
 	user, err := UserService.GetUserByEmail(firebaseUserInfo["Email"])
 	if err != nil {
+		fmt.Printf("Cannnot find user: %v", err)
 		c.String(http.StatusInternalServerError, "Server Error")
 		return
 	}

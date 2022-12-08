@@ -13,7 +13,7 @@ import (
 func main() {
 
 	log.Println("Start Server")
-	SetUpServer().Run(":8080")
+	SetUpServer().Run(":8082")
 	// v1.GET("/list/simultaneous/:user_id", controller.SimultaneousStayUserList)
 
 	// BotService := service.BotService{}

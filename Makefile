@@ -22,6 +22,10 @@ reloadgolang:
 down:
 	docker-compose down
 
+dev:
+	docker-compose up
+dev-d:
+	docker-compose up -d
 ##composeでexecするときはservice名だからenvを使用しない
 vol_mysql:
 	docker-compose up vol_mysql
@@ -42,8 +46,7 @@ prod:
 	sleep 120
 	docker-compose up -d vol_golang
 	
-network:
-	docker network create vol_network
+
 
 
 
