@@ -6,13 +6,14 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"io"
+
 	"net/http"
 )
 
 type BotService struct{}
 
-//BOTにメッセージを送信する
+// BOTにメッセージを送信する
 func (BotService) SendMessage(message string, channelID string) error {
 
 	requestBody := &model.RequestBody{
@@ -39,7 +40,8 @@ func (BotService) SendMessage(message string, channelID string) error {
 	}
 	defer resp.Body.Close()
 
-	byteArray, err := ioutil.ReadAll(resp.Body)
+	byteArray, err := io.ReadAll(resp.Body)
+
 	if err != nil {
 		return fmt.Errorf(" failed: %w", err)
 	}
@@ -49,7 +51,7 @@ func (BotService) SendMessage(message string, channelID string) error {
 	return nil
 }
 
-//Botに電池切れのメッセージを送信する
+// Botに電池切れのメッセージを送信する
 func (BotService) NotifyOutOfBattery() error {
 	RoomService := RoomService{}
 	UserService := UserService{}
@@ -57,7 +59,7 @@ func (BotService) NotifyOutOfBattery() error {
 	BotService := BotService{}
 
 	//二週間分のログを取り出す
-	logs, err := RoomService.GetLogByDate(14)
+	logs, err := RoomService.GetLogWithinDate(14)
 	if err != nil {
 		fmt.Println(err)
 	}
