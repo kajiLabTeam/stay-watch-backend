@@ -3,6 +3,7 @@ package controller
 import (
 	"Stay_watch/model"
 	"Stay_watch/service"
+	"fmt"
 	"net/http"
 	"strconv"
 
@@ -17,6 +18,8 @@ func Stayer(c *gin.Context) {
 	//Stayerテーブルから全てのデータを取得する
 	allStayer, err := RoomService.GetAllStayer()
 	if err != nil {
+
+		fmt.Printf("failed: Cannnot get stayer %v", err)
 		c.String(http.StatusInternalServerError, "Server Error")
 		return
 	}
@@ -35,8 +38,7 @@ func Stayer(c *gin.Context) {
 			c.String(http.StatusInternalServerError, "Server Error")
 			return
 		}
-
-		tags := make([]model.Tag, 0)
+		tagsGetResponse := make([]model.TagGetResponse, 0)
 
 		tagsID, err := UserService.GetUserTagsID(stayer.UserID)
 		if err != nil {
@@ -51,11 +53,11 @@ func Stayer(c *gin.Context) {
 				c.String(http.StatusInternalServerError, "Server Error")
 				return
 			}
-			tag := model.Tag{
+			tag := model.TagGetResponse{
 				ID:   tagID,
 				Name: tagName,
 			}
-			tags = append(tags, tag)
+			tagsGetResponse = append(tagsGetResponse, tag)
 		}
 
 		stayerGetResponse = append(stayerGetResponse, model.StayerGetResponse{
@@ -63,7 +65,7 @@ func Stayer(c *gin.Context) {
 			Name:   userName,
 			Room:   roomName,
 			RoomID: int(stayer.RoomID),
-			Tags:   tags,
+			Tags:   tagsGetResponse,
 		})
 	}
 	c.JSON(200, stayerGetResponse)
@@ -103,36 +105,36 @@ func Log(c *gin.Context) {
 		}
 
 		logGetResponse = append(logGetResponse, model.LogGetResponse{
-			ID:      log.ID,
+			ID:      int64(log.ID),
 			Name:    userName,
 			Room:    roomName,
-			StartAt: log.StartAt,
-			EndAt:   log.EndAt,
+			StartAt: log.StartAt.Format("2006-01-02 15:04:05"),
+			EndAt:   log.EndAt.Format("2006-01-02 15:04:05"),
 		})
 	}
 	c.JSON(200, logGetResponse)
 }
 
-func SimultaneousList(c *gin.Context) {
-	userID := c.Param("user_id")
+// func SimultaneousList(c *gin.Context) {
+// 	userID := c.Param("user_id")
 
-	RoomService := service.RoomService{}
+// 	RoomService := service.RoomService{}
 
-	//userIDをint64に変換
-	userIDInt, err := strconv.ParseInt(userID, 10, 64)
-	if err != nil {
-		c.String(http.StatusBadRequest, "Bad Request")
-		return
-	}
+// 	//userIDをint64に変換
+// 	userIDInt, err := strconv.ParseInt(userID, 10, 64)
+// 	if err != nil {
+// 		c.String(http.StatusBadRequest, "Bad Request")
+// 		return
+// 	}
 
-	SimultaneousList, err := RoomService.GetSimultaneousList(userIDInt)
-	if err != nil {
-		c.String(http.StatusInternalServerError, "Server Error")
-		return
-	}
+// 	SimultaneousList, err := RoomService.GetSimultaneousList(userIDInt)
+// 	if err != nil {
+// 		c.String(http.StatusInternalServerError, "Server Error")
+// 		return
+// 	}
 
-	c.JSON(http.StatusOK, SimultaneousList)
-}
+// 	c.JSON(http.StatusOK, SimultaneousList)
+// }
 
 func LogGantt(c *gin.Context) {
 

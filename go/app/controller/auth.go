@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"os"
 	"strings"
 
 	firebase "firebase.google.com/go"
@@ -18,7 +19,11 @@ func verifyCheck(r *http.Request) (map[string]string, error) {
 		ctx = context.Background()
 	}
 
-	opt := option.WithCredentialsFile("/app/credentials/firebase.json")
+	opt := option.WithCredentialsFile("./credentials/firebase.json")
+	if os.Getenv("ENVIRONMENT") == "production" {
+		opt = option.WithCredentialsFile("/app/credentials/firebase.json")
+	}
+
 	conf := &firebase.Config{ProjectID: "stay-watch-a616f"}
 	//OAuth2.0更新トークン対応用
 	app, err := firebase.NewApp(ctx, conf, opt)
@@ -33,16 +38,13 @@ func verifyCheck(r *http.Request) (map[string]string, error) {
 
 	header := r.Header.Get("Authorization") //クライアントからJWTを取得する
 	tokenID := strings.Replace(header, "Bearer ", "", 1)
-	fmt.Println(tokenID)
-	//fmt.Println(token_id)
+
 	//JWTのベリファイ
 	gotToken, err := auth.VerifyIDToken(ctx, tokenID)
 	if err != nil { //認証に失敗した場合(JWTが不正な場合)は、エラーを返す
 		fmt.Printf("Cannot verify token_id: %v\n", err)
 		return nil, err
 	}
-
-	log.Printf("Verified ID token: %v\n", gotToken)
 
 	uid := gotToken.UID //認証に成功した場合はuidを取得する
 	log.Printf("Verified user_id: %v\n", uid)

@@ -1,11 +1,16 @@
 package model
 
 type StayerGetResponse struct {
-	ID     int64  `json:"id"`
-	Name   string `json:"name"`
-	Room   string `json:"room"`
-	RoomID int    `json:"roomID"`
-	Tags   []Tag  `json:"tags"`
+	ID     int64            `json:"id"`
+	Name   string           `json:"name"`
+	Room   string           `json:"room"`
+	RoomID int              `json:"roomId"`
+	Tags   []TagGetResponse `json:"tags"`
+}
+
+type TagGetResponse struct {
+	ID   int64  `json:"id"`
+	Name string `json:"name"`
 }
 
 type LogGetResponse struct {
@@ -17,15 +22,20 @@ type LogGetResponse struct {
 }
 
 type UserInformationGetResponse struct {
-	ID   int64  `json:"id"`
-	Name string `json:"name"`
-	Tags []Tag  `json:"tags"`
+	ID   int64            `json:"id"`
+	Name string           `json:"name"`
+	Tags []TagGetResponse `json:"tags"`
 }
 
 type UserDetailInformationGetResponse struct {
 	Email string `json:"email"`
 	Role  int64  `json:"role"`
 	UserInformationGetResponse
+}
+
+type UserRoleGetResponse struct {
+	ID   int64 `json:"id"`
+	Role int64 `json:"role"`
 }
 
 type RoomStayTime struct {
@@ -74,8 +84,18 @@ type RequestBody struct {
 }
 
 type RegistrationUserForm struct {
-	TargetID    int64  `json:"targetID"`
-	TargetEmail string `json:"targetEmail"`
-	TargetName  string `json:"targetName"`
-	TargetRole  int64  `json:"targetRole"`
+	ID    int64  `form:"id"`
+	Email string `form:"email"`
+	Name  string `form:"name"`
+	Role  int64  `form:"role"`
+}
+
+type BeaconRoom struct {
+	Beacons []*Beacon `json:"beacons"`
+	RoomID  int64     `json:"roomId"`
+}
+
+type Beacon struct {
+	Uuid string `json:"uuid" form:"uuid"`
+	Rssi int64  `json:"rssi" form:"rssi"`
 }

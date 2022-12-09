@@ -5,7 +5,8 @@ import (
 	"Stay_watch/service"
 	"fmt"
 	"net/http"
-	"strconv"
+	"os"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 )
@@ -16,11 +17,10 @@ func Detail(c *gin.Context) {
 	})
 }
 
-func Register(c *gin.Context) {
+func CreateUser(c *gin.Context) {
+	RegistrationUserForm := model.RegistrationUserForm{}
+	c.Bind(&RegistrationUserForm)
 
-	RegistrationUserForm := model.User{}
-	c.BindJSON(&RegistrationUserForm)
-	fmt.Println(RegistrationUserForm)
 	UserService := service.UserService{}
 	//userIDがないなら新規登録
 	if RegistrationUserForm.ID == 0 {
@@ -30,35 +30,22 @@ func Register(c *gin.Context) {
 			Role:  RegistrationUserForm.Role,
 			UUID:  UserService.NewUUID(),
 		}
+
 		err := UserService.RegisterUser(&user)
 		if err != nil {
+			fmt.Printf("Cannnot register user: %v", err)
 			c.String(http.StatusInternalServerError, "Server Error")
 			return
 		}
 	}
+
 	//userIDがあるなら更新
 	if RegistrationUserForm.ID != 0 {
 		//userNameが空なので、userIDからuserNameを取得する
-		userName, err := UserService.GetUserNameByUserID(RegistrationUserForm.ID)
-		if err != nil {
-			c.String(http.StatusInternalServerError, "Server Error")
-			return
-		}
-
-		uuid, err := UserService.GetUserUUIDByUserID(RegistrationUserForm.ID)
-		if err != nil {
-			c.String(http.StatusInternalServerError, "Server Error")
-			return
-		}
-
-		user := model.User{
-			ID:    RegistrationUserForm.ID,
-			Name:  userName,
-			Email: RegistrationUserForm.Email,
-			Role:  RegistrationUserForm.Role,
-			UUID:  uuid,
-		}
-		err = UserService.UpdateUser(&user)
+		err := UserService.UpdateUser(
+			int(RegistrationUserForm.ID),
+			RegistrationUserForm.Email,
+		)
 
 		if err != nil {
 			c.String(http.StatusInternalServerError, "Server Error")
@@ -66,10 +53,12 @@ func Register(c *gin.Context) {
 		}
 	}
 
-	mailService := service.MailService{}
-	mailService.SendMail("滞在ウォッチユーザ登録の完了のお知らせ", "ユーザ登録が完了したので滞在ウォッチを閲覧することが可能になりました\n一度プロジェクトをリセットしたので再度ログインお願いします。\nアプリドメイン\nhttps://stay-watch-go.kajilab.tk/", RegistrationUserForm.Email)
+	if !strings.HasSuffix(os.Args[0], ".test") {
+		mailService := service.MailService{}
+		mailService.SendMail("滞在ウォッチユーザ登録の完了のお知らせ", "ユーザ登録が完了したので滞在ウォッチを閲覧することが可能になりました\n一度プロジェクトをリセットしたので再度ログインお願いします。\nアプリドメイン\nhttps://stay-watch-go.kajilab.tk/", RegistrationUserForm.Email)
+	}
 
-	c.JSON(200, gin.H{
+	c.JSON(http.StatusCreated, gin.H{
 		"status": "ok",
 	})
 }
@@ -87,8 +76,8 @@ func UserList(c *gin.Context) {
 
 	for _, user := range users {
 
-		tags := make([]model.Tag, 0)
-		tagsID, err := UserService.GetUserTagsID(user.ID)
+		tags := make([]model.TagGetResponse, 0)
+		tagsID, err := UserService.GetUserTagsID(int64(user.Model.ID))
 		if err != nil {
 			c.String(http.StatusInternalServerError, "Server Error")
 			return
@@ -101,7 +90,7 @@ func UserList(c *gin.Context) {
 				c.String(http.StatusInternalServerError, "Server Error")
 				return
 			}
-			tag := model.Tag{
+			tag := model.TagGetResponse{
 				ID:   tagID,
 				Name: tagName,
 			}
@@ -109,13 +98,13 @@ func UserList(c *gin.Context) {
 		}
 
 		userInformationGetResponse = append(userInformationGetResponse, model.UserInformationGetResponse{
-			ID:   user.ID,
+			ID:   int64(user.ID),
 			Name: user.Name,
 			Tags: tags,
 		})
 	}
 
-	c.JSON(200, userInformationGetResponse)
+	c.JSON(http.StatusOK, userInformationGetResponse)
 }
 
 func Attendance(c *gin.Context) {
@@ -169,42 +158,42 @@ func Attendance(c *gin.Context) {
 		ExcelService.WriteExcel(allAttendancesTmp, meeting.ID)
 	}
 
-	c.JSON(200, gin.H{
+	c.JSON(http.StatusOK, gin.H{
 		"status": "ok",
 	})
 }
 
-func SimultaneousStayUserList(c *gin.Context) {
-	userID := c.Param("user_id")
-	//int64に変換
-	userIDInt64, err := strconv.ParseInt(userID, 10, 64)
-	if err != nil {
-		c.String(http.StatusInternalServerError, "Server Error")
-		return
-	}
+// func SimultaneousStayUserList(c *gin.Context) {
+// 	userID := c.Param("user_id")
+// 	//int64に変換
+// 	userIDInt64, err := strconv.ParseInt(userID, 10, 64)
+// 	if err != nil {
+// 		c.String(http.StatusInternalServerError, "Server Error")
+// 		return
+// 	}
 
-	UserService := service.UserService{}
-	RoomService := service.RoomService{}
+// 	UserService := service.UserService{}
+// 	RoomService := service.RoomService{}
 
-	logs, err := RoomService.GetLogByUserAndDate(userIDInt64, 14)
-	if err != nil {
-		c.String(http.StatusInternalServerError, "Server Error")
-		return
-	}
-	simultaneousStayUserGetResponses, err := UserService.GetSameTimeUser(logs)
-	if err != nil {
-		c.String(http.StatusInternalServerError, "Server Error")
-		return
-	}
+// 	logs, err := RoomService.GetLogByUserAndDate(userIDInt64, 14)
+// 	if err != nil {
+// 		c.String(http.StatusInternalServerError, "Server Error")
+// 		return
+// 	}
+// 	simultaneousStayUserGetResponses, err := UserService.GetSameTimeUser(logs)
+// 	if err != nil {
+// 		c.String(http.StatusInternalServerError, "Server Error")
+// 		return
+// 	}
 
-	c.JSON(200, simultaneousStayUserGetResponses)
-}
+// 	c.JSON(200, simultaneousStayUserGetResponses)
+// }
 
 func Check(c *gin.Context) {
+
 	firebaseUserInfo, err := verifyCheck(c.Request)
 	if err != nil {
-		fmt.Println(err)
-		c.JSON(401, gin.H{
+		c.JSON(http.StatusUnauthorized, gin.H{
 			"status": "invalid token",
 		})
 		return
@@ -213,6 +202,7 @@ func Check(c *gin.Context) {
 	UserService := service.UserService{}
 	user, err := UserService.GetUserByEmail(firebaseUserInfo["Email"])
 	if err != nil {
+		fmt.Printf("Cannnot find user: %v", err)
 		c.String(http.StatusInternalServerError, "Server Error")
 		return
 	}
@@ -220,13 +210,18 @@ func Check(c *gin.Context) {
 
 	//メールアドレスが存在しない場合はUserは存在しないのでリクエスト失敗
 	if (user == model.User{}) {
-		c.JSON(403, gin.H{
+		c.JSON(http.StatusForbidden, gin.H{
 			"status": "権限がありません 管理者にユーザ追加を依頼してください",
 		})
 		return
 	}
 
-	c.JSON(200,
-		user,
+	userRole := model.UserRoleGetResponse{
+		ID:   int64(user.ID),
+		Role: user.Role,
+	}
+
+	c.JSON(http.StatusOK,
+		userRole,
 	)
 }

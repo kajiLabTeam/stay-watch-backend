@@ -64,13 +64,10 @@ func (ExcelService) WriteExcel(attendancesTmp []model.AttendanceTmp, meetingID i
 			//書き込み
 			var vr sheets.ValueRange
 			vr.Values = append(vr.Values, AbstractSlice(mozis))
-
 			updateRange := fmt.Sprintf("3年セミナー 2022!C%d:M%d", dateIndex+2, dateIndex+2)
-
 			if _, err = srv.Spreadsheets.Values.Update(spreadsheetID, updateRange, &vr).ValueInputOption("RAW").Do(); err != nil {
 				return fmt.Errorf(" failed: %w", err)
 			}
-
 			srv.Spreadsheets.Values.Update(spreadsheetID, updateRange, &vr).ValueInputOption("RAW").Do()
 		}
 
