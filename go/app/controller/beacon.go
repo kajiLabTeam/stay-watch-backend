@@ -7,12 +7,14 @@ import (
 
 	"Stay_watch/model"
 	"Stay_watch/service"
+	"Stay_watch/util"
 
 	"github.com/gin-gonic/gin"
 )
 
 // ビーコン情報を受け取る
 func Beacon(c *gin.Context) {
+
 	beaconRoom := model.BeaconRoom{}
 	err := c.Bind(&beaconRoom)
 	if err != nil {
@@ -24,8 +26,11 @@ func Beacon(c *gin.Context) {
 	RoomService := service.RoomService{}
 	UserService := service.UserService{}
 	BotService := service.BotService{}
+	Util := util.Util{}
+
 	// 事前にStayerテーブルのデータを取得する
 	pastAllStayer, err := RoomService.GetAllStayer()
+
 	if err != nil {
 		fmt.Printf("failed: Cannnot get stayer %v", err)
 		c.String(http.StatusInternalServerError, "Server Error")
@@ -74,7 +79,7 @@ func Beacon(c *gin.Context) {
 					c.String(http.StatusInternalServerError, "Server Error")
 				}
 				// logテーブルのendAtを更新する
-				err = RoomService.InsertEndAt(pastStayer.UserID)
+				err = RoomService.UpdateEndAt(pastStayer.UserID)
 				if err != nil {
 					fmt.Println("failed: Cannnot update endAt")
 					c.String(http.StatusInternalServerError, "Server Error")
@@ -129,7 +134,7 @@ func Beacon(c *gin.Context) {
 			}
 
 			// logテーブルのendAtを更新する
-			err = RoomService.InsertEndAt(pastStayer.UserID)
+			err = RoomService.UpdateEndAt(pastStayer.UserID)
 			if err != nil {
 				fmt.Println(err)
 			}
@@ -181,23 +186,25 @@ func Beacon(c *gin.Context) {
 			c.String(http.StatusBadRequest, "Bad Request")
 			return
 		}
+
 		// 該当ユーザがいない場合はstayerテーブルとlogテーブルに新規に追加する
 		if !stayerFlag {
-			err = RoomService.SetStayer(&model.Stayer{UserID: currentUserID, RoomID: beaconRoom.RoomID, Rssi: currentStayer.Rssi})
+			err = RoomService.CreateStayer(&model.Stayer{UserID: currentUserID, RoomID: beaconRoom.RoomID, Rssi: currentStayer.Rssi})
 			if err != nil {
 				fmt.Println("failed: Cannnot set stayer")
 				c.String(http.StatusBadRequest, "Bad Request")
 				return
 			}
 			currentTime := time.Now()
-			endAt, err := time.Parse("2006-01-02 15:04:05", "2016-01-01 00:00:00")
+			endAt, err := Util.ConvertDatetimeToLocationTime("2016-01-01 00:00:00", "Asia/Tokyo")
+			fmt.Println(endAt)
 			if err != nil {
 				fmt.Println("failed: Cannnot parse time")
 				c.String(http.StatusBadRequest, "Bad Request")
 				return
 			}
 
-			err = RoomService.SetLog(&model.Log{RoomID: beaconRoom.RoomID, StartAt: currentTime, EndAt: endAt, UserID: currentUserID, Rssi: currentStayer.Rssi})
+			err = RoomService.CreateLog(&model.Log{RoomID: beaconRoom.RoomID, StartAt: currentTime, EndAt: endAt, UserID: currentUserID, Rssi: currentStayer.Rssi})
 			if err != nil {
 				fmt.Println("failed: Cannnot set log")
 				c.String(http.StatusBadRequest, "Bad Request")

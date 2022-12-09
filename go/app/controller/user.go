@@ -227,7 +227,12 @@ func Check(c *gin.Context) {
 		return
 	}
 
+	userRole := model.UserRoleGetResponse{
+		ID:   int64(user.ID),
+		Role: user.Role,
+	}
+
 	c.JSON(http.StatusOK,
-		user,
+		userRole,
 	)
 }

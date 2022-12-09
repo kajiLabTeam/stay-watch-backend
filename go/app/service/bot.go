@@ -59,7 +59,7 @@ func (BotService) NotifyOutOfBattery() error {
 	BotService := BotService{}
 
 	//二週間分のログを取り出す
-	logs, err := RoomService.GetLogByDate(14)
+	logs, err := RoomService.GetLogWithinDate(14)
 	if err != nil {
 		fmt.Println(err)
 	}
