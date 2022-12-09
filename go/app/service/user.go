@@ -55,14 +55,16 @@ func (UserService) RegisterUser(user *model.User) error {
 }
 
 // ユーザのアップデート
-func (UserService) UpdateUser(user *model.User) error {
+func (UserService) UpdateUser(userID int, email string) error {
+	fmt.Println("updateUser")
+
 	DbEngine := connect()
 	closer, err := DbEngine.DB()
 	if err != nil {
 		return err
 	}
 	defer closer.Close()
-	result := DbEngine.Where("id=?", user.ID).Updates(user)
+	result := DbEngine.Model(&model.User{}).Where("id = ?", userID).Update("email", email)
 	if result.Error != nil {
 		fmt.Printf("ユーザ更新失敗 %v", result.Error)
 		return result.Error

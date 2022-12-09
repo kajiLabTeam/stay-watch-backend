@@ -5,6 +5,8 @@ import (
 	"Stay_watch/service"
 	"fmt"
 	"net/http"
+	"os"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 )
@@ -17,14 +19,15 @@ func Detail(c *gin.Context) {
 
 func CreateUser(c *gin.Context) {
 	RegistrationUserForm := model.RegistrationUserForm{}
-	c.BindJSON(&RegistrationUserForm)
+	c.Bind(&RegistrationUserForm)
+
 	UserService := service.UserService{}
 	//userIDがないなら新規登録
-	if RegistrationUserForm.TargetID == 0 {
+	if RegistrationUserForm.ID == 0 {
 		user := model.User{
-			Name:  RegistrationUserForm.TargetName,
-			Email: RegistrationUserForm.TargetEmail,
-			Role:  RegistrationUserForm.TargetRole,
+			Name:  RegistrationUserForm.Name,
+			Email: RegistrationUserForm.Email,
+			Role:  RegistrationUserForm.Role,
 			UUID:  UserService.NewUUID(),
 		}
 
@@ -37,28 +40,12 @@ func CreateUser(c *gin.Context) {
 	}
 
 	//userIDがあるなら更新
-	if RegistrationUserForm.TargetID != 0 {
+	if RegistrationUserForm.ID != 0 {
 		//userNameが空なので、userIDからuserNameを取得する
-		userName, err := UserService.GetUserNameByUserID(int64(RegistrationUserForm.TargetID))
-		if err != nil {
-			c.String(http.StatusInternalServerError, "Server Error")
-			return
-		}
-
-		uuid, err := UserService.GetUserUUIDByUserID(int64(RegistrationUserForm.TargetID))
-		if err != nil {
-			c.String(http.StatusInternalServerError, "Server Error")
-			return
-		}
-
-		user := model.User{
-			// ID:    RegistrationUserForm.id,
-			Name:  userName,
-			Email: RegistrationUserForm.TargetEmail,
-			Role:  RegistrationUserForm.TargetRole,
-			UUID:  uuid,
-		}
-		err = UserService.UpdateUser(&user)
+		err := UserService.UpdateUser(
+			int(RegistrationUserForm.ID),
+			RegistrationUserForm.Email,
+		)
 
 		if err != nil {
 			c.String(http.StatusInternalServerError, "Server Error")
@@ -66,8 +53,10 @@ func CreateUser(c *gin.Context) {
 		}
 	}
 
-	mailService := service.MailService{}
-	mailService.SendMail("滞在ウォッチユーザ登録の完了のお知らせ", "ユーザ登録が完了したので滞在ウォッチを閲覧することが可能になりました\n一度プロジェクトをリセットしたので再度ログインお願いします。\nアプリドメイン\nhttps://stay-watch-go.kajilab.tk/", RegistrationUserForm.TargetEmail)
+	if !strings.HasSuffix(os.Args[0], ".test") {
+		mailService := service.MailService{}
+		mailService.SendMail("滞在ウォッチユーザ登録の完了のお知らせ", "ユーザ登録が完了したので滞在ウォッチを閲覧することが可能になりました\n一度プロジェクトをリセットしたので再度ログインお願いします。\nアプリドメイン\nhttps://stay-watch-go.kajilab.tk/", RegistrationUserForm.Email)
+	}
 
 	c.JSON(http.StatusCreated, gin.H{
 		"status": "ok",

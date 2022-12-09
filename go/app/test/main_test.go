@@ -123,10 +123,10 @@ func TestPostUser(t *testing.T) {
 	ginContext, _ := gin.CreateTestContext(response)
 
 	user := model.RegistrationUserForm{
-		TargetID:    0,
-		TargetRole:  1,
-		TargetEmail: "hogehoge@gmail.com",
-		TargetName:  "hoge",
+		ID:    0,
+		Role:  1,
+		Email: "hogehoge@gmail.com",
+		Name:  "hoge",
 	}
 	//jsonに変換
 	jsonUser, err := json.Marshal(user)
