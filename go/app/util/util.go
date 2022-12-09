@@ -45,8 +45,8 @@ func (Util) ArrayStringContains(target []string, str string) bool {
 
 // 引数datetime文字列とタイムゾーン文字列を受け取りTime型に変換する関数
 func (Util) ConvertDatetimeToLocationTime(datetime string, timezone string) (time.Time, error) {
-	jst, _ := time.LoadLocation(timezone)
-	locationTime, err := time.ParseInLocation("2006-01-02 15:04:05", datetime, jst)
+	timeZone, _ := time.LoadLocation(timezone)
+	locationTime, err := time.ParseInLocation("2006-01-02 15:04:05", datetime, timeZone)
 	if err != nil {
 		log.Fatal(err.Error())
 		return time.Time{}, err

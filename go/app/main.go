@@ -49,7 +49,7 @@ func SetUpServer() *gin.Engine {
 		MaxAge:           24 * time.Hour,
 	}))
 
-	versionEngine := engine.Group("/v1")
+	versionEngine := engine.Group("api/v1")
 	{
 		versionEngine.GET("/stayers", controller.Stayer)
 		versionEngine.POST("/stayers", controller.Beacon)

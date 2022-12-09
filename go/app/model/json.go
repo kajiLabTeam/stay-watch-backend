@@ -33,6 +33,11 @@ type UserDetailInformationGetResponse struct {
 	UserInformationGetResponse
 }
 
+type UserRoleGetResponse struct {
+	ID   int64 `json:"id"`
+	Role int64 `json:"role"`
+}
+
 type RoomStayTime struct {
 	Date      string     `json:"date"`
 	TimeRooms []TimeRoom `json:"timeRooms"`

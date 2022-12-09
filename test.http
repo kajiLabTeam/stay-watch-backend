@@ -4,13 +4,13 @@
 
 
 ###
-Get {{baseURL}}/v1/stayers
+Get {{baseURL}}/api/v1/stayers
 
 ###
-Get {{baseURL}}/room/v1/log
+Get {{baseURL}}/api/v1/logs
 
 ###
-Get {{baseURL}}/v1/users
+Get {{baseURL}}/api/v1/users
 
 ###
 POST  https://hooks.slack.com/services/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
@@ -31,13 +31,13 @@ content-type: application/json
 
 
 ###
-Get {{baseURL}}/room/v1/list/simultaneous/1
+Get {{baseURL}}/api/v1/list/simultaneous/1
 
 ###
-Get {{baseURL}}/user/v1/list/simultaneous/2
+Get {{baseURL}}/api/v1/list/simultaneous/2
 
 ###
-POST {{baseURL}}/v1/stayers HTTP/1.1
+POST {{baseURL}}/api/v1/stayers HTTP/1.1
 content-type: application/json
 
 {
@@ -54,14 +54,28 @@ content-type: application/json
     "roomID": 1
 }
 
-
 ###
-POST {{baseURL}}/v1/stayers HTTP/1.1
+POST {{baseURL}}/api/v1/stayers HTTP/1.1
 content-type: application/json
 
 {
     "Beacons":[
-      
+        {
+            "uuid": "e7d61ea3f8dd49c88f2ff2484c07ac00",
+            "rssi": -60
+        }
+    ],
+    "roomID": 1
+}
+
+
+###
+POST {{baseURL}}/api/v1/stayers HTTP/1.1
+content-type: application/json
+
+{
+    "Beacons":[
+    
     ],
     "roomID": 1
 }
@@ -74,7 +88,7 @@ content-type: application/json
 #     "meetingID":"2",
 # }
 ###
-POST {{baseURL}}/user/v1/attendance HTTP/1.1
+POST {{baseURL}}/api/v1/attendance HTTP/1.1
 content-type: application/json
 
 {
@@ -83,10 +97,8 @@ content-type: application/json
 
 
 ###
-GET {{baseURL}}/room/v1/log/gantt HTTP/1.1
+GET {{baseURL}}/api/v1/log/gantt HTTP/1.1
 content-type: application/json
 
-
-
 ###
-GET {{baseURL}}/user/v1/check
+GET {{baseURL}}/api/v1/check

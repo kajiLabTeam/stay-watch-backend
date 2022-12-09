@@ -10,7 +10,7 @@ import (
 
 type RoomService struct{}
 
-func (RoomService) SetLog(Log *model.Log) error {
+func (RoomService) CreateLog(Log *model.Log) error {
 
 	DbEngine := connect()
 	closer, err := DbEngine.DB()
@@ -21,7 +21,7 @@ func (RoomService) SetLog(Log *model.Log) error {
 
 	result := DbEngine.Create(&Log)
 	if result.Error != nil {
-		return fmt.Errorf(" failed: %w", result.Error)
+		return fmt.Errorf(" failed to create log: %w", result.Error)
 	}
 	return nil
 }
@@ -34,11 +34,19 @@ func (RoomService) GetStayer(userID int64) (error, bool) {
 		return err, false
 	}
 	defer closer.Close()
-	result := DbEngine.Table("stayers").Where("user_id=?", userID).Take(&model.Stayer{})
-	if result.RowsAffected != 0 {
-		return nil, true
+
+	//レコードの数を取得する
+	var count int64
+	result := DbEngine.Table("stayers").Where("user_id=?", userID).Count(&count)
+	if result.Error != nil {
+		return fmt.Errorf(" failed to get count: %w", result.Error), false
 	}
-	return nil, false
+	fmt.Println("count=", count)
+
+	if count == 0 {
+		return nil, false
+	}
+	return nil, true
 }
 
 // 滞在者全体を取得する
@@ -52,8 +60,7 @@ func (RoomService) GetAllStayer() ([]model.Stayer, error) {
 	stayers := make([]model.Stayer, 0)
 	result := DbEngine.Table("stayers").Find(&stayers)
 	if result.Error != nil {
-		fmt.Printf("failed: %v", result.Error)
-		return nil, result.Error
+		return nil, fmt.Errorf(" failed to get all stayer: %w", result.Error)
 	}
 
 	return stayers, nil
@@ -75,7 +82,7 @@ func (RoomService) GetAllStayer() ([]model.Stayer, error) {
 // 	return stayers, nil
 // }
 
-func (RoomService) SetStayer(stayer *model.Stayer) error {
+func (RoomService) CreateStayer(stayer *model.Stayer) error {
 	DbEngine := connect()
 	closer, err := DbEngine.DB()
 	if err != nil {
@@ -85,7 +92,7 @@ func (RoomService) SetStayer(stayer *model.Stayer) error {
 
 	result := DbEngine.Create(&stayer)
 	if result.Error != nil {
-		return fmt.Errorf(" failed: %w", result.Error)
+		return fmt.Errorf(" failed: to create stayer: %w", result.Error)
 	}
 	return nil
 }
@@ -101,7 +108,7 @@ func (RoomService) UpdateStayer(stayer *model.Stayer) error {
 	result := DbEngine.Model(&model.Stayer{}).Where("user_id=?", stayer.UserID).Updates(&stayer)
 
 	if result.Error != nil {
-		return fmt.Errorf(" failed: %w", result.Error)
+		return fmt.Errorf(" failed to update stayer: %w", result.Error)
 	}
 
 	return nil
@@ -117,12 +124,12 @@ func (RoomService) DeleteStayer(userID int64) error {
 
 	result := DbEngine.Where("user_id=?", userID).Delete(&model.Stayer{})
 	if result.Error != nil {
-		return fmt.Errorf(" failed: %w", result.Error)
+		return fmt.Errorf(" failed to delete stayer: %w", result.Error)
 	}
 	return nil
 }
 
-func (RoomService) InsertEndAt(userID int64) error {
+func (RoomService) UpdateEndAt(userID int64) error {
 	DbEngine := connect()
 	closer, err := DbEngine.DB()
 	if err != nil {
@@ -132,14 +139,9 @@ func (RoomService) InsertEndAt(userID int64) error {
 
 	currentTime := time.Now()
 
-	// _, err := DbEngine.Table("log").Desc("start_at").Limit(1).Where("user_id=?", userID).Update(map[string]string{"end_at": currentTime.Format("2006-01-02 15:04:05")})
-	// if err != nil {
-	// 	return fmt.Errorf(" failed: %w", err)
-	// }
-
-	result := DbEngine.Last(&model.Log{}).Where("user_id=? ", userID).Update("end_at", currentTime.Format("2006-01-02 15:04:05"))
+	result := DbEngine.Where("user_id=? ", userID).Last(&model.Log{}).Update("end_at", currentTime.Format("2006-01-02 15:04:05"))
 	if result.Error != nil {
-		return fmt.Errorf(" failed: %w", result.Error)
+		return fmt.Errorf(" failed to update end_at: %w", result.Error)
 	}
 
 	return nil
@@ -156,14 +158,29 @@ func (RoomService) GetLogByUserAndDate(userID int64, date int64) ([]model.Log, e
 	return logs, nil
 }
 
-// 現在の日付から指定した日付以内のログを取得する
-func (RoomService) GetLogByDate(date int64) ([]model.Log, error) {
-	// currentTime := time.Now()
+func (RoomService) GetLogWithinDate(date int64) ([]model.Log, error) {
+
+	DbEngine := connect()
+	closer, err := DbEngine.DB()
+	if err != nil {
+		return nil, err
+	}
+	currentTime := time.Now()
 	logs := make([]model.Log, 0)
-	// err := DbEngine.Table("log").Asc("start_at").Where("start_at>=?", currentTime.AddDate(0, 0, -int(date)).Format("2006-01-02 15:04:05")).Find(&logs)
-	// if err != nil {
-	// 	return nil, fmt.Errorf(" failed: %w", err)
-	// }
+
+	// 現在の日付から指定した日付以内のログを取得する
+	// err = DbEngine.Table("log").Asc("start_at").Where("start_at>=?", currentTime.AddDate(0, 0, -int(date)).Format("2006-01-02 15:04:05")).Find(&logs)
+	result := DbEngine.Order("start_at asc").Where("start_at>=?", currentTime.AddDate(0, 0, -int(date)).Format("2006-01-02 15:04:05")).Find(&logs)
+	if result.Error != nil {
+		return nil, fmt.Errorf(" failed: %w", result.Error)
+	}
+
+	if err != nil {
+		return nil, fmt.Errorf(" failed: %w", err)
+	}
+
+	defer closer.Close()
+
 	return logs, nil
 }
 
@@ -179,7 +196,8 @@ func (RoomService) GetGanttLog() ([]model.SimulataneousStayLogGetResponse, error
 	RoomService := RoomService{}
 	UserService := UserService{}
 	//1週間以内のログを取得
-	logs, err := RoomService.GetLogByDate(7)
+	logs, err := RoomService.GetLogWithinDate(7)
+	fmt.Println(logs)
 	if err != nil {
 		return nil, err
 	}
@@ -228,12 +246,22 @@ func (RoomService) GetGanttLog() ([]model.SimulataneousStayLogGetResponse, error
 				unixMilli := util.TimeToUnixMilli(locationTime)
 				stayTime.StartAt = unixMilli
 
-				locationTime, err = util.ConvertDatetimeToLocationTime(log.EndAt.Format("2006-01-02 15:04:05"), "Asia/Tokyo")
-
-				if err != nil {
-					return nil, err
+				// 終了時間が初期値　2016-01-01 00:00:00の場合は現在時刻を入れる
+				if log.EndAt.Format("2006-01-01 15:04:05") == "2016-01-01 00:00:00" {
+					locationTime, err = util.ConvertDatetimeToLocationTime(time.Now().Format("2006-01-02 15:04:05"), "Asia/Tokyo")
+					if err != nil {
+						return nil, err
+					}
+					unixMilli = util.TimeToUnixMilli(locationTime)
+				} else {
+					locationTime, err = util.ConvertDatetimeToLocationTime(log.EndAt.Format("2006-01-02 15:04:05"), "Asia/Tokyo")
+					if err != nil {
+						return nil, err
+					}
+					unixMilli = util.TimeToUnixMilli(locationTime)
 				}
-				unixMilli = util.TimeToUnixMilli(locationTime)
+
+				fmt.Println(unixMilli)
 				stayTime.EndAt = unixMilli
 
 				userName, err := UserService.GetUserNameByUserID(log.UserID)
