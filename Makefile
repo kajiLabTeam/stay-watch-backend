@@ -21,7 +21,6 @@ reloadgolang:
 	docker-compose up -d vol_golang
 down:
 	docker-compose down
-
 dev:
 	docker-compose up
 dev-d:
@@ -45,9 +44,5 @@ prod:
 	docker-compose up -d vol_mysql
 	sleep 120
 	docker-compose up -d vol_golang
-	
-
-
-
 
 

@@ -4,7 +4,7 @@ type StayerGetResponse struct {
 	ID     int64            `json:"id"`
 	Name   string           `json:"name"`
 	Room   string           `json:"room"`
-	RoomID int              `json:"roomID"`
+	RoomID int              `json:"roomId"`
 	Tags   []TagGetResponse `json:"tags"`
 }
 
@@ -84,15 +84,15 @@ type RequestBody struct {
 }
 
 type RegistrationUserForm struct {
-	TargetID    int64  `json:"targetID"`
-	TargetEmail string `json:"targetEmail"`
-	TargetName  string `json:"targetName"`
-	TargetRole  int64  `json:"targetRole"`
+	ID    int64  `form:"id"`
+	Email string `form:"email"`
+	Name  string `form:"name"`
+	Role  int64  `form:"role"`
 }
 
 type BeaconRoom struct {
 	Beacons []*Beacon `json:"beacons"`
-	RoomID  int64     `json:"roomID"`
+	RoomID  int64     `json:"roomId"`
 }
 
 type Beacon struct {
