@@ -122,7 +122,7 @@ func (RoomService) DeleteStayer(userID int64) error {
 	}
 	defer closer.Close()
 
-	result := DbEngine.Where("user_id=?", userID).Delete(&model.Stayer{})
+	result := DbEngine.Unscoped().Where("user_id=?", userID).Delete(&model.Stayer{})
 	if result.Error != nil {
 		return fmt.Errorf(" failed to delete stayer: %w", result.Error)
 	}
