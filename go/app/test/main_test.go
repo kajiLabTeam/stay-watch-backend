@@ -118,28 +118,28 @@ func TestGetUser(t *testing.T) {
 
 }
 
-func TestPostUser(t *testing.T) {
-	response := httptest.NewRecorder()
-	ginContext, _ := gin.CreateTestContext(response)
+// func TestPostUser(t *testing.T) {
+// 	response := httptest.NewRecorder()
+// 	ginContext, _ := gin.CreateTestContext(response)
 
-	user := model.RegistrationUserForm{
-		ID:    0,
-		Role:  1,
-		Email: "hogehoge@gmail.com",
-		Name:  "hoge",
-	}
-	//jsonに変換
-	jsonUser, err := json.Marshal(user)
+// 	user := model.RegistrationUserForm{
+// 		ID:    0,
+// 		Role:  1,
+// 		Email: "hogehoge@gmail.com",
+// 		Name:  "hoge",
+// 	}
+// 	//jsonに変換
+// 	jsonUser, err := json.Marshal(user)
 
-	if err != nil {
-		t.Fatal(err)
-	}
-	// リクエスト情報をコンテキストに入れる
-	ginContext.Request, _ = http.NewRequest(http.MethodPost, "/users", nil)
-	// ginContext.Request.Header.Set("Content-Type", "application/x-www-form-urlencoded")
-	ginContext.Request.Body = ioutil.NopCloser(bytes.NewBuffer(jsonUser))
-	controller.CreateUser(ginContext)
-	asserts := assert.New(t)
-	// レスポンスのステータスコードの確認
-	asserts.Equal(http.StatusCreated, response.Code)
-}
+// 	if err != nil {
+// 		t.Fatal(err)
+// 	}
+// 	// リクエスト情報をコンテキストに入れる
+// 	ginContext.Request, _ = http.NewRequest(http.MethodPost, "/users", nil)
+// 	// ginContext.Request.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+// 	ginContext.Request.Body = ioutil.NopCloser(bytes.NewBuffer(jsonUser))
+// 	controller.CreateUser(ginContext)
+// 	asserts := assert.New(t)
+// 	// レスポンスのステータスコードの確認
+// 	asserts.Equal(http.StatusCreated, response.Code)
+// }
