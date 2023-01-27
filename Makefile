@@ -44,5 +44,6 @@ prod:
 	docker-compose up -d vol_mysql
 	sleep 120
 	docker-compose up -d vol_golang
-
-
+	
+pull-backup-sql:
+	scp  ssh-server.kajilab.tk:/home/kjlb/stay-watch-backend/mysql/backup/backup.sql ~/
