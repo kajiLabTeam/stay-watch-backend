@@ -23,9 +23,9 @@ jobs:
         if: failure()
         uses: rtCamp/action-slack-notify@v2
         env:
-          SLACK_WEBHOOK: https://hooks.slack.com/services/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
-          SLACK_TITLE: 'GitHub'
-          SLACK_USERNAME: 'GitHub Actions'
+          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+          SLACK_USERNAME: GitHub
+          SLACK_ICON: https://s3-us-west-2.amazonaws.com/slack-files2/bot_icons/2023-01-01/4582569248242_48.png
           SLACK_COLO JR: '#FF0000'
 
   test:
@@ -65,7 +65,8 @@ jobs:
         uses: rtCamp/action-slack-notify@v2
         if: always()
         env:
-          SLACK_WEBHOOK: https://hooks.slack.com/services/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
+          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
           SLACK_COLOR: ${{ job.status }} # (3)
           SLACK_TITLE: Job Result
+          SLACK_ICON: https://s3-us-west-2.amazonaws.com/slack-files2/bot_icons/2023-01-01/4582569248242_48.png
           SLACK_USERNAME: GitHub
