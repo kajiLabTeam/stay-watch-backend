@@ -41,17 +41,10 @@ POST {{baseURL}}/api/v1/stayers HTTP/1.1
 content-type: application/json
 
 {
-    "Beacons":[
-        {
-            "uuid": "e7d61ea3f8dd49c88f2ff2484c07ac00",
-            "rssi": -60
-        },
-        {
-            "uuid": "e7d61ea3f8dd49c88f2ff2484c07ac08",
-            "rssi": -75
-        }
+    "beacons":[
+        
     ],
-    "roomID": 1
+    "roomId": 1
 }
 
 ###
@@ -59,15 +52,14 @@ POST {{baseURL}}/api/v1/stayers HTTP/1.1
 content-type: application/json
 
 {
-    "Beacons":[
+    "beacons":[
         {
             "uuid": "e7d61ea3f8dd49c88f2ff2484c07ac00",
-            "rssi": -60
+            "rssi": -50
         }
     ],
-    "roomID": 1
+    "roomId": 2
 }
-
 
 ###
 POST {{baseURL}}/api/v1/stayers HTTP/1.1

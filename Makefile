@@ -21,10 +21,6 @@ reloadgolang:
 	docker-compose up -d vol_golang
 down:
 	docker-compose down
-dev:
-	docker-compose up
-dev-d:
-	docker-compose up -d
 
 ## mysqlコンテナの立ち上げ
 vol_mysql:
