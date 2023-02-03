@@ -14,18 +14,7 @@ func main() {
 
 	log.Println("Start Server")
 	SetUpServer().Run(":8082")
-	// v1.GET("/list/simultaneous/:user_id", controller.SimultaneousStayUserList)
-
-	// BotService := service.BotService{}
-	// //2週間に一度定期的実行
-	// ticker := time.NewTicker(time.Hour * 24 * 14)
-	// defer ticker.Stop()
-	// for {
-	// 	select {
-	// 	case <-ticker.C:
-	// 		BotService.NotifyOutOfBattery()
-	// 	}
-	// }
+	// v1.GET("/list/simultaneous/:user_id", controller.SimultaneousStayUserList
 }
 
 func SetUpServer() *gin.Engine {
