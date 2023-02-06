@@ -45,6 +45,7 @@ func SetUpServer() *gin.Engine {
 		versionEngine.GET("/logs", controller.Log)
 		versionEngine.GET("/logs/gantt", controller.LogGantt)
 		versionEngine.GET("/users", controller.UserList)
+		versionEngine.GET("/users/extended", controller.ExtendedUserList)
 		versionEngine.POST("/users", controller.CreateUser)
 		versionEngine.GET("/check", controller.Check)
 		versionEngine.POST("/attendance", controller.Attendance)
