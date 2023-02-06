@@ -575,7 +575,7 @@ func connect() *gorm.DB {
 
 	//本番環境の場合はコンテナ名で接続する
 	if os.Getenv("ENVIRONMENT") == "production" {
-		dsn = "root:root@tcp(vol_mysql:3306)/app?charset=utf8mb4&parseTime=true&Asia%2FTokyo"
+		dsn = "root:root@tcp(vol_mysql:3306)/app?charset=utf8mb4&parseTime=true&loc=Asia%2FTokyo"
 	}
 
 	gormDB, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
