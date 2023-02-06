@@ -6,11 +6,16 @@
 ###
 Get {{baseURL}}/api/v1/stayers
 
+
 ###
 Get {{baseURL}}/api/v1/logs
 
 ###
 Get {{baseURL}}/api/v1/users
+
+
+###
+Get {{baseURL}}/api/v1/users/extended
 
 ###
 POST  https://hooks.slack.com/services/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
@@ -66,10 +71,10 @@ POST {{baseURL}}/api/v1/stayers HTTP/1.1
 content-type: application/json
 
 {
-    "Beacons":[
+    "beacons":[
     
     ],
-    "roomID": 1
+    "roomId": 2
 }
 
 

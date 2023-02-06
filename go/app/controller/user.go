@@ -107,6 +107,85 @@ func UserList(c *gin.Context) {
 	c.JSON(http.StatusOK, userInformationGetResponse)
 }
 
+func ExtendedUserList(c *gin.Context) {
+
+	UserService := service.UserService{}
+	users, err := UserService.GetAllUser()
+	if err != nil {
+		c.String(http.StatusInternalServerError, "Server Error")
+		return
+	}
+
+	extendedUserInformationGetResponses := []model.ExtendedUserInformationGetResponse{}
+	// userInformationGetResponse := []model.UserInformationGetResponse{}
+
+	for _, user := range users {
+
+		tags := make([]model.TagGetResponse, 0)
+		tagsID, err := UserService.GetUserTagsID(int64(user.Model.ID))
+		if err != nil {
+			c.String(http.StatusInternalServerError, "Server Error")
+			return
+		}
+
+		for _, tagID := range tagsID {
+			//タグIDからタグ名を取得する
+			tagName, err := UserService.GetTagName(tagID)
+			if err != nil {
+				c.String(http.StatusInternalServerError, "Server Error")
+				return
+			}
+			tag := model.TagGetResponse{
+				ID:   tagID,
+				Name: tagName,
+			}
+			tags = append(tags, tag)
+		}
+
+		extendedUserInformationGetResponses = append(extendedUserInformationGetResponses, model.ExtendedUserInformationGetResponse{
+			ID:   int64(user.ID),
+			Name: user.Name,
+			Tags: tags,
+			Role: user.Role,
+			Uuid: user.UUID,
+		})
+	}
+
+	c.JSON(http.StatusOK, extendedUserInformationGetResponses)
+}
+
+// for _, user := range users {
+
+// 	tags := make([]model.TagGetResponse, 0)
+// 	tagsID, err := UserService.GetUserTagsID(int64(user.Model.ID))
+// 	if err != nil {
+// 		c.String(http.StatusInternalServerError, "Server Error")
+// 		return
+// 	}
+
+// 	for _, tagID := range tagsID {
+// 		//タグIDからタグ名を取得する
+// 		tagName, err := UserService.GetTagName(tagID)
+// 		if err != nil {
+// 			c.String(http.StatusInternalServerError, "Server Error")
+// 			return
+// 		}
+// 		tag := model.TagGetResponse{
+// 			ID:   tagID,
+// 			Name: tagName,
+// 		}
+// 		tags = append(tags, tag)
+// 	}
+
+// 	userInformationGetResponse = append(userInformationGetResponse, model.UserInformationGetResponse{
+// 		ID:   int64(user.ID),
+// 		Name: user.Name,
+// 		Tags: tags,
+// 	})
+// }
+
+// c.JSON(http.StatusOK, userInformationGetResponse)
+
 func Attendance(c *gin.Context) {
 
 	//構造体定義
