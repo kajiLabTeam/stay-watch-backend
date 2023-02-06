@@ -49,6 +49,7 @@ func SetUpServer() *gin.Engine {
 		versionEngine.POST("/users", controller.CreateUser)
 		versionEngine.GET("/check", controller.Check)
 		versionEngine.POST("/attendance", controller.Attendance)
+		versionEngine.GET("/signup", controller.SignUp)
 	}
 
 	return engine

@@ -304,3 +304,40 @@ func Check(c *gin.Context) {
 		userRole,
 	)
 }
+
+func SignUp(c *gin.Context) {
+
+	firebaseUserInfo, err := verifyCheck(c.Request)
+	if err != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{
+			"status": "invalid token",
+		})
+		return
+	}
+
+	UserService := service.UserService{}
+	user, err := UserService.GetUserByEmail(firebaseUserInfo["Email"])
+	if err != nil {
+		fmt.Printf("Cannnot find user: %v", err)
+		c.String(http.StatusInternalServerError, "Server Error")
+		return
+	}
+	fmt.Println(user)
+
+	//メールアドレスが存在しない場合はUserは存在しないのでリクエスト失敗
+	if (user == model.User{}) {
+		c.JSON(http.StatusForbidden, gin.H{
+			"status": "権限がありません 管理者にユーザ追加を依頼してください",
+		})
+		return
+	}
+
+	// userRole := model.UserRoleGetResponse{
+	// 	ID:   int64(user.ID),
+	// 	Role: user.Role,
+	// }
+
+	c.JSON(http.StatusOK,
+		user,
+	)
+}
