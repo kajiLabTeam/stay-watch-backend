@@ -99,3 +99,12 @@ type Beacon struct {
 	Uuid string `json:"uuid" form:"uuid"`
 	Rssi int64  `json:"rssi" form:"rssi"`
 }
+
+type RoomEditorForm struct {
+	Name string `json:"room_name"`
+	Points string `json:"points"`
+}
+
+type RoomsGetResponse struct {
+	Names string `json:"room_name"`
+}

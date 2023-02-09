@@ -4,6 +4,7 @@ import (
 	controller "Stay_watch/controller"
 	"log"
 	"time"
+	"fmt"
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
@@ -59,7 +60,11 @@ func SetUpServer() *gin.Engine {
 		versionEngine.POST("/users", controller.CreateUser)
 		versionEngine.GET("/check", controller.Check)
 		versionEngine.POST("/attendance", controller.Attendance)
+		versionEngine.POST("/storeroom", controller.StoreRoom)
+		versionEngine.GET("/rooms/:communityID", controller.GetRoomsByCommunityID)
 	}
+
+	fmt.Println("main.goまで来たよ")
 
 	return engine
 }
