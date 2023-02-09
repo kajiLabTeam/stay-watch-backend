@@ -54,6 +54,15 @@ type Attendance struct {
 	Flag   bool
 }
 
+type TmpRoom struct {
+	gorm.Model
+
+	Name string
+	BuildingID int64
+	CommunityID int64
+	Polygon string
+}
+
 type AttendanceTmp struct {
 	UserID int64 `json:"userID" xorm:"user_id"`
 	Flag   int64 `json:"exit" xorm:"flag"`
