@@ -38,8 +38,14 @@ services:
       interval: 20s
       timeout: 20s
       retries: 10
-    # ports:
-    #   - 33060:3306
+  vol_python:
+    container_name: vol_python
+    build: ./python
+    volumes:
+      - ./python:/app
+    depends_on:
+      vol_mysql:
+        condition: service_healthy      
 networks:
   default:
     external:
