@@ -16,6 +16,9 @@ services:
       - "${GOLANG_PORT}:8082"
     env_file:
       - .env
+    depends_on:
+      vol_mysql:
+        condition: service_healthy
   vol_mysql:
     container_name: ${MYSQL_CONTAINER_NAME}
     build: ./mysql
@@ -30,6 +33,11 @@ services:
       MYSQL_PASSWORD: setsetset
     cap_add:
       - SYS_NICE
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 20s
+      timeout: 20s
+      retries: 10
     # ports:
     #   - 33060:3306
 networks:
