@@ -11,10 +11,8 @@ def task():
     upload.post_slack(image_path)
 
 
-# schedule.every(30).seconds.do(task)
-
-# # 毎月最終日の23:59にジョブを実行する
-schedule.every().month.do(task).last_day().at("23:59")
+# 毎月最終日の23:59にジョブを実行する
+schedule.every().month.do(task).last_day().at("23:50")
 
 while True:
     schedule.run_pending()
