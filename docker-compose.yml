@@ -35,14 +35,17 @@ services:
       - SYS_NICE
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
-      interval: 20s
+      interval: 10s
       timeout: 20s
-      retries: 10
+      retries: 20
   vol_python:
     container_name: vol_python
     build: ./python
     volumes:
-      - ./python:/app
+      - ./python/app:/app
+    command: 
+      - "python3"      
+      - "main.py"
     depends_on:
       vol_mysql:
         condition: service_healthy      
