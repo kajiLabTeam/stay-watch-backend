@@ -1,9 +1,15 @@
 import matplotlib.pyplot as plt
+import matplotlib.font_manager as fm  # 追加
 import datetime
 
 
 # ユーザのログ時間の合計を円グラフで表示して保存する関数
 def save_users_log_time_pie_chart(log_times: dict):
+
+    # 日本語フォントを指定
+    fp = fm.FontProperties(
+        fname="/System/Library/Fonts/ヒラギノ角ゴシック W3.ttc")  # フォントのパスは環境に合わせて変更
+    plt.rcParams['font.family'] = fp.get_name()
 
     # 現在日時の取得
     now = datetime.datetime.now().strftime('%Y-%m-%d')
