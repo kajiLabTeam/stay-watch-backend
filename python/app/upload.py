@@ -17,7 +17,7 @@ def post_slack(image_path):
     try:
         # files.upload APIメソッドを呼び出して、画像をアップロード
         response = client.files_upload_v2(
-            channel='C047W3W4XGF',
+            channel=os.environ.get('SLACK_CHANNEL'),
             file=image_path,
             title='Uploaded image'
         )
