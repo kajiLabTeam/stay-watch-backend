@@ -1,3 +1,4 @@
+import datetime
 import upload
 import pie_chart
 import data
@@ -6,13 +7,25 @@ import time
 
 
 def task():
-    log_times = data.get_log_times()
-    image_path = pie_chart.save_users_log_time_pie_chart(log_times)
-    upload.post_slack(image_path)
+    # 現在の日付を取得
+    today = datetime.date.today()
+
+    # 月の最後の日を計算
+    last_day = datetime.date(today.year, today.month,
+                             1) + datetime.timedelta(days=32)
+    last_day = last_day.replace(day=1) - datetime.timedelta(days=1)
+
+    # 今日が月の最後の日かどうかを判定
+    if today == last_day:
+        print("今日は月の最後の日です")
+        log_times = data.get_log_times()
+        print(log_times)
+        image_path = pie_chart.save_users_log_time_pie_chart(log_times)
+        upload.post_slack(image_path)
 
 
-# 毎月最終日の23:59にジョブを実行する
-schedule.every().month.do(task).last_day().at("23:50")
+# 一日一回実行
+schedule.every(1).days.do(task)
 
 while True:
     schedule.run_pending()
