@@ -7,6 +7,8 @@ import time
 
 
 def task():
+    # 現在時刻を表示
+    print("Function executed at:", datetime.datetime.now())
     # 現在の日付を取得
     today = datetime.date.today()
 
