@@ -43,6 +43,8 @@ services:
     build: ./python
     volumes:
       - ./python/app:/app
+    env_file:
+      - .env
     command: 
       - "python3"      
       - "main.py"
