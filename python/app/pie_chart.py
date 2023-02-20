@@ -1,8 +1,11 @@
 import matplotlib.pyplot as plt
 import datetime
 
+plt.rcParams['font.family'] = 'IPAGothic'
 
 # ユーザのログ時間の合計を円グラフで表示して保存する関数
+
+
 def save_users_log_time_pie_chart(log_times: dict):
 
     # 現在日時の取得
