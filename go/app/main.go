@@ -60,7 +60,7 @@ func SetUpServer() *gin.Engine {
 		versionEngine.POST("/users", controller.CreateUser)
 		versionEngine.GET("/check", controller.Check)
 		versionEngine.POST("/attendance", controller.Attendance)
-		versionEngine.POST("/storeroom", controller.StoreRoom)
+		versionEngine.POST("/updateroom", controller.UpdateRoom)
 		versionEngine.GET("/rooms/:communityID", controller.GetRoomsByCommunityID)
 	}
 

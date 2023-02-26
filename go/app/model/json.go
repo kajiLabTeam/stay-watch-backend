@@ -101,10 +101,16 @@ type Beacon struct {
 }
 
 type RoomEditorForm struct {
-	Name string `json:"room_name"`
-	Points string `json:"points"`
+	RoomID int64 `json:"roomID"`
+	RoomName string `json:"room_name"`
+	Polygon string `json:"polygon"`
+	BuildingID int64 `json:"buildingID"`
 }
 
 type RoomsGetResponse struct {
-	Names string `json:"room_name"`
+	RoomID int64 `json:"roomID"`
+	Name string `json:"room_name"`
+	CommunityName string `json:"community_name"`
+	BuildingName string `json:"building_name"`
+	Polygon string `json:"polygon"`
 }

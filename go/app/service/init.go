@@ -205,18 +205,33 @@ func init() {
 		rooms := []model.Room{
 			{
 				Name: "梶研-学生部屋",
+				BuildingID: 2,
+				CommunityID: 2,
+				Polygon: "0,0-0,0",
 			},
 			{
 				Name: "梶研-スマートルーム",
+				BuildingID: 2,
+				CommunityID: 2,
+				Polygon: "0,0-0,0",
 			},
 			{
 				Name: "梶研-院生部屋",
+				BuildingID: 2,
+				CommunityID: 2,
+				Polygon: "0,0-0,0",
 			},
 			{
 				Name: "梶研-FA部屋",
+				BuildingID: 2,
+				CommunityID: 2,
+				Polygon: "0,0-0,0",
 			},
 			{
 				Name: "梶研-先生部屋",
+				BuildingID: 2,
+				CommunityID: 2,
+				Polygon: "0,0-0,0",
 			},
 		}
 		db.Create(&rooms)
