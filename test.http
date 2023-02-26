@@ -12,6 +12,9 @@ Get {{baseURL}}/api/v1/logs
 ###
 Get {{baseURL}}/api/v1/users
 
+### コミュニティの部屋の情報を取得
+Get {{baseURL}}/api/v1/rooms/2
+
 ###
 POST  https://hooks.slack.com/services/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
 content-type: application/json
@@ -36,25 +39,25 @@ Get {{baseURL}}/api/v1/list/simultaneous/1
 ###
 Get {{baseURL}}/api/v1/list/simultaneous/2
 
-###
+### 入室
 POST {{baseURL}}/api/v1/stayers HTTP/1.1
 content-type: application/json
 
 {
     "Beacons":[
         {
-            "uuid": "e7d61ea3f8dd49c88f2ff2484c07ac00",
+            "uuid": "e7d61ea3f8dd49c88f2ff2484c07ac11",
             "rssi": -60
         },
         {
-            "uuid": "e7d61ea3f8dd49c88f2ff2484c07ac08",
+            "uuid": "e7d61ea3f8dd49c88f2ff2484c07ac07",
             "rssi": -75
         }
     ],
-    "roomID": 1
+    "roomID": 2
 }
 
-###
+### 退室
 POST {{baseURL}}/api/v1/stayers HTTP/1.1
 content-type: application/json
 
@@ -102,3 +105,14 @@ content-type: application/json
 
 ###
 GET {{baseURL}}/api/v1/check
+
+### 部屋名のフォーム送信
+POST {{baseURL}}/api/v1/updateroom HTTP/1.1
+content-type: application/json
+
+{
+    "roomID":46,
+    "room_name":"学生部屋",
+    "polygon":"2150,1480-2403,1605",
+    "building_name":"4号館"
+}

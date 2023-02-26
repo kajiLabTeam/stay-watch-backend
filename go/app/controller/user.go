@@ -27,7 +27,6 @@ func CreateUser(c *gin.Context) {
 	if RegistrationUserForm.ID == 0 {
 		user := model.User{
 			Name:  RegistrationUserForm.Name,
-			// Name: "usergo",
 			Email: RegistrationUserForm.Email,
 			Role:  RegistrationUserForm.Role,
 			UUID:  UserService.NewUUID(),

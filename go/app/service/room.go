@@ -66,77 +66,31 @@ func (RoomService) GetAllStayer() ([]model.Stayer, error) {
 	return stayers, nil
 }
 
-//==================================================================
-//========================　ここから自分の　===========================
-//==================================================================
-//func (RoomService) CreateSampleRoom(room *model.TmpRoom) error {
-func (RoomService) CreateSampleRoom(room_data *model.TmpRoom) error {
-
+// 部屋のID、建物の名前、建物のID、部屋の範囲をデータベースへ保存
+func (RoomService) UpdateRoom(roomID int, room_name string, buildingID int, polygon string) error {
 	DbEngine := connect()
 	closer, err := DbEngine.DB()
 	if err != nil {
 		return err
 	}
 	defer closer.Close()
-	result := DbEngine.Create(room_data)
+	result := DbEngine.Model(&model.Room{}).Where("id = ?", roomID).Updates(model.Room{Name:room_name, Polygon:polygon})	// 今は部屋名と範囲だけ
 	if result.Error != nil {
-		fmt.Printf("ユーザ登録処理失敗 %v", result.Error)
+		fmt.Printf("ユーザ更新失敗 %v", result.Error)
 		return result.Error
 	}
 	return nil
-
-
-	// DbEngine := connect()
-	// closer, err := DbEngine.DB()
-	// if err != nil {
-	// 	return nil, err
-	// }
-	// defer closer.Close()
-	// stayers := make([]model.Stayer, 0)
-	// result := DbEngine.Table("stayers").Find(&stayers)
-	// if result.Error != nil {
-	// 	return nil, fmt.Errorf(" failed to get all stayer: %w", result.Error)
-	// }
-
-	// samplestayer :=  make([]model.Stayer, 0)
-
-	// return samplestayer, nil
-
-
-
-	// DbEngine := connect()
-	// closer, err := DbEngine.DB()
-	// if err != nil {
-	// 	return err
-	// }
-	// defer closer.Close()
-
-	// sample_room := model.TmpRoom{
-	// 	RoomID: 1,
-	// 	Name: "studentroom",
-	// 	BuildingID: 1,
-	// 	PolygonID: 2,
-	// 	CommunityID: 2,
-	// }
-
-	// result := DbEngine.Create(sample_room)
-	// if result.Error != nil {
-	// 	return fmt.Errorf(" failed to create log: %w", result.Error)
-	// }
-	// fmt.Println("serviceのCreateSampleRoomまで来たよ")
-	// fmt.Println(sample_room)
-	// return nil
 }
 
-func (RoomService) GetAllRooms() ([]model.TmpRoom, error) {
+func (RoomService) GetAllRooms() ([]model.Room, error) {
 	DbEngine := connect()
 	closer, err := DbEngine.DB()
 	if err != nil {
 		return nil, err
 	}
 	defer closer.Close()
-	rooms := make([]model.TmpRoom, 0)
-	result := DbEngine.Table("tmp_rooms").Find(&rooms)
+	rooms := make([]model.Room, 0)
+	result := DbEngine.Table("rooms").Find(&rooms)
 	if result.Error != nil {
 		return nil, fmt.Errorf(" failed to get all stayer: %w", result.Error)
 	}
@@ -637,11 +591,14 @@ func (RoomService) GetRoomNameByRoomID(roomID int64) (string, error) {
 	defer closer.Close()
 
 	room := model.Room{}
-	result := DbEngine.Take(&room).Where("room_id = ?", roomID)
+	result := DbEngine.Take(&room).Where("room_id=?", roomID)	// DBを変えたことでここが不具合
 	if result.Error != nil {
 		fmt.Printf("Cannot get room: %v", result.Error)
 		return "", result.Error
 	}
+	// fmt.Println("GetRoomNameByRoomIDのところ")
+	// fmt.Println(roomID)
+	// fmt.Println(room)
 	return room.Name, nil
 }
 

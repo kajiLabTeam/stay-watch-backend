@@ -27,6 +27,10 @@ type Log struct {
 type Room struct {
 	gorm.Model
 	Name string
+	BuildingID int64
+	CommunityID int64
+	Polygon string
+	RecieverID string
 }
 
 type Stayer struct {
@@ -52,15 +56,6 @@ type Attendance struct {
 	UserID int64
 	Date   string
 	Flag   bool
-}
-
-type TmpRoom struct {
-	gorm.Model
-
-	Name string
-	BuildingID int64
-	CommunityID int64
-	Polygon string
 }
 
 type AttendanceTmp struct {
