@@ -591,14 +591,11 @@ func (RoomService) GetRoomNameByRoomID(roomID int64) (string, error) {
 	defer closer.Close()
 
 	room := model.Room{}
-	result := DbEngine.Take(&room).Where("room_id=?", roomID)	// DBを変えたことでここが不具合
+	result := DbEngine.Take(&room,roomID)
 	if result.Error != nil {
 		fmt.Printf("Cannot get room: %v", result.Error)
 		return "", result.Error
 	}
-	// fmt.Println("GetRoomNameByRoomIDのところ")
-	// fmt.Println(roomID)
-	// fmt.Println(room)
 	return room.Name, nil
 }
 
