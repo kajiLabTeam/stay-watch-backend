@@ -116,3 +116,6 @@ content-type: application/json
     "polygon":"2150,1480-2403,1605",
     "building_name":"4号館"
 }
+
+### 建物の情報を全て取得する
+GET {{baseURL}}/api/v1/buildings/editor

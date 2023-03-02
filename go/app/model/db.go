@@ -6,6 +6,8 @@ import (
 	"gorm.io/gorm"
 )
 
+// DBで user_name ならここでは UserName こうしてDBの値を取得している
+
 type User struct {
 	gorm.Model
 
@@ -31,6 +33,12 @@ type Room struct {
 	CommunityID int64
 	Polygon string
 	RecieverID string
+}
+
+type Building struct {
+	gorm.Model
+	Name string
+	MapFile string
 }
 
 type Stayer struct {
