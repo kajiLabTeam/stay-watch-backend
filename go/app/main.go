@@ -62,6 +62,7 @@ func SetUpServer() *gin.Engine {
 		versionEngine.POST("/attendance", controller.Attendance)
 		versionEngine.POST("/updateroom", controller.UpdateRoom)
 		versionEngine.GET("/rooms/:communityID", controller.GetRoomsByCommunityID)
+		versionEngine.GET("/buildings/editor", controller.GetBuildingsEditor)
 	}
 
 	fmt.Println("main.goまで来たよ")

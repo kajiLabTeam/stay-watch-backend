@@ -114,3 +114,9 @@ type RoomsGetResponse struct {
 	BuildingName string `json:"building_name"`
 	Polygon string `json:"polygon"`
 }
+
+type BuildingsEditorGetResponse struct {
+	BuildingID int64 `json:"buildingId"`
+	Name string `json:"buildingName"`
+	MapImagePath string `json:"buildingImagePath"`
+}
