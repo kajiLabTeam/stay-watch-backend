@@ -53,7 +53,7 @@ func GetRoomsByCommunityID(c *gin.Context) {
 		if(room.CommunityID == communityID){
 			roomName := room.Name
 			roomID := int64(room.ID)
-			//---roomIDから建物の名前を調べる機能実装予定---
+			//---roomIDから建物の名前,IDを調べる機能実装予定---
 
 			//----------------------------------------
 			roomsGetResponse = append(roomsGetResponse, model.RoomsGetResponse{
@@ -62,6 +62,7 @@ func GetRoomsByCommunityID(c *gin.Context) {
 				CommunityName: "梶研究室",
 				BuildingName: "4号館",
 				Polygon: room.Polygon,
+				BuildingId: 2,
 			})
 		}
 	}
