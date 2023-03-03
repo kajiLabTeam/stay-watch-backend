@@ -113,6 +113,7 @@ type RoomsGetResponse struct {
 	CommunityName string `json:"community_name"`
 	BuildingName string `json:"building_name"`
 	Polygon string `json:"polygon"`
+	BuildingId int64 `json:"buildingId"`
 }
 
 type BuildingsEditorGetResponse struct {
