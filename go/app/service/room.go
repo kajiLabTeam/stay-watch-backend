@@ -74,7 +74,7 @@ func (RoomService) UpdateRoom(roomID int, room_name string, buildingID int, poly
 		return err
 	}
 	defer closer.Close()
-	result := DbEngine.Model(&model.Room{}).Where("id = ?", roomID).Updates(model.Room{Name:room_name, Polygon:polygon})	// 今は部屋名と範囲だけ
+	result := DbEngine.Model(&model.Room{}).Where("id = ?", roomID).Updates(model.Room{Name:room_name, Polygon:polygon, BuildingID:int64(buildingID)})	// 今は部屋名と範囲だけ
 	if result.Error != nil {
 		fmt.Printf("ユーザ更新失敗 %v", result.Error)
 		return result.Error

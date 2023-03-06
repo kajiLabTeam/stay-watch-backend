@@ -62,7 +62,7 @@ func GetRoomsByCommunityID(c *gin.Context) {
 				CommunityName: "梶研究室",
 				BuildingName: "4号館",
 				Polygon: room.Polygon,
-				BuildingId: 2,
+				BuildingId: room.BuildingID,
 			})
 		}
 	}
