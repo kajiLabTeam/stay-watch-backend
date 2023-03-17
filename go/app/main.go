@@ -2,9 +2,9 @@ package main
 
 import (
 	controller "Stay_watch/controller"
+	"fmt"
 	"log"
 	"time"
-	"fmt"
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
@@ -15,18 +15,7 @@ func main() {
 
 	log.Println("Start Server")
 	SetUpServer().Run(":8082")
-	// v1.GET("/list/simultaneous/:user_id", controller.SimultaneousStayUserList)
-
-	// BotService := service.BotService{}
-	// //2週間に一度定期的実行
-	// ticker := time.NewTicker(time.Hour * 24 * 14)
-	// defer ticker.Stop()
-	// for {
-	// 	select {
-	// 	case <-ticker.C:
-	// 		BotService.NotifyOutOfBattery()
-	// 	}
-	// }
+	// v1.GET("/list/simultaneous/:user_id", controller.SimultaneousStayUserList
 }
 
 func SetUpServer() *gin.Engine {
@@ -57,12 +46,14 @@ func SetUpServer() *gin.Engine {
 		versionEngine.GET("/logs", controller.Log)
 		versionEngine.GET("/logs/gantt", controller.LogGantt)
 		versionEngine.GET("/users", controller.UserList)
+		versionEngine.GET("/users/extended", controller.ExtendedUserList)
 		versionEngine.POST("/users", controller.CreateUser)
 		versionEngine.GET("/check", controller.Check)
 		versionEngine.POST("/attendance", controller.Attendance)
 		versionEngine.POST("/updateroom", controller.UpdateRoom)
 		versionEngine.GET("/rooms/:communityID", controller.GetRoomsByCommunityID)
 		versionEngine.GET("/buildings/editor", controller.GetBuildingsEditor)
+		versionEngine.GET("/signup", controller.SignUp)
 	}
 
 	fmt.Println("main.goまで来たよ")

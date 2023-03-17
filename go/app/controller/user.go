@@ -108,6 +108,85 @@ func UserList(c *gin.Context) {
 	c.JSON(http.StatusOK, userInformationGetResponse)
 }
 
+func ExtendedUserList(c *gin.Context) {
+
+	UserService := service.UserService{}
+	users, err := UserService.GetAllUser()
+	if err != nil {
+		c.String(http.StatusInternalServerError, "Server Error")
+		return
+	}
+
+	extendedUserInformationGetResponses := []model.ExtendedUserInformationGetResponse{}
+	// userInformationGetResponse := []model.UserInformationGetResponse{}
+
+	for _, user := range users {
+
+		tags := make([]model.TagGetResponse, 0)
+		tagsID, err := UserService.GetUserTagsID(int64(user.Model.ID))
+		if err != nil {
+			c.String(http.StatusInternalServerError, "Server Error")
+			return
+		}
+
+		for _, tagID := range tagsID {
+			//タグIDからタグ名を取得する
+			tagName, err := UserService.GetTagName(tagID)
+			if err != nil {
+				c.String(http.StatusInternalServerError, "Server Error")
+				return
+			}
+			tag := model.TagGetResponse{
+				ID:   tagID,
+				Name: tagName,
+			}
+			tags = append(tags, tag)
+		}
+
+		extendedUserInformationGetResponses = append(extendedUserInformationGetResponses, model.ExtendedUserInformationGetResponse{
+			ID:   int64(user.ID),
+			Name: user.Name,
+			Tags: tags,
+			Role: user.Role,
+			Uuid: user.UUID,
+		})
+	}
+
+	c.JSON(http.StatusOK, extendedUserInformationGetResponses)
+}
+
+// for _, user := range users {
+
+// 	tags := make([]model.TagGetResponse, 0)
+// 	tagsID, err := UserService.GetUserTagsID(int64(user.Model.ID))
+// 	if err != nil {
+// 		c.String(http.StatusInternalServerError, "Server Error")
+// 		return
+// 	}
+
+// 	for _, tagID := range tagsID {
+// 		//タグIDからタグ名を取得する
+// 		tagName, err := UserService.GetTagName(tagID)
+// 		if err != nil {
+// 			c.String(http.StatusInternalServerError, "Server Error")
+// 			return
+// 		}
+// 		tag := model.TagGetResponse{
+// 			ID:   tagID,
+// 			Name: tagName,
+// 		}
+// 		tags = append(tags, tag)
+// 	}
+
+// 	userInformationGetResponse = append(userInformationGetResponse, model.UserInformationGetResponse{
+// 		ID:   int64(user.ID),
+// 		Name: user.Name,
+// 		Tags: tags,
+// 	})
+// }
+
+// c.JSON(http.StatusOK, userInformationGetResponse)
+
 func Attendance(c *gin.Context) {
 
 	//構造体定義
@@ -224,5 +303,42 @@ func Check(c *gin.Context) {
 
 	c.JSON(http.StatusOK,
 		userRole,
+	)
+}
+
+func SignUp(c *gin.Context) {
+
+	firebaseUserInfo, err := verifyCheck(c.Request)
+	if err != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{
+			"status": "invalid token",
+		})
+		return
+	}
+
+	UserService := service.UserService{}
+	user, err := UserService.GetUserByEmail(firebaseUserInfo["Email"])
+	if err != nil {
+		fmt.Printf("Cannnot find user: %v", err)
+		c.String(http.StatusInternalServerError, "Server Error")
+		return
+	}
+	fmt.Println(user)
+
+	//メールアドレスが存在しない場合はUserは存在しないのでリクエスト失敗
+	if (user == model.User{}) {
+		c.JSON(http.StatusForbidden, gin.H{
+			"status": "権限がありません 管理者にユーザ追加を依頼してください",
+		})
+		return
+	}
+
+	// userRole := model.UserRoleGetResponse{
+	// 	ID:   int64(user.ID),
+	// 	Role: user.Role,
+	// }
+
+	c.JSON(http.StatusOK,
+		user,
 	)
 }

@@ -27,10 +27,19 @@ type UserInformationGetResponse struct {
 	Tags []TagGetResponse `json:"tags"`
 }
 
-type UserDetailInformationGetResponse struct {
+// type UserDetailInformationGetResponse struct {
+// 	Email string `json:"email"`
+// 	Role  int64  `json:"role"`
+// 	UserInformationGetResponse
+// }
+
+type ExtendedUserInformationGetResponse struct {
+	ID   int64            `json:"id"`
+	Name string           `json:"name"`
+	Tags []TagGetResponse `json:"tags"`
+	Uuid  string `json:"uuid"`
 	Email string `json:"email"`
 	Role  int64  `json:"role"`
-	UserInformationGetResponse
 }
 
 type UserRoleGetResponse struct {

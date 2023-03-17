@@ -6,6 +6,7 @@
 ###
 Get {{baseURL}}/api/v1/stayers
 
+
 ###
 Get {{baseURL}}/api/v1/logs
 
@@ -14,6 +15,9 @@ Get {{baseURL}}/api/v1/users
 
 ### コミュニティの部屋の情報を取得
 Get {{baseURL}}/api/v1/rooms/2
+
+###
+Get {{baseURL}}/api/v1/users/extended
 
 ###
 POST  https://hooks.slack.com/services/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
@@ -44,17 +48,10 @@ POST {{baseURL}}/api/v1/stayers HTTP/1.1
 content-type: application/json
 
 {
-    "Beacons":[
-        {
-            "uuid": "e7d61ea3f8dd49c88f2ff2484c07ac11",
-            "rssi": -60
-        },
-        {
-            "uuid": "e7d61ea3f8dd49c88f2ff2484c07ac07",
-            "rssi": -75
-        }
+    "beacons":[
+        
     ],
-    "roomID": 2
+    "roomId": 1
 }
 
 ### 退室
@@ -62,25 +59,24 @@ POST {{baseURL}}/api/v1/stayers HTTP/1.1
 content-type: application/json
 
 {
-    "Beacons":[
+    "beacons":[
         {
             "uuid": "e7d61ea3f8dd49c88f2ff2484c07ac00",
-            "rssi": -60
+            "rssi": -50
         }
     ],
-    "roomID": 1
+    "roomId": 2
 }
-
 
 ###
 POST {{baseURL}}/api/v1/stayers HTTP/1.1
 content-type: application/json
 
 {
-    "Beacons":[
+    "beacons":[
     
     ],
-    "roomID": 1
+    "roomId": 2
 }
 
 
