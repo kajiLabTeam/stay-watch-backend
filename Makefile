@@ -21,13 +21,13 @@ reloadgolang:
 	docker-compose up -d vol_golang
 down:
 	docker-compose down
-dev:
-	docker-compose up
-dev-d:
-	docker-compose up -d
-##composeでexecするときはservice名だからenvを使用しない
+
+## mysqlコンテナの立ち上げ
 vol_mysql:
 	docker-compose up vol_mysql
+
+vol_mysql-d:
+	docker-compose up -d vol_mysql
 
 ex_vol_mysql:
 	docker-compose exec vol_mysql bash
@@ -44,5 +44,6 @@ prod:
 	docker-compose up -d vol_mysql
 	sleep 120
 	docker-compose up -d vol_golang
-
-
+	
+pull-backup-sql:
+	scp  ssh-server.kajilab.tk:/home/kjlb/stay-watch-backend/mysql/backup/backup.sql ~/
