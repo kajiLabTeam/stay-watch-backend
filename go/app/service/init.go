@@ -20,7 +20,7 @@ func init() {
 		return
 	}
 	defer closer.Close()
-	db.AutoMigrate(&model.User{}, &model.Log{}, &model.Room{}, &model.Stayer{}, &model.Tag{}, &model.TagMap{})
+	db.AutoMigrate(&model.User{}, &model.Log{}, &model.Room{}, &model.Stayer{}, &model.Tag{}, &model.TagMap{}, &model.Building{})
 
 	var count int64
 	db.Model(&model.User{}).Count(&count)
@@ -198,6 +198,17 @@ func init() {
 		}
 		db.Create(&users)
 
+	}
+
+	db.Model(&model.Building{}).Count(&count)
+	if count == 0 {
+		buildings := []model.Building{
+			{
+				Name: "4号館",
+				MapFile: "/4g-honkan-bekkan.jpg",
+			},
+		}
+		db.Create(&buildings)
 	}
 
 	db.Model(&model.Room{}).Count(&count)
