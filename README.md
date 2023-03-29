@@ -14,6 +14,12 @@ MYSQL_CONTAINER_NAME=vol_mysql
 .firebase.jsonもgo/app/credentialsに置く
 slackのprj_staywatchを参照
 
+実行方法(ローカル)<br>
+/stay-watch-backend/app ディレクトリに移動して下のコマンド
+```
+go run main.go
+```
+
 
 ネットワーク作成
 ```
@@ -42,6 +48,18 @@ mysql -uroot -proot
 use app;
 ```
 
+データベースの初期化方法(ローカル)<br>
+1. 現在のmysqlコンテナを削除する。（Docker Desktop だとゴミ箱マーク）
+2. コンテナを作成する。
+    ```
+    docker-compose up
+    ```
+    実行するとテーブルも何もないmysqlコンテナが作られる
+3. /stay-watch-backend/app ディレクトリに移動してmain.goを実行する
+    ```
+    go run main.go
+    ```
+    すると先程のmysqlコンテナに init.sql に書いてある内容のテーブル、カラム、値が入る。
 
 
 
