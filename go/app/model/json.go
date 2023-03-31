@@ -27,19 +27,13 @@ type UserInformationGetResponse struct {
 	Tags []TagGetResponse `json:"tags"`
 }
 
-// type UserDetailInformationGetResponse struct {
-// 	Email string `json:"email"`
-// 	Role  int64  `json:"role"`
-// 	UserInformationGetResponse
-// }
-
 type ExtendedUserInformationGetResponse struct {
-	ID   int64            `json:"id"`
-	Name string           `json:"name"`
-	Tags []TagGetResponse `json:"tags"`
-	Uuid  string `json:"uuid"`
-	Email string `json:"email"`
-	Role  int64  `json:"role"`
+	ID    int64            `json:"id"`
+	Name  string           `json:"name"`
+	Tags  []TagGetResponse `json:"tags"`
+	Uuid  string           `json:"uuid"`
+	Email string           `json:"email"`
+	Role  int64            `json:"role"`
 }
 
 type UserRoleGetResponse struct {
@@ -110,23 +104,23 @@ type Beacon struct {
 }
 
 type RoomEditorForm struct {
-	RoomID int64 `json:"roomID"`
-	RoomName string `json:"room_name"`
-	Polygon string `json:"polygon"`
-	BuildingID int64 `json:"buildingID"`
+	RoomID     int64  `json:"roomId"`
+	RoomName   string `json:"roomName"`
+	Polygon    string `json:"polygon"`
+	BuildingID int64  `json:"buildingId"`
 }
 
 type RoomsGetResponse struct {
-	RoomID int64 `json:"roomID"`
-	Name string `json:"room_name"`
-	CommunityName string `json:"community_name"`
-	BuildingName string `json:"building_name"`
-	Polygon string `json:"polygon"`
-	BuildingId int64 `json:"buildingId"`
+	RoomID        int64  `json:"roomId"`
+	Name          string `json:"roomName"`
+	CommunityName string `json:"communityName"`
+	BuildingName  string `json:"buildingName"`
+	Polygon       string `json:"polygon"`
+	BuildingId    int64  `json:"buildingId"`
 }
 
 type BuildingsEditorGetResponse struct {
-	BuildingID int64 `json:"buildingId"`
-	Name string `json:"buildingName"`
+	BuildingID   int64  `json:"buildingId"`
+	Name         string `json:"buildingName"`
 	MapImagePath string `json:"buildingImagePath"`
 }
