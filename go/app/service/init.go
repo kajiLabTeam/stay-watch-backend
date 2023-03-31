@@ -211,6 +211,10 @@ func init() {
 				Name:    "4号館別館",
 				MapFile: "/4goukanbekkan.jpg",
 			},
+			{
+				Name: "4号館別館",
+				MapFile: "/4goubekkan.jpg",
+			},
 		}
 		db.Create(&buildings)
 	}
@@ -219,32 +223,32 @@ func init() {
 	if count == 0 {
 		rooms := []model.Room{
 			{
-				Name:        "梶研-学生部屋",
-				BuildingID:  2,
+				Name: "梶研-学生部屋",
+				BuildingID: 1,
 				CommunityID: 2,
 				Polygon:     "0,0-0,0",
 			},
 			{
-				Name:        "梶研-スマートルーム",
-				BuildingID:  2,
+				Name: "梶研-スマートルーム",
+				BuildingID: 1,
 				CommunityID: 2,
 				Polygon:     "0,0-0,0",
 			},
 			{
-				Name:        "梶研-院生部屋",
-				BuildingID:  2,
+				Name: "梶研-院生部屋",
+				BuildingID: 1,
 				CommunityID: 2,
 				Polygon:     "0,0-0,0",
 			},
 			{
-				Name:        "梶研-FA部屋",
-				BuildingID:  2,
+				Name: "梶研-FA部屋",
+				BuildingID: 1,
 				CommunityID: 2,
 				Polygon:     "0,0-0,0",
 			},
 			{
-				Name:        "梶研-先生部屋",
-				BuildingID:  2,
+				Name: "梶研-先生部屋",
+				BuildingID: 1,
 				CommunityID: 2,
 				Polygon:     "0,0-0,0",
 			},
