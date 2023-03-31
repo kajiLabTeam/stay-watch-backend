@@ -2,7 +2,6 @@ package main
 
 import (
 	controller "Stay_watch/controller"
-	"fmt"
 	"log"
 	"time"
 
@@ -53,8 +52,6 @@ func SetUpServer() *gin.Engine {
 		versionEngine.GET("/buildings/editor", controller.GetBuildingsEditor)
 		versionEngine.GET("/signup", controller.SignUp)
 	}
-
-	fmt.Println("main.goまで来たよ")
 
 	return engine
 }
