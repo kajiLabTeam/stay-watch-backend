@@ -3,7 +3,6 @@ package service
 import (
 	"Stay_watch/model"
 	"fmt"
-	"log"
 	"os"
 	"strings"
 
@@ -212,7 +211,7 @@ func init() {
 				MapFile: "/4goukanbekkan.jpg",
 			},
 			{
-				Name: "4号館別館",
+				Name:    "4号館別館",
 				MapFile: "/4goubekkan.jpg",
 			},
 		}
@@ -223,32 +222,32 @@ func init() {
 	if count == 0 {
 		rooms := []model.Room{
 			{
-				Name: "梶研-学生部屋",
-				BuildingID: 1,
+				Name:        "梶研-学生部屋",
+				BuildingID:  1,
 				CommunityID: 2,
 				Polygon:     "0,0-0,0",
 			},
 			{
-				Name: "梶研-スマートルーム",
-				BuildingID: 1,
+				Name:        "梶研-スマートルーム",
+				BuildingID:  1,
 				CommunityID: 2,
 				Polygon:     "0,0-0,0",
 			},
 			{
-				Name: "梶研-院生部屋",
-				BuildingID: 1,
+				Name:        "梶研-院生部屋",
+				BuildingID:  1,
 				CommunityID: 2,
 				Polygon:     "0,0-0,0",
 			},
 			{
-				Name: "梶研-FA部屋",
-				BuildingID: 1,
+				Name:        "梶研-FA部屋",
+				BuildingID:  1,
 				CommunityID: 2,
 				Polygon:     "0,0-0,0",
 			},
 			{
-				Name: "梶研-先生部屋",
-				BuildingID: 1,
+				Name:        "梶研-先生部屋",
+				BuildingID:  1,
 				CommunityID: 2,
 				Polygon:     "0,0-0,0",
 			},
@@ -616,7 +615,5 @@ func connect() *gorm.DB {
 	if err != nil {
 		panic(err)
 	}
-
-	log.Println("DB connected")
 	return gormDB
 }
