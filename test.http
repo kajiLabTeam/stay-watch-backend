@@ -129,10 +129,10 @@ POST {{baseURL}}/api/v1/updateroom HTTP/1.1
 content-type: application/json
 
 {
-    "roomID":1,
-    "room_name":"学生部屋",
-    "polygon":"2150,1480-2403,1605",
-    "buildingID":2
+    "roomId":1,
+    "roomName":"学生部屋",
+    "polygon":"2150,1480-2403,1600",
+    "buildingId":2
 }
 
 ### 建物の情報を全て取得する
