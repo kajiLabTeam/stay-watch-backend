@@ -66,6 +66,31 @@ use app;
 
 <br>
 
+### Database の中身を閲覧、編集する方法（DBeaver）
+（事前にvol_mysqlコンテナを起動しておく）
+
+1. DBeaver をインストールし起動
+
+2. Create sample database は cancel
+
+3. MySQL を選択
+
+4. 以下のように設定する
+    - Server Host: localhost
+    - Port: 33066
+    - Database: app
+    - ユーザー名: root
+    - パスワード: (先駆者まで)
+
+    他はそのまま
+
+5. テスト接続が通ったら終了
+
+6. 「app -> データベース -> app -> テーブル」　から閲覧、編集ができる
+
+
+<br>
+
 ### 環境構築の手順 <br><br>
 1. gitをインストール<br>
     homebrewが必要（「brew -v」 が使えるか）
