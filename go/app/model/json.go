@@ -106,7 +106,7 @@ type Beacon struct {
 type RoomEditorForm struct {
 	RoomID     int64  `json:"roomId"`
 	RoomName   string `json:"roomName"`
-	Polygon    string `json:"polygon"`
+	Polygon    [][]int64 `json:"polygon"`
 	BuildingID int64  `json:"buildingId"`
 }
 

@@ -134,7 +134,7 @@ content-type: application/json
 {
     "roomId":1,
     "roomName":"学生部屋",
-    "polygon":"2150,1480-2403,1600",
+    "polygon":[[2150, 1480],[2403,1600]],
     "buildingId":2
 }
 
