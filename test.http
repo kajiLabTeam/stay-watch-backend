@@ -124,6 +124,9 @@ content-type: application/json
 ###
 GET {{baseURL}}/api/v1/check
 
+###
+GET {{baseURL}}/api/v1/rooms/2
+
 ### 部屋名のフォーム送信
 POST {{baseURL}}/api/v1/updateroom HTTP/1.1
 content-type: application/json

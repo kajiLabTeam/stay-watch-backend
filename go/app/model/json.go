@@ -115,7 +115,7 @@ type RoomsGetResponse struct {
 	Name          string `json:"roomName"`
 	CommunityName string `json:"communityName"`
 	BuildingName  string `json:"buildingName"`
-	Polygon       string `json:"polygon"`
+	Polygon       [][]int64 `json:"polygon"`
 	BuildingId    int64  `json:"buildingId"`
 }
 

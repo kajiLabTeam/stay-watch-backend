@@ -4,11 +4,30 @@ import (
 	"Stay_watch/model"
 	"Stay_watch/service"
 	"fmt"
+	"strings"
 	"net/http"
 	"strconv"
 
 	"github.com/gin-gonic/gin"
 )
+
+// 例："100,101-200,201" -> [[100,101],[200,201]]
+func ParseStringToIntSlice(str string) [][]int64 {
+	polygonStringArray := strings.Split(str,"-")
+	polygonIntArray := [][]int64{}
+	for _, pointString := range polygonStringArray {
+		parts := strings.Split(pointString, ",")	// parts: ["100","101"]
+		pointIntArray := []int64{}
+		for _, part := range parts {
+			tmp, _ := strconv.Atoi(part)
+			pointIntArray = append(pointIntArray, int64(tmp))
+		}
+		polygonIntArray = append(polygonIntArray,pointIntArray)
+	}
+	return polygonIntArray
+}
+
+
 
 func UpdateRoom(c *gin.Context) {
 
@@ -53,6 +72,7 @@ func GetRoomsByCommunityID(c *gin.Context) {
 		if(room.CommunityID == communityID){
 			roomName := room.Name
 			roomID := int64(room.ID)
+			
 			//---roomIDから建物の名前,IDを調べる機能実装予定---
 
 			//----------------------------------------
@@ -61,7 +81,7 @@ func GetRoomsByCommunityID(c *gin.Context) {
 				Name: roomName,
 				CommunityName: "梶研究室",
 				BuildingName: "4号館",
-				Polygon: room.Polygon,
+				Polygon: ParseStringToIntSlice(room.Polygon),
 				BuildingId: room.BuildingID,
 			})
 		}
