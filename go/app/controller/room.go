@@ -39,8 +39,11 @@ func UpdateRoom(c *gin.Context) {
 		return
 	}
 
+	// [2][2]int64 -> string
+	storePolygon := strconv.FormatInt(RoomForm.Polygon[0][0], 10) + "," + strconv.FormatInt(RoomForm.Polygon[0][1], 10) + "-" + strconv.FormatInt(RoomForm.Polygon[1][0], 10) + "," + strconv.FormatInt(RoomForm.Polygon[1][1], 10)
+
 	RoomService := service.RoomService{}
-	RoomService.UpdateRoom(int(RoomForm.RoomID) ,RoomForm.RoomName, int(RoomForm.BuildingID), RoomForm.Polygon)
+	RoomService.UpdateRoom(int(RoomForm.RoomID) ,RoomForm.RoomName, int(RoomForm.BuildingID), storePolygon)
 
 	c.JSON(http.StatusCreated, gin.H{
 		"status": "ok",
