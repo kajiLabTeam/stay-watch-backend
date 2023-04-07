@@ -128,13 +128,13 @@ GET {{baseURL}}/api/v1/check
 GET {{baseURL}}/api/v1/rooms/2
 
 ### 部屋名のフォーム送信
-POST {{baseURL}}/api/v1/updateroom HTTP/1.1
+PUT {{baseURL}}/api/v1/rooms HTTP/1.1
 content-type: application/json
 
 {
     "roomId":1,
     "roomName":"学生部屋",
-    "polygon":[[2150, 1480],[2403,1600]],
+    "polygon":[[2170, 1480],[2403,1600]],
     "buildingId":2
 }
 
