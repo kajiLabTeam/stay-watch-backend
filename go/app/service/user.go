@@ -89,6 +89,25 @@ func (UserService) GetAllUser() ([]model.User, error) {
 	return users, nil
 }
 
+// コミュニティのユーザの編集に必要な部分を取得する
+func (UserService) GetEditUsersByCommunityId(communityId int64) ([]model.User, error) {
+	DbEngine := connect()
+	closer, err := DbEngine.DB()
+	if err != nil {
+		return nil, err
+	}
+	defer closer.Close()
+	users := make([]model.User, 0)
+	result := DbEngine.Find(&users)
+	if result.Error != nil {
+		fmt.Printf("ユーザ取得失敗 %v", result.Error)
+		return nil, result.Error
+	}
+	fmt.Print("コミュニティID：")
+	fmt.Println(communityId)
+	return users, nil
+}
+
 // 全てのユーザネームを取得する
 func (UserService) GetAllUserName() ([]string, error) {
 	DbEngine := connect()

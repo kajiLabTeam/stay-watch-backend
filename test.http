@@ -99,3 +99,7 @@ content-type: application/json
 
 ###
 GET {{baseURL}}/api/v1/check
+
+### 管理者画面でのユーザ情報の取得
+GET {{baseURL}}/api/v1/users/12?fields=admin
+content-type: application/json
