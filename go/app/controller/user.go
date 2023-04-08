@@ -66,6 +66,20 @@ func CreateUser(c *gin.Context) {
 func UserList(c *gin.Context) {
 
 	UserService := service.UserService{}
+
+	if c.Query("fields") == "admin" {
+		// 編集画面のユーザの情報を返す
+
+		edit_users, err := UserService.GetEditUsersByCommunityId(1)
+		if err != nil {
+			c.String(http.StatusInternalServerError, "Server Error")
+		}
+		fmt.Print("fields : ")
+		fmt.Println(c.Query("fields"))
+		fmt.Println(edit_users)
+
+	}
+
 	users, err := UserService.GetAllUser()
 	if err != nil {
 		c.String(http.StatusInternalServerError, "Server Error")

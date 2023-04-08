@@ -34,12 +34,12 @@ type UserInformationGetResponse struct {
 // }
 
 type ExtendedUserInformationGetResponse struct {
-	ID   int64            `json:"id"`
-	Name string           `json:"name"`
-	Tags []TagGetResponse `json:"tags"`
-	Uuid  string `json:"uuid"`
-	Email string `json:"email"`
-	Role  int64  `json:"role"`
+	ID    int64            `json:"id"`
+	Name  string           `json:"name"`
+	Tags  []TagGetResponse `json:"tags"`
+	Uuid  string           `json:"uuid"`
+	Email string           `json:"email"`
+	Role  int64            `json:"role"`
 }
 
 type UserRoleGetResponse struct {
@@ -97,6 +97,16 @@ type RegistrationUserForm struct {
 	Email string `form:"email"`
 	Name  string `form:"name"`
 	Role  int64  `form:"role"`
+}
+
+type UserEditorResponse struct {
+	ID         int64  `json:"id"`
+	Name       string `json:"name"`
+	Uuid       string `json:"uuid"`
+	Email      string `json:"email"`
+	Role       int64  `json:"role"`
+	BeaconType int64  `json:"beaconType"`
+	BeaconName string `json:"beaconName"`
 }
 
 type BeaconRoom struct {
