@@ -100,13 +100,14 @@ type RegistrationUserForm struct {
 }
 
 type UserEditorResponse struct {
-	ID         int64  `json:"id"`
-	Name       string `json:"name"`
-	Uuid       string `json:"uuid"`
-	Email      string `json:"email"`
-	Role       int64  `json:"role"`
-	BeaconType int64  `json:"beaconType"`
-	BeaconName string `json:"beaconName"`
+	ID         int64            `json:"id"`
+	Name       string           `json:"name"`
+	Uuid       string           `json:"uuid"`
+	Email      string           `json:"email"`
+	Role       int64            `json:"role"`
+	BeaconType int64            `json:"beaconType"`
+	BeaconName string           `json:"beaconName"`
+	Tags       []TagGetResponse `json:"tags"`
 }
 
 type BeaconRoom struct {

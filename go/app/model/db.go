@@ -9,10 +9,12 @@ import (
 type User struct {
 	gorm.Model
 
-	UUID  string
-	Name  string
-	Email string
-	Role  int64
+	UUID         string
+	Name         string
+	Email        string
+	Role         int64
+	BeaconTypeId int64
+	CommunityId  int64
 }
 
 type Log struct {
