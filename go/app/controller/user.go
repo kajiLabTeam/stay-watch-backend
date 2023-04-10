@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+	"strconv"
 	"strings"
 
 	"github.com/gin-gonic/gin"
@@ -66,11 +67,15 @@ func CreateUser(c *gin.Context) {
 func UserList(c *gin.Context) {
 
 	UserService := service.UserService{}
+	communityId, _ := strconv.ParseInt(c.Param("communityId"), 10, 64) // string -> int64
 
 	if c.Query("fields") == "admin" {
 		// 編集画面のユーザの情報を返す
+		fmt.Print("コミュニティID：")
+		fmt.Println(communityId)
+		fmt.Printf("%T\n", communityId)
 
-		edit_users, err := UserService.GetEditUsersByCommunityId(1)
+		edit_users, err := UserService.GetEditUsersByCommunityId(communityId)
 		if err != nil {
 			c.String(http.StatusInternalServerError, "Server Error")
 		}

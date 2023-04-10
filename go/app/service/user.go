@@ -98,7 +98,8 @@ func (UserService) GetEditUsersByCommunityId(communityId int64) ([]model.User, e
 	}
 	defer closer.Close()
 	users := make([]model.User, 0)
-	result := DbEngine.Find(&users)
+	//result := DbEngine.Find(&users)
+	result := DbEngine.Where("community_id = ?", communityId).Find(&users)
 	if result.Error != nil {
 		fmt.Printf("ユーザ取得失敗 %v", result.Error)
 		return nil, result.Error
