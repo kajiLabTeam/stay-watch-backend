@@ -104,8 +104,6 @@ func (UserService) GetEditUsersByCommunityId(communityId int64) ([]model.User, e
 		fmt.Printf("ユーザ取得失敗 %v", result.Error)
 		return nil, result.Error
 	}
-	fmt.Print("コミュニティID：")
-	fmt.Println(communityId)
 	return users, nil
 }
 

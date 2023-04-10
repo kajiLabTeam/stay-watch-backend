@@ -60,3 +60,9 @@ type AttendanceTmp struct {
 	UserID int64 `json:"userID" xorm:"user_id"`
 	Flag   int64 `json:"exit" xorm:"flag"`
 }
+
+type BeaconType struct {
+	gorm.Model
+	Name         string
+	UuidEditable bool
+}

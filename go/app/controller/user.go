@@ -67,13 +67,11 @@ func CreateUser(c *gin.Context) {
 func UserList(c *gin.Context) {
 
 	UserService := service.UserService{}
+	BeaconService := service.BeaconService{}
 	communityId, _ := strconv.ParseInt(c.Param("communityId"), 10, 64) // string -> int64
 
 	if c.Query("fields") == "admin" {
 		// 編集画面のユーザの情報を返す
-		fmt.Print("コミュニティID：")
-		fmt.Println(communityId)
-		fmt.Printf("%T\n", communityId)
 
 		edit_users, err := UserService.GetEditUsersByCommunityId(communityId)
 		if err != nil {
@@ -105,15 +103,26 @@ func UserList(c *gin.Context) {
 				tags = append(tags, tag)
 			}
 
+			if err != nil {
+				c.String(http.StatusInternalServerError, "Server Error")
+				return
+			}
+
+			beacon, err := BeaconService.GetBeaconByBeaconId(user.BeaconTypeId)
+			if err != nil {
+				c.String(http.StatusInternalServerError, "Server Error")
+				return
+			}
+
 			userEditorResponse = append(userEditorResponse, model.UserEditorResponse{
-				ID:         int64(user.ID),
-				Name:       user.Name,
-				Uuid:       user.UUID,
-				Email:      user.Email,
-				Role:       user.Role,
-				BeaconType: user.BeaconTypeId,
-				BeaconName: "android",
-				Tags:       tags,
+				ID:                 int64(user.ID),
+				Name:               user.Name,
+				Uuid:               user.UUID,
+				Email:              user.Email,
+				Role:               user.Role,
+				BeaconUuidEditable: beacon.UuidEditable,
+				BeaconName:         beacon.Name,
+				Tags:               tags,
 			})
 		}
 		c.JSON(http.StatusOK, userEditorResponse)
