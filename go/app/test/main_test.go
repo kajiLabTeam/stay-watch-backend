@@ -2,11 +2,12 @@
 package main
 
 import (
-	"Stay_watch/controller"
+	controller "Stay_watch/controller"
 	"Stay_watch/model"
 	"bytes"
 	"encoding/json"
 	"io/ioutil"
+	"strconv"
 
 	"net/http"
 	"net/http/httptest"
@@ -112,34 +113,47 @@ func TestGetUser(t *testing.T) {
 	var responseUser []model.UserInformationGetResponse
 	json.Unmarshal(response.Body.Bytes(), &responseUser)
 	// レスポンスのボディの確認
+	//fmt.Println(responseUser)
 	asserts.Equal("kaji", responseUser[0].Name)
 	asserts.Equal("梶研", responseUser[0].Tags[0].Name)
 	asserts.Equal(1, int(responseUser[0].ID))
 
 }
 
-// func TestPostUser(t *testing.T) {
-// 	response := httptest.NewRecorder()
-// 	ginContext, _ := gin.CreateTestContext(response)
+// 管理者画面でのユーザ取得API
+func TestGetEditorUser(t *testing.T) {
 
-// 	user := model.RegistrationUserForm{
-// 		ID:    0,
-// 		Role:  1,
-// 		Email: "hogehoge@gmail.com",
-// 		Name:  "hoge",
-// 	}
-// 	//jsonに変換
-// 	jsonUser, err := json.Marshal(user)
+	router := gin.Default()
+	router.GET("/api/v1/users/:communityId", controller.UserList)
 
-// 	if err != nil {
-// 		t.Fatal(err)
-// 	}
-// 	// リクエスト情報をコンテキストに入れる
-// 	ginContext.Request, _ = http.NewRequest(http.MethodPost, "/users", nil)
-// 	// ginContext.Request.Header.Set("Content-Type", "application/x-www-form-urlencoded")
-// 	ginContext.Request.Body = ioutil.NopCloser(bytes.NewBuffer(jsonUser))
-// 	controller.CreateUser(ginContext)
-// 	asserts := assert.New(t)
-// 	// レスポンスのステータスコードの確認
-// 	asserts.Equal(http.StatusCreated, response.Code)
-// }
+	asserts := assert.New(t)
+
+	lastSumUsers := 0
+	isAllSumEqual := true
+
+	for i := 0; i < 10; i++ {
+		// HTTPリクエストの生成
+		req, _ := http.NewRequest(http.MethodGet, "/api/v1/users/"+strconv.Itoa(i)+"?fields=admin", nil)
+
+		// レスポンスのレコーダーを作成
+		res := httptest.NewRecorder()
+
+		// リクエストをハンドル
+		router.ServeHTTP(res, req)
+		// レスポンスのステータスコードの確認
+		asserts.Equal(http.StatusOK, res.Code)
+
+		// レスポンスのボディを構造体に変換
+		var responseUser []model.UserEditorResponse
+		json.Unmarshal(res.Body.Bytes(), &responseUser)
+
+		if lastSumUsers != len(responseUser) {
+			isAllSumEqual = false
+		}
+	}
+	if isAllSumEqual {
+		// 全てユーザ数が同じ場合は正常なら存在しないため
+		// community_idによる絞り込みができていないか、データがそもそも取れていないかなど
+		t.Fatalf("All community users have the same count")
+	}
+}
