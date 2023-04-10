@@ -204,11 +204,7 @@ func init() {
 		buildings := []model.Building{
 			{
 				Name:    "4号館",
-				MapFile: "/4goukan.jpg",
-			},
-			{
-				Name:    "4号館別館",
-				MapFile: "/4goukanbekkan.jpg",
+				MapFile: "/4g-honkan-bekkan.jpg",
 			},
 			{
 				Name:    "4号館別館",
