@@ -4,11 +4,95 @@ import (
 	"Stay_watch/model"
 	"Stay_watch/service"
 	"fmt"
+	"strings"
 	"net/http"
 	"strconv"
 
 	"github.com/gin-gonic/gin"
 )
+
+// 例："100,101-200,201" -> [[100,101],[200,201]]
+func ParseStringToIntSlice(str string) [][]int64 {
+	polygonStringArray := strings.Split(str,"-")
+	polygonIntArray := [][]int64{}
+	for _, pointString := range polygonStringArray {
+		parts := strings.Split(pointString, ",")	// parts: ["100","101"]
+		pointIntArray := []int64{}
+		for _, part := range parts {
+			tmp, _ := strconv.Atoi(part)
+			pointIntArray = append(pointIntArray, int64(tmp))
+		}
+		polygonIntArray = append(polygonIntArray,pointIntArray)
+	}
+	return polygonIntArray
+}
+
+
+
+func UpdateRoom(c *gin.Context) {
+
+	RoomForm := model.RoomEditorForm{}
+	err := c.Bind(&RoomForm)
+
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	// [2][2]int64 -> string
+	storePolygon := strconv.FormatInt(RoomForm.Polygon[0][0], 10) + "," + strconv.FormatInt(RoomForm.Polygon[0][1], 10) + "-" + strconv.FormatInt(RoomForm.Polygon[1][0], 10) + "," + strconv.FormatInt(RoomForm.Polygon[1][1], 10)
+
+	RoomService := service.RoomService{}
+	RoomService.UpdateRoom(int(RoomForm.RoomID) ,RoomForm.RoomName, int(RoomForm.BuildingID), storePolygon)
+
+	c.JSON(http.StatusCreated, gin.H{
+		"status": "ok",
+	})
+}
+
+func GetRoomsByCommunityID(c *gin.Context) {
+	communityID, _ := strconv.ParseInt(c.Param("communityID"), 10, 64)	// string -> int64
+	RoomService := service.RoomService{}
+	rooms, err := RoomService.GetAllRooms()
+	if err != nil {
+		fmt.Printf("failed: Cannnot get stayer %v", err)
+		c.String(http.StatusInternalServerError, "Server Error")
+		return
+	}
+	roomsGetResponse := []model.RoomsGetResponse{}
+	
+	//---communityIDからコミュニティの名前を調べる機能実装予定---
+
+	//----------------------------------------------------
+
+	for _, room := range rooms {
+		// fmt.Print("コミュニティID: ")
+		// fmt.Println(room.CommunityID)
+		// fmt.Print("ポリゴン: ")
+		// fmt.Println(room.Polygon)
+
+		// コミュニティIDが一致した部屋情報だけ返す
+		if(room.CommunityID == communityID){
+			roomName := room.Name
+			roomID := int64(room.ID)
+			
+			//---roomIDから建物の名前,IDを調べる機能実装予定---
+
+			//----------------------------------------
+			roomsGetResponse = append(roomsGetResponse, model.RoomsGetResponse{
+				RoomID: roomID,
+				Name: roomName,
+				CommunityName: "梶研究室",
+				BuildingName: "4号館",
+				Polygon: ParseStringToIntSlice(room.Polygon),
+				BuildingId: room.BuildingID,
+			})
+		}
+	}
+	c.JSON(200, roomsGetResponse)
+
+}
+
 
 func Stayer(c *gin.Context) {
 

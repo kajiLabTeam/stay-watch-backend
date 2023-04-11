@@ -223,6 +223,8 @@ $RECYCLE.BIN/
 
 credentials/
 backup/
+mysql/backup.sql
+mysql/test.sql
 
 
 __pycache__/

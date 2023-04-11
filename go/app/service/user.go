@@ -8,6 +8,23 @@ import (
 
 type UserService struct{}
 
+
+func (UserService) RegisterSampleUser(user *model.User) error {
+	DbEngine := connect()
+	closer, err := DbEngine.DB()
+	if err != nil {
+		return err
+	}
+	defer closer.Close()
+	result := DbEngine.Create(user)
+	if result.Error != nil {
+		fmt.Printf("ユーザ登録処理失敗 %v", result.Error)
+		return result.Error
+	}
+	return nil
+}
+
+
 // 新しいuuidを生成する
 func (UserService) NewUUID() string {
 

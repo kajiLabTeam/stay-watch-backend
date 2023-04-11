@@ -13,6 +13,17 @@ Get {{baseURL}}/api/v1/logs
 ###
 Get {{baseURL}}/api/v1/users
 
+###
+POST {{baseURL}}/api/v1/users HTTP/1.1
+content-type: application/json
+
+{
+    "id":0,
+    "email":"aikout@gmail.com",
+    "name": "tarou",
+    "role": 1
+}
+
 
 ###
 Get {{baseURL}}/api/v1/users/extended
@@ -41,25 +52,38 @@ Get {{baseURL}}/api/v1/list/simultaneous/1
 ###
 Get {{baseURL}}/api/v1/list/simultaneous/2
 
-###
-POST {{baseURL}}/api/v1/stayers HTTP/1.1
-content-type: application/json
-
-{
-    "beacons":[
-        
-    ],
-    "roomId": 1
-}
-
-###
+### 入室
 POST {{baseURL}}/api/v1/stayers HTTP/1.1
 content-type: application/json
 
 {
     "beacons":[
         {
-            "uuid": "e7d61ea3f8dd49c88f2ff2484c07ac00",
+            "uuid": "e7d61ea3f8dd49c88f2ff2484c07ac11",
+            "rssi": -50
+        }
+    ],
+    "roomId": 1
+}
+
+### 受信したビーコンの情報を渡す
+POST {{baseURL}}/api/v1/stayers HTTP/1.1
+content-type: application/json
+
+{
+    "beacons":[
+    ],
+    "roomId": 2
+}
+
+### 入室
+POST {{baseURL}}/api/v1/stayers HTTP/1.1
+content-type: application/json
+
+{
+    "beacons":[
+        {
+            "uuid": "e7d61ea3f8dd49c88f2ff2484c07ac13",
             "rssi": -50
         }
     ],
@@ -72,7 +96,7 @@ content-type: application/json
 
 {
     "beacons":[
-    
+
     ],
     "roomId": 2
 }
@@ -94,8 +118,25 @@ content-type: application/json
 
 
 ###
-GET {{baseURL}}/api/v1/log/gantt HTTP/1.1
+GET {{baseURL}}/api/v1/logs/gantt HTTP/1.1
 content-type: application/json
 
 ###
 GET {{baseURL}}/api/v1/check
+
+###
+GET {{baseURL}}/api/v1/rooms/2
+
+### 部屋名のフォーム送信
+PUT {{baseURL}}/api/v1/rooms HTTP/1.1
+content-type: application/json
+
+{
+    "roomId":1,
+    "roomName":"学生部屋",
+    "polygon":[[2170, 1480],[2403,1600]],
+    "buildingId":2
+}
+
+### 建物の情報を全て取得する
+GET {{baseURL}}/api/v1/buildings/editor

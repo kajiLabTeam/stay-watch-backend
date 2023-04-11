@@ -3,7 +3,6 @@ package service
 import (
 	"Stay_watch/model"
 	"fmt"
-	"log"
 	"os"
 	"strings"
 
@@ -20,7 +19,7 @@ func init() {
 		return
 	}
 	defer closer.Close()
-	db.AutoMigrate(&model.User{}, &model.Log{}, &model.Room{}, &model.Stayer{}, &model.Tag{}, &model.TagMap{})
+	db.AutoMigrate(&model.User{}, &model.Log{}, &model.Room{}, &model.Stayer{}, &model.Tag{}, &model.TagMap{}, &model.Building{})
 
 	var count int64
 	db.Model(&model.User{}).Count(&count)
@@ -200,23 +199,53 @@ func init() {
 
 	}
 
+	db.Model(&model.Building{}).Count(&count)
+	if count == 0 {
+		buildings := []model.Building{
+			{
+				Name:    "4号館",
+				MapFile: "/4g-honkan-bekkan.jpg",
+			},
+			{
+				Name:    "4号館別館",
+				MapFile: "/4goubekkan.jpg",
+			},
+		}
+		db.Create(&buildings)
+	}
+
 	db.Model(&model.Room{}).Count(&count)
 	if count == 0 {
 		rooms := []model.Room{
 			{
-				Name: "梶研-学生部屋",
+				Name:        "梶研-学生部屋",
+				BuildingID:  1,
+				CommunityID: 2,
+				Polygon:     "0,0-0,0",
 			},
 			{
-				Name: "梶研-スマートルーム",
+				Name:        "梶研-スマートルーム",
+				BuildingID:  1,
+				CommunityID: 2,
+				Polygon:     "0,0-0,0",
 			},
 			{
-				Name: "梶研-院生部屋",
+				Name:        "梶研-院生部屋",
+				BuildingID:  1,
+				CommunityID: 2,
+				Polygon:     "0,0-0,0",
 			},
 			{
-				Name: "梶研-FA部屋",
+				Name:        "梶研-FA部屋",
+				BuildingID:  1,
+				CommunityID: 2,
+				Polygon:     "0,0-0,0",
 			},
 			{
-				Name: "梶研-先生部屋",
+				Name:        "梶研-先生部屋",
+				BuildingID:  1,
+				CommunityID: 2,
+				Polygon:     "0,0-0,0",
 			},
 		}
 		db.Create(&rooms)
@@ -582,7 +611,5 @@ func connect() *gorm.DB {
 	if err != nil {
 		panic(err)
 	}
-
-	log.Println("DB connected")
 	return gormDB
 }
