@@ -17,6 +17,7 @@ func Detail(c *gin.Context) {
 	})
 }
 
+
 func CreateUser(c *gin.Context) {
 	RegistrationUserForm := model.RegistrationUserForm{}
 	c.Bind(&RegistrationUserForm)
