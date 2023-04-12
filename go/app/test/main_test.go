@@ -114,8 +114,8 @@ func TestGetUser(t *testing.T) {
 	json.Unmarshal(response.Body.Bytes(), &responseUser)
 	// レスポンスのボディの確認
 	//fmt.Println(responseUser)
-	asserts.Equal("kaji", responseUser[0].Name)
-	asserts.Equal("梶研", responseUser[0].Tags[0].Name)
+	asserts.Equal("test", responseUser[0].Name)
+	asserts.Equal("テストタグ", responseUser[0].Tags[0].Name)
 	asserts.Equal(1, int(responseUser[0].ID))
 
 }
@@ -146,6 +146,15 @@ func TestGetEditorUser(t *testing.T) {
 		// レスポンスのボディを構造体に変換
 		var responseUser []model.UserEditorResponse
 		json.Unmarshal(res.Body.Bytes(), &responseUser)
+
+		// community_id=1 のテストユーザの情報が正しく取れているか確認
+		if i == 1 {
+			asserts.Equal("test", responseUser[0].Name)
+			asserts.Equal("テストタグ", responseUser[0].Tags[0].Name)
+			asserts.Equal("e7d61ea3f8dd49c88f2ff2484c07ab00", responseUser[0].Uuid)
+			asserts.Equal("test@gmail.com", responseUser[0].Email)
+			asserts.Equal("FCS1301", responseUser[0].BeaconName)
+		}
 
 		if lastSumUsers != len(responseUser) {
 			isAllSumEqual = false
