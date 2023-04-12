@@ -93,6 +93,7 @@ type RegistrationUserForm struct {
 	Role  int64  `form:"role"`
 }
 
+// バックエンドからフロントへ返すユーザ情報
 type UserEditorResponse struct {
 	ID                 int64            `json:"id"`
 	Name               string           `json:"name"`
@@ -102,6 +103,27 @@ type UserEditorResponse struct {
 	BeaconUuidEditable bool             `json:"beaconUuidEditable"`
 	BeaconName         string           `json:"beaconName"`
 	Tags               []TagGetResponse `json:"tags"`
+}
+
+// フロントからバックエンドへ送られてきた新規作成ユーザ情報
+type UserCreateRequest struct {
+	Name        string  `json:"name"`
+	Uuid        string  `json:"uuid"`
+	Email       string  `json:"email"`
+	Role        int64   `json:"role"`
+	CommunityId int64   `json:"communityId"`
+	BeaconName  string  `json:"beaconName"`
+	TagIds      []int64 `json:"tagIds"`
+}
+
+// フロントからバックエンドへ送られてきた更新するユーザ情報
+type UserUpdateResponse struct {
+	Id int64 `json:"id"`
+}
+
+// フロントからバックエンドへ送られてきた削除するユーザ情報
+type UserDeleteResponse struct {
+	Id int64 `json:"id"`
 }
 
 type BeaconRoom struct {
