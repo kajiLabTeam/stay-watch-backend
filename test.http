@@ -13,7 +13,8 @@ Get {{baseURL}}/api/v1/logs
 ###
 Get {{baseURL}}/api/v1/users
 
-POST {{{baseURL}}}/api/v1/users HTTP/1.1
+###
+POST {{baseURL}}/api/v1/users HTTP/1.1
 content-type: application/json
 
 {
