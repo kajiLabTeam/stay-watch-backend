@@ -20,6 +20,44 @@ func Detail(c *gin.Context) {
 
 
 func CreateUser(c *gin.Context) {
+	UserCreateRequest := model.UserCreateRequest{}
+	c.Bind(&UserCreateRequest)
+
+	UserService := service.UserService{}
+	BeaconService := service.BeaconService{}
+
+	beaconTypeId, err := BeaconService.GetBeaconTypeIdByBeaconName(UserCreateRequest.BeaconName)
+	// もしbeaconTypeIdが取得できたらerrがnilになる
+	if err != nil {
+		c.String(http.StatusInternalServerError, "Server Error")
+		return
+	}
+
+	user := model.User{
+		Name:         UserCreateRequest.Name,
+		Email:        UserCreateRequest.Email,
+		Role:         UserCreateRequest.Role,
+		UUID:         UserService.NewUUID(),
+		BeaconTypeId: beaconTypeId,
+		CommunityId:  UserCreateRequest.CommunityId,
+	}
+
+	fmt.Println(user)
+
+	// err = UserService.RegisterUser(&user)
+	// if err != nil {
+	// 	fmt.Printf("Cannnot register user: %v", err)
+	// 	c.String(http.StatusInternalServerError, "Server Error")
+	// 	return
+	// }
+
+	c.JSON(http.StatusCreated, gin.H{
+		"status": "ok",
+	})
+
+}
+
+func PastCreateUser(c *gin.Context) {
 	RegistrationUserForm := model.RegistrationUserForm{}
 	c.Bind(&RegistrationUserForm)
 
