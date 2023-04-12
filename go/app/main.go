@@ -18,7 +18,6 @@ func main() {
 }
 
 func SetUpServer() *gin.Engine {
-
 	engine := gin.Default()
 	// ミドルウェア
 	// engine.Use(middleware.RecordUaAndTime)
@@ -50,6 +49,10 @@ func SetUpServer() *gin.Engine {
 		versionEngine.POST("/users", controller.CreateUser)
 		versionEngine.GET("/check", controller.Check)
 		versionEngine.POST("/attendance", controller.Attendance)
+		versionEngine.GET("/rooms/:communityID", controller.GetRoomsByCommunityID)
+		versionEngine.PUT("/rooms", controller.UpdateRoom)
+		// versionEngine.POST("/updateroom", controller.UpdateRoom)
+		versionEngine.GET("/buildings/editor", controller.GetBuildingsEditor)
 		versionEngine.GET("/signup", controller.SignUp)
 	}
 
