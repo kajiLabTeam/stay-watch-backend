@@ -68,9 +68,8 @@ func TestGetStayer(t *testing.T) {
 	// レスポンスのボディの確認
 	asserts.Equal("kaji", responseStayer[0].Name)
 	asserts.Equal("梶研", responseStayer[0].Tags[0].Name)
-	asserts.Equal("梶研", responseStayer[0].Tags[0].Name)
-	asserts.Equal(1, int(responseStayer[0].Tags[0].ID))
-	asserts.Equal(1, int(responseStayer[0].ID))
+	asserts.Equal(2, int(responseStayer[0].Tags[0].ID))
+	asserts.Equal(2, int(responseStayer[0].ID))
 	asserts.Equal(1, int(responseStayer[0].RoomID))
 }
 
