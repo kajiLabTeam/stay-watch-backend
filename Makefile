@@ -4,18 +4,17 @@ include .env
 DB_CONTAINER_NAME = $(MYSQL_CONTAINER_NAME)
 # データベース名
 DB_NAME = app
-# mysqlのログイン情報を設定
-set:
-	docker exec -it $(DB_CONTAINER_NAME) mysql_config_editor set -u root -p
-# mysqldumpのログイン情報を設定
-setdump:
-	docker exec -it $(DB_CONTAINER_NAME) mysql_config_editor set --login-path=mysqldump -u root -p
+MYSQL_PASSWORD=root
+
 # データベースをダンプ
 dump:
-	docker exec -it $(DB_CONTAINER_NAME) mysqldump $(DB_NAME) > mysql/backup/backup.sql
+	docker exec -it $(DB_CONTAINER_NAME) mysqldump -uroot --password=${MYSQL_PASSWORD} $(DB_NAME) > mysql/backup/tmp_backup.sql 
+replace_dump: dump
+	sed '1d' mysql/backup/tmp_backup.sql > mysql/backup/backup.sql
 # データベースをリストア
 restore:
-	docker exec -i $(DB_CONTAINER_NAME) mysql $(DB_NAME) < mysql/backup/backup.sql
+	docker exec -i $(DB_CONTAINER_NAME) mysql -uroot -p$(MYSQL_PASSWORD) $(DB_NAME) < mysql/backup/backup.sql
+	
 reloadgolang:
 	docker-compose rm -fsv vol_golang
 	docker-compose up -d vol_golang
