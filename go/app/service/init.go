@@ -27,6 +27,14 @@ func init() {
 		//複数のユーザーを作成
 		users := []model.User{
 			{
+				Name:         "test",
+				Email:        "test@gmail.com",
+				Role:         1,
+				UUID:         "e7d61ea3f8dd49c88f2ff2484c07ab00",
+				BeaconTypeId: 1,
+				CommunityId:  1,
+			},
+			{
 				Name:         "kaji",
 				Email:        "",
 				Role:         1,
@@ -281,6 +289,9 @@ func init() {
 	if count == 0 {
 		tags := []model.Tag{
 			{
+				Name: "テストタグ",
+			},
+			{
 				Name: "梶研",
 			},
 			{
@@ -325,24 +336,12 @@ func init() {
 				TagID:  1,
 			},
 			{
-				UserID: 1,
-				TagID:  11,
-			},
-			{
-				UserID: 2,
-				TagID:  1,
-			},
-			{
 				UserID: 2,
 				TagID:  2,
 			},
 			{
 				UserID: 2,
-				TagID:  10,
-			},
-			{
-				UserID: 3,
-				TagID:  1,
+				TagID:  12,
 			},
 			{
 				UserID: 3,
@@ -350,23 +349,15 @@ func init() {
 			},
 			{
 				UserID: 3,
-				TagID:  10,
+				TagID:  3,
 			},
 			{
 				UserID: 4,
-				TagID:  1,
-			},
-			{
-				UserID: 4,
-				TagID:  4,
-			},
-			{
-				UserID: 4,
-				TagID:  9,
+				TagID:  12,
 			},
 			{
 				UserID: 5,
-				TagID:  1,
+				TagID:  3,
 			},
 			{
 				UserID: 5,
@@ -374,11 +365,19 @@ func init() {
 			},
 			{
 				UserID: 5,
-				TagID:  9,
+				TagID:  12,
 			},
 			{
-				UserID: 6,
-				TagID:  1,
+				UserID: 5,
+				TagID:  2,
+			},
+			{
+				UserID: 5,
+				TagID:  5,
+			},
+			{
+				UserID: 5,
+				TagID:  10,
 			},
 			{
 				UserID: 6,
@@ -386,11 +385,11 @@ func init() {
 			},
 			{
 				UserID: 6,
-				TagID:  9,
+				TagID:  5,
 			},
 			{
-				UserID: 7,
-				TagID:  1,
+				UserID: 6,
+				TagID:  10,
 			},
 			{
 				UserID: 7,
@@ -398,11 +397,15 @@ func init() {
 			},
 			{
 				UserID: 7,
-				TagID:  8,
+				TagID:  3,
+			},
+			{
+				UserID: 7,
+				TagID:  10,
 			},
 			{
 				UserID: 8,
-				TagID:  1,
+				TagID:  2,
 			},
 			{
 				UserID: 8,
@@ -410,11 +413,7 @@ func init() {
 			},
 			{
 				UserID: 8,
-				TagID:  8,
-			},
-			{
-				UserID: 9,
-				TagID:  1,
+				TagID:  9,
 			},
 			{
 				UserID: 9,
@@ -422,75 +421,79 @@ func init() {
 			},
 			{
 				UserID: 9,
-				TagID:  8,
-			},
-			{
-				UserID: 10,
-				TagID:  1,
-			},
-			{
-				UserID: 10,
 				TagID:  4,
 			},
 			{
+				UserID: 9,
+				TagID:  9,
+			},
+			{
 				UserID: 10,
-				TagID:  8,
-			},
-			{
-				UserID: 11,
-				TagID:  1,
-			},
-			{
-				UserID: 11,
 				TagID:  2,
 			},
 			{
-				UserID: 11,
-				TagID:  8,
-			},
-			{
-				UserID: 12,
-				TagID:  1,
-			},
-			{
-				UserID: 12,
-				TagID:  4,
-			},
-			{
-				UserID: 12,
-				TagID:  8,
-			},
-			{
-				UserID: 13,
-				TagID:  1,
-			},
-			{
-				UserID: 13,
+				UserID: 10,
 				TagID:  3,
 			},
 			{
+				UserID: 10,
+				TagID:  9,
+			},
+			{
+				UserID: 11,
+				TagID:  2,
+			},
+			{
+				UserID: 11,
+				TagID:  5,
+			},
+			{
+				UserID: 11,
+				TagID:  9,
+			},
+			{
+				UserID: 12,
+				TagID:  2,
+			},
+			{
+				UserID: 12,
+				TagID:  3,
+			},
+			{
+				UserID: 12,
+				TagID:  9,
+			},
+			{
 				UserID: 13,
-				TagID:  8,
+				TagID:  2,
 			},
 			{
-				UserID: 14,
-				TagID:  1,
+				UserID: 13,
+				TagID:  5,
+			},
+			{
+				UserID: 13,
+				TagID:  9,
 			},
 			{
 				UserID: 14,
 				TagID:  2,
 			},
 			{
-				UserID: 15,
-				TagID:  1,
+				UserID: 14,
+				TagID:  4,
+			},
+			{
+				UserID: 14,
+				TagID:  9,
 			},
 			{
 				UserID: 15,
-				TagID:  8,
+				TagID:  2,
 			},
 			{
-				UserID: 16,
-				TagID:  1,
+				UserID: 15,
+				TagID:  3,
 			},
 			{
 				UserID: 16,
@@ -498,103 +501,115 @@ func init() {
 			},
 			{
 				UserID: 16,
+				TagID:  9,
+			},
+			{
+				UserID: 17,
+				TagID:  2,
+			},
+			{
+				UserID: 17,
+				TagID:  3,
+			},
+			{
+				UserID: 17,
+				TagID:  9,
+			},
+			{
+				UserID: 18,
+				TagID:  2,
+			},
+			{
+				UserID: 18,
 				TagID:  8,
 			},
 			{
-				UserID: 17,
-				TagID:  1,
-			},
-			{
-				UserID: 17,
-				TagID:  7,
-			},
-			{
-				UserID: 18,
-				TagID:  1,
-			},
-			{
-				UserID: 18,
-				TagID:  7,
+				UserID: 19,
+				TagID:  2,
 			},
 			{
 				UserID: 19,
-				TagID:  1,
-			},
-			{
-				UserID: 19,
-				TagID:  7,
+				TagID:  8,
 			},
 			{
 				UserID: 20,
-				TagID:  1,
+				TagID:  2,
 			},
 			{
 				UserID: 20,
-				TagID:  7,
+				TagID:  8,
 			},
 			{
 				UserID: 21,
-				TagID:  1,
+				TagID:  2,
 			},
 			{
 				UserID: 21,
-				TagID:  7,
+				TagID:  8,
 			},
 			{
 				UserID: 22,
-				TagID:  1,
+				TagID:  2,
 			},
 			{
 				UserID: 22,
-				TagID:  7,
+				TagID:  8,
 			},
 			{
 				UserID: 23,
-				TagID:  1,
+				TagID:  2,
 			},
 			{
 				UserID: 23,
-				TagID:  7,
+				TagID:  8,
 			},
 			{
 				UserID: 24,
-				TagID:  1,
+				TagID:  2,
 			},
 			{
 				UserID: 24,
-				TagID:  7,
+				TagID:  8,
 			},
 			{
 				UserID: 25,
-				TagID:  1,
+				TagID:  2,
 			},
 			{
 				UserID: 25,
-				TagID:  7,
+				TagID:  8,
 			},
 			{
 				UserID: 26,
-				TagID:  1,
+				TagID:  2,
 			},
 			{
 				UserID: 26,
-				TagID:  7,
+				TagID:  8,
 			},
 			{
 				UserID: 27,
-				TagID:  1,
+				TagID:  2,
 			},
 			{
 				UserID: 27,
-				TagID:  7,
+				TagID:  8,
 			},
 			{
 				UserID: 28,
-				TagID:  1,
+				TagID:  2,
 			},
 			{
 				UserID: 28,
-				TagID:  7,
+				TagID:  8,
+			},
+			{
+				UserID: 29,
+				TagID:  2,
+			},
+			{
+				UserID: 29,
+				TagID:  8,
 			},
 		}
 		db.Create(&tagMaps)
