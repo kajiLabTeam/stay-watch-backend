@@ -18,7 +18,6 @@ func Detail(c *gin.Context) {
 	})
 }
 
-
 func CreateUser(c *gin.Context) {
 	UserCreateRequest := model.UserCreateRequest{}
 	c.Bind(&UserCreateRequest)
@@ -42,14 +41,17 @@ func CreateUser(c *gin.Context) {
 		CommunityId:  UserCreateRequest.CommunityId,
 	}
 
-	fmt.Println(user)
+	err = UserService.RegisterUser(&user)
+	if err != nil {
+		fmt.Printf("Cannnot register user: %v", err)
+		c.String(http.StatusInternalServerError, "Server Error")
+		return
+	}
 
-	// err = UserService.RegisterUser(&user)
-	// if err != nil {
-	// 	fmt.Printf("Cannnot register user: %v", err)
-	// 	c.String(http.StatusInternalServerError, "Server Error")
-	// 	return
-	// }
+	if !strings.HasSuffix(os.Args[0], ".test") {
+		mailService := service.MailService{}
+		mailService.SendMail("滞在ウォッチユーザ登録の完了のお知らせ", "ユーザ登録が完了したので滞在ウォッチを閲覧することが可能になりました\n一度プロジェクトをリセットしたので再度ログインお願いします。\nアプリドメイン\nhttps://stay-watch-go.kajilab.tk/", UserCreateRequest.Email)
+	}
 
 	c.JSON(http.StatusCreated, gin.H{
 		"status": "ok",
