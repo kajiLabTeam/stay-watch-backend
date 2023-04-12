@@ -632,6 +632,7 @@ func init() {
 			},
 			{
 				UserID: 28,
+				TagID:  8,
 			},
 			{
 				UserID: 29,
