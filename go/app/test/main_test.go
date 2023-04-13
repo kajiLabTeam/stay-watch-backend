@@ -6,6 +6,7 @@ import (
 	"Stay_watch/model"
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"strconv"
 
@@ -165,3 +166,97 @@ func TestGetEditorUser(t *testing.T) {
 		t.Fatalf("All community users have the same count")
 	}
 }
+
+// ユーザの新規登録API
+// 未登録の場合
+func TestCreateUserUnRegistered(t *testing.T) {
+
+	response := httptest.NewRecorder()
+	ginContext, _ := gin.CreateTestContext(response)
+
+	// 未登録ユーザ
+	unregisteredUser := model.UserCreateRequest{
+		Name:        "tarou",
+		Uuid:        "",
+		Email:       "togdae7113+unregisterd@gmail.com",
+		Role:        1,
+		CommunityId: 1,
+		BeaconName:  "FCS1301",
+		TagIds:      []int64{1, 2, 5},
+	}
+	jsonUnegisteredUser, err := json.Marshal(unregisteredUser)
+	if err != nil {
+		t.Fatal(err)
+	}
+	// リクエスト情報をコンテキストに入れる
+	ginContext.Request, _ = http.NewRequest(http.MethodPost, "/users", nil)
+	ginContext.Request.Header.Set("Content-Type", "application/json")
+	ginContext.Request.Body = ioutil.NopCloser(bytes.NewBuffer(jsonUnegisteredUser))
+	controller.CreateUser(ginContext)
+	asserts := assert.New(t)
+	fmt.Println(response)
+	// レスポンスのステータスコードの確認(未登録ユーザ)
+	asserts.Equal(http.StatusCreated, response.Code)
+}
+
+// 既に登録済みの場合
+func TestCreateUserRegisterd(t *testing.T) {
+
+	response := httptest.NewRecorder()
+	ginContext, _ := gin.CreateTestContext(response)
+
+	// 登録済みユーザ
+	registeredUser := model.UserCreateRequest{
+		Name:        "tarou",
+		Uuid:        "",
+		Email:       "test@gmail.com",
+		Role:        1,
+		CommunityId: 1,
+		BeaconName:  "FCS1301",
+		TagIds:      []int64{1, 2, 5},
+	}
+	//jsonに変換
+	jsonRegisteredUser, err := json.Marshal(registeredUser)
+	if err != nil {
+		t.Fatal(err)
+	}
+	// リクエスト情報をコンテキストに入れる
+	ginContext.Request, _ = http.NewRequest(http.MethodPost, "/users", nil)
+	ginContext.Request.Header.Set("Content-Type", "application/json")
+	ginContext.Request.Body = ioutil.NopCloser(bytes.NewBuffer(jsonRegisteredUser))
+	controller.CreateUser(ginContext)
+	asserts := assert.New(t)
+	fmt.Println(response)
+	// レスポンスのステータスコードの確認(登録済みユーザ)
+	asserts.Equal(http.StatusConflict, response.Code)
+}
+
+// func TestCreateUserUnRegistered(t *testing.T) {
+
+// 	response := httptest.NewRecorder()
+// 	ginContext, _ := gin.CreateTestContext(response)
+
+// 	// 未登録ユーザ
+// 	unregisteredUser := model.UserCreateRequest{
+// 		Name:        "tarou",
+// 		Uuid:        "",
+// 		Email:       "toge711312121212@gmail.com",
+// 		Role:        1,
+// 		CommunityId: 1,
+// 		BeaconName:  "FCS1301",
+// 		TagIds:      []int64{1, 2, 5},
+// 	}
+// 	jsonUnegisteredUser, err := json.Marshal(unregisteredUser)
+// 	if err != nil {
+// 		t.Fatal(err)
+// 	}
+// 	// リクエスト情報をコンテキストに入れる
+// 	ginContext.Request, _ = http.NewRequest(http.MethodPost, "/users", nil)
+// 	ginContext.Request.Header.Set("Content-Type", "application/json")
+// 	ginContext.Request.Body = ioutil.NopCloser(bytes.NewBuffer(jsonUnegisteredUser))
+// 	controller.CreateUser(ginContext)
+// 	asserts := assert.New(t)
+// 	fmt.Println(response)
+// 	// レスポンスのステータスコードの確認(未登録ユーザ)
+// 	asserts.Equal(http.StatusCreated, response.Code)
+// }

@@ -29,7 +29,7 @@ func init() {
 		users := []model.User{
 			{
 				Name:         "test",
-				Email:        "test@gmail.com",
+				Email:        "toge7113+test-stay-watch@gmail.com",
 				Role:         1,
 				UUID:         "e7d61ea3f8dd49c88f2ff2484c07ab00",
 				BeaconTypeId: 1,
