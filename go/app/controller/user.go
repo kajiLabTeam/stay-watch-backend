@@ -42,6 +42,17 @@ func CreateUser(c *gin.Context) {
 		CommunityId:  UserCreateRequest.CommunityId,
 	}
 
+	// 同じメールアドレスのユーザが既に登録済みだったら409を返す
+	isRegisterd, err := UserService.IsEmailAlreadyRegistered(UserCreateRequest.Email)
+	if err != nil {
+		c.String(http.StatusInternalServerError, "Server Error")
+		return
+	} else if isRegisterd {
+		// 同じメールアドレスが既に登録済みの場合
+		c.String(http.StatusConflict, "Arleady Registered Email")
+		return
+	}
+
 	// usersテーブルにユーザ情報を保存
 	err = UserService.RegisterUser(&user)
 	if err != nil {
@@ -51,8 +62,12 @@ func CreateUser(c *gin.Context) {
 	}
 
 	// 今登録したユーザのIDを取得
-	// registeredUserId := UserService.GetUserIDBy()
-	registerdUserId := 32
+	registerdUserId, err := UserService.GetUserIDByEmail(UserCreateRequest.Email)
+	if err != nil {
+		fmt.Printf("Cannnot get userId: %v", err)
+		c.String(http.StatusInternalServerError, "Server Error")
+		return
+	}
 
 	// tag_mapsテーブルにタグのマップを保存
 	for _, tagId := range UserCreateRequest.TagIds {
