@@ -289,6 +289,41 @@ func (UserService) GetUserIDByUUID(uuid string) (int64, error) {
 	return int64(user.ID), nil
 }
 
+func (UserService) GetUserIDByEmail(email string) (int64, error) {
+	DbEngine := connect()
+	closer, err := DbEngine.DB()
+	if err != nil {
+		return 0, err
+	}
+	defer closer.Close()
+	user := model.User{}
+	result := DbEngine.Where("email=?", email).Take(&user)
+	if result.Error != nil {
+		fmt.Printf("ユーザID取得失敗 %v", result.Error)
+		return 0, result.Error
+	}
+
+	return int64(user.ID), nil
+
+}
+
+func (UserService) IsEmailAlreadyRegistered(email string) (bool, error) {
+	DbEngine := connect()
+	closer, err := DbEngine.DB()
+	if err != nil {
+		// 接続できなかった場合もtrueとする
+		return true, err
+	}
+	defer closer.Close()
+	user := model.User{}
+	result := DbEngine.Where("email=?", email).Take(&user)
+	// エラーの時はメールアドレスが見つからなかった時と同じなため
+	if result.Error != nil {
+		return false, nil
+	}
+	return true, nil
+}
+
 //指定されたログリストと同じ時間にいたユーザを取得する
 // func (UserService) GetSameTimeUser(logs []model.Log) ([]model.SimultaneousStayUserGetResponse, error) {
 // 	targetLogs := make([]model.Log, 0)
