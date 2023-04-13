@@ -8,7 +8,6 @@ import (
 
 type UserService struct{}
 
-
 func (UserService) RegisterSampleUser(user *model.User) error {
 	DbEngine := connect()
 	closer, err := DbEngine.DB()
@@ -23,7 +22,6 @@ func (UserService) RegisterSampleUser(user *model.User) error {
 	}
 	return nil
 }
-
 
 // 新しいuuidを生成する
 func (UserService) NewUUID() string {
@@ -55,7 +53,7 @@ func (UserService) NewUUID() string {
 
 }
 
-// ユーザ登録処理
+// ユーザ登録処理 ユーザIDも返す
 func (UserService) RegisterUser(user *model.User) error {
 	DbEngine := connect()
 	closer, err := DbEngine.DB()

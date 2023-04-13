@@ -13,6 +13,10 @@ Get {{baseURL}}/api/v1/logs
 ###
 Get {{baseURL}}/api/v1/users
 
+### 管理者画面でのユーザ情報の取得
+GET {{baseURL}}/api/v1/users/1?fields=admin
+content-type: application/json
+
 ###
 POST {{baseURL}}/api/v1/users HTTP/1.1
 content-type: application/json
@@ -20,7 +24,7 @@ content-type: application/json
 {
     "name":"tarou",
     "uuid":"",
-    "email":"toge7113@gmail.com",
+    "email":"ssinya0922@gmail.com",
     "role":1,
     "communityId":1,
     "beaconName":"FCS1301",
@@ -126,10 +130,6 @@ content-type: application/json
 
 ###
 GET {{baseURL}}/api/v1/check
-
-### 管理者画面でのユーザ情報の取得
-GET {{baseURL}}/api/v1/users/2?fields=admin
-content-type: application/json
 
 ###
 GET {{baseURL}}/api/v1/rooms/2
