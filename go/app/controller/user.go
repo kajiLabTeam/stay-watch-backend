@@ -24,6 +24,7 @@ func CreateUser(c *gin.Context) {
 
 	UserService := service.UserService{}
 	BeaconService := service.BeaconService{}
+	TagService := service.TagService{}
 
 	beaconTypeId, err := BeaconService.GetBeaconTypeIdByBeaconName(UserCreateRequest.BeaconName)
 	// もしbeaconTypeIdが取得できたらerrがnilになる
@@ -41,11 +42,30 @@ func CreateUser(c *gin.Context) {
 		CommunityId:  UserCreateRequest.CommunityId,
 	}
 
+	// usersテーブルにユーザ情報を保存
 	err = UserService.RegisterUser(&user)
 	if err != nil {
 		fmt.Printf("Cannnot register user: %v", err)
 		c.String(http.StatusInternalServerError, "Server Error")
 		return
+	}
+
+	// 今登録したユーザのIDを取得
+	// registeredUserId := UserService.GetUserIDBy()
+	registerdUserId := 32
+
+	// tag_mapsテーブルにタグのマップを保存
+	for _, tagId := range UserCreateRequest.TagIds {
+		tag := model.TagMap{
+			UserID: int64(registerdUserId),
+			TagID:  int64(tagId),
+		}
+		err = TagService.CreateTagMap(&tag)
+		if err != nil {
+			fmt.Printf("Cannot register tagMap: %v", err)
+			c.String(http.StatusInternalServerError, "Server Error")
+			return
+		}
 	}
 
 	if !strings.HasSuffix(os.Args[0], ".test") {
