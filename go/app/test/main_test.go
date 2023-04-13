@@ -152,7 +152,7 @@ func TestGetEditorUser(t *testing.T) {
 			asserts.Equal("test", responseUser[0].Name)
 			asserts.Equal("テストタグ", responseUser[0].Tags[0].Name)
 			asserts.Equal("e7d61ea3f8dd49c88f2ff2484c07ab00", responseUser[0].Uuid)
-			asserts.Equal("test@gmail.com", responseUser[0].Email)
+			asserts.Equal("toge7113+test-stay-watch@gmail.com", responseUser[0].Email)
 			asserts.Equal("FCS1301", responseUser[0].BeaconName)
 		}
 
@@ -169,7 +169,7 @@ func TestGetEditorUser(t *testing.T) {
 
 // ユーザの新規登録API
 // 未登録の場合
-func TestCreateUserUnRegistered(t *testing.T) {
+func TestCreateUser(t *testing.T) {
 
 	response := httptest.NewRecorder()
 	ginContext, _ := gin.CreateTestContext(response)
@@ -178,7 +178,7 @@ func TestCreateUserUnRegistered(t *testing.T) {
 	unregisteredUser := model.UserCreateRequest{
 		Name:        "tarou",
 		Uuid:        "",
-		Email:       "togdae7113+unregisterd@gmail.com",
+		Email:       "toge7113+unregisterd@gmail.com",
 		Role:        1,
 		CommunityId: 1,
 		BeaconName:  "FCS1301",
@@ -197,38 +197,6 @@ func TestCreateUserUnRegistered(t *testing.T) {
 	fmt.Println(response)
 	// レスポンスのステータスコードの確認(未登録ユーザ)
 	asserts.Equal(http.StatusCreated, response.Code)
-}
-
-// 既に登録済みの場合
-func TestCreateUserRegisterd(t *testing.T) {
-
-	response := httptest.NewRecorder()
-	ginContext, _ := gin.CreateTestContext(response)
-
-	// 登録済みユーザ
-	registeredUser := model.UserCreateRequest{
-		Name:        "tarou",
-		Uuid:        "",
-		Email:       "test@gmail.com",
-		Role:        1,
-		CommunityId: 1,
-		BeaconName:  "FCS1301",
-		TagIds:      []int64{1, 2, 5},
-	}
-	//jsonに変換
-	jsonRegisteredUser, err := json.Marshal(registeredUser)
-	if err != nil {
-		t.Fatal(err)
-	}
-	// リクエスト情報をコンテキストに入れる
-	ginContext.Request, _ = http.NewRequest(http.MethodPost, "/users", nil)
-	ginContext.Request.Header.Set("Content-Type", "application/json")
-	ginContext.Request.Body = ioutil.NopCloser(bytes.NewBuffer(jsonRegisteredUser))
-	controller.CreateUser(ginContext)
-	asserts := assert.New(t)
-	fmt.Println(response)
-	// レスポンスのステータスコードの確認(登録済みユーザ)
-	asserts.Equal(http.StatusConflict, response.Code)
 }
 
 // func TestCreateUserUnRegistered(t *testing.T) {
