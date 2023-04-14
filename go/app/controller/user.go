@@ -140,6 +140,54 @@ func PastCreateUser(c *gin.Context) {
 	})
 }
 
+func DeleteUser(c *gin.Context) {
+
+	userId, _ := strconv.ParseInt(c.Param("userId"), 10, 64) // string -> int64
+
+	fmt.Print("userId: ")
+	fmt.Println(userId)
+
+	UserService := service.UserService{}
+	DeletedUserService := service.DeletedUserService{}
+
+	// 削除するユーザの情報の取得
+	user, err := UserService.GetUserByUserId(userId)
+	if err != nil {
+		c.String(http.StatusInternalServerError, "Server Error")
+		return
+	}
+
+	// ユーザ情報をDeletedUserの型に格納
+	deletedUser := model.DeletedUser{
+		Name:         user.Name,
+		Email:        user.Email,
+		Role:         user.Role,
+		UUID:         user.UUID,
+		BeaconTypeId: user.BeaconTypeId,
+		CommunityId:  user.CommunityId,
+		UserId:       userId,
+	}
+
+	// deletedUserテーブルに登録
+	err = DeletedUserService.CreateDeletedUser(&deletedUser)
+	if err != nil {
+		c.String(http.StatusInternalServerError, "Server Error")
+		return
+	}
+
+	// usersテーブルから削除
+	err = UserService.DeleteUser(userId)
+	if err != nil {
+		c.String(http.StatusInternalServerError, "Server Error")
+		return
+	}
+
+	c.JSON(http.StatusCreated, gin.H{
+		"status": "ok",
+	})
+
+}
+
 func UserList(c *gin.Context) {
 
 	UserService := service.UserService{}

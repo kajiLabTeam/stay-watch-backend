@@ -19,6 +19,18 @@ type User struct {
 	CommunityId  int64
 }
 
+type DeletedUser struct {
+	gorm.Model
+
+	UUID         string
+	Name         string
+	Email        string
+	Role         int64
+	BeaconTypeId int64
+	CommunityId  int64
+	UserId       int64
+}
+
 type Log struct {
 	gorm.Model
 	RoomID  int64
@@ -30,16 +42,16 @@ type Log struct {
 
 type Room struct {
 	gorm.Model
-	Name string
-	BuildingID int64
+	Name        string
+	BuildingID  int64
 	CommunityID int64
-	Polygon string
-	RecieverID string
+	Polygon     string
+	RecieverID  string
 }
 
 type Building struct {
 	gorm.Model
-	Name string
+	Name    string
 	MapFile string
 }
 

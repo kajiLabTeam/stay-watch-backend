@@ -20,7 +20,7 @@ func init() {
 		return
 	}
 	defer closer.Close()
-	db.AutoMigrate(&model.User{}, &model.Log{}, &model.Room{}, &model.Stayer{}, &model.Tag{}, &model.TagMap{}, &model.Building{}, &model.BeaconType{})
+	db.AutoMigrate(&model.User{}, &model.Log{}, &model.Room{}, &model.Stayer{}, &model.Tag{}, &model.TagMap{}, &model.Building{}, &model.BeaconType{}, &model.DeletedUser{})
 
 	var count int64
 	db.Model(&model.User{}).Count(&count)
@@ -261,7 +261,22 @@ func init() {
 			},
 		}
 		db.Create(&users)
+	}
 
+	db.Model(&model.DeletedUser{}).Count(&count)
+	if count == 0 {
+		deletedUsers := []model.DeletedUser{
+			{
+				Name:         "deleted-test",
+				Email:        "deleted-test-staywatch@gmail.com",
+				Role:         1,
+				UUID:         "e7d61ea3f8dd49c88f2ff2484c07deleted-test",
+				BeaconTypeId: 1,
+				CommunityId:  1,
+				UserId:       0,
+			},
+		}
+		db.Create(&deletedUsers)
 	}
 
 	db.Model(&model.Building{}).Count(&count)
