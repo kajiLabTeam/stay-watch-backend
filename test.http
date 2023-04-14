@@ -32,6 +32,21 @@ content-type: application/json
 }
 
 ###
+PUT {{baseURL}}/api/v1/users HTTP/1.1
+content-type: application/json
+
+{
+    "id":10,
+    "name":"taadakadu",
+    "uuid":"adfawefasdfwefasdfwedefewd",
+    "email":"ssinya09fda22d2dadf2@gmail.com",
+    "role":1,
+    "communityId":1,
+    "beaconName":"FCS1301",
+    "tagIds":[1,5,10]
+}
+
+###
 DELETE {{baseURL}}/api/v1/users/16 HTTP/1.1
 
 
