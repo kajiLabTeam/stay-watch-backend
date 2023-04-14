@@ -199,6 +199,36 @@ func TestCreateUser(t *testing.T) {
 	asserts.Equal(http.StatusCreated, response.Code)
 }
 
+// ユーザの更新API
+func TestPutUser(t *testing.T) {
+
+	response := httptest.NewRecorder()
+	ginContext, _ := gin.CreateTestContext(response)
+
+	user := model.UserUpdateRequest{
+		ID:          1,
+		Name:        "test-tarou",
+		Uuid:        "dmfnfkffodkvffajjsdjfoeafab00",
+		Email:       "toge7113+unoverlap@gmail.com",
+		Role:        1,
+		CommunityId: 1,
+		BeaconName:  "FCS1301",
+		TagIds:      []int64{1, 2, 5},
+	}
+	jsonUser, err := json.Marshal(user)
+	if err != nil {
+		t.Fatal(err)
+	}
+	// リクエスト情報をコンテキストに入れる
+	ginContext.Request, _ = http.NewRequest(http.MethodPost, "/users", nil)
+	ginContext.Request.Header.Set("Content-Type", "application/json")
+	ginContext.Request.Body = ioutil.NopCloser(bytes.NewBuffer(jsonUser))
+	controller.UpdateUser(ginContext)
+	asserts := assert.New(t)
+	// レスポンスのステータスコードの確認
+	asserts.Equal(http.StatusCreated, response.Code)
+}
+
 func TestDeleteUser(t *testing.T) {
 
 	router := gin.Default()

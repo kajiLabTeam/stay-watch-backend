@@ -205,7 +205,7 @@ func init() {
 			},
 			{
 				Name:         "togawa",
-				Email:        "",
+				Email:        "toge7113@gmail.com",
 				Role:         1,
 				UUID:         "e7d61ea3f8dd49c88f2ff2484c07ac15",
 				BeaconTypeId: 1,
