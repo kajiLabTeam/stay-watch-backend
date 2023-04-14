@@ -199,6 +199,32 @@ func TestCreateUser(t *testing.T) {
 	asserts.Equal(http.StatusCreated, response.Code)
 }
 
+func TestDeleteUser(t *testing.T) {
+
+	router := gin.Default()
+	router.DELETE("/api/v1/users/:userId", controller.UserList)
+
+	asserts := assert.New(t)
+
+	for i := 0; i < 5; i++ {
+		// HTTPリクエストの生成
+		req, _ := http.NewRequest(http.MethodDelete, "/api/v1/users/"+strconv.Itoa(i), nil)
+
+		// レスポンスのレコーダーを作成
+		res := httptest.NewRecorder()
+
+		// リクエストをハンドル
+		router.ServeHTTP(res, req)
+		// レスポンスのステータスコードの確認
+		asserts.Equal(http.StatusOK, res.Code)
+
+		// レスポンスのボディを構造体に変換
+		var responseUser []model.UserEditorResponse
+		json.Unmarshal(res.Body.Bytes(), &responseUser)
+
+	}
+}
+
 // func TestCreateUserUnRegistered(t *testing.T) {
 
 // 	response := httptest.NewRecorder()
