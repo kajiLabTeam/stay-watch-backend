@@ -118,7 +118,14 @@ type UserCreateRequest struct {
 
 // フロントからバックエンドへ送られてきた更新するユーザ情報
 type UserUpdateRequest struct {
-	Id int64 `json:"id"`
+	ID          int64   `json:"id"`
+	Name        string  `json:"name"`
+	Uuid        string  `json:"uuid"`
+	Email       string  `json:"email"`
+	Role        int64   `json:"role"`
+	CommunityId int64   `json:"communityId"`
+	BeaconName  string  `json:"beaconName"`
+	TagIds      []int64 `json:"tagIds"`
 }
 
 type BeaconRoom struct {

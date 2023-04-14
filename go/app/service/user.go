@@ -69,9 +69,24 @@ func (UserService) RegisterUser(user *model.User) error {
 	return nil
 }
 
+// ユーザのアップデート（以前の）
+func (UserService) PastUpdateUser(userId int, email string) error {
+	DbEngine := connect()
+	closer, err := DbEngine.DB()
+	if err != nil {
+		return err
+	}
+	defer closer.Close()
+	result := DbEngine.Model(&model.User{}).Where("id = ?", userId).Update("email", email)
+	if result.Error != nil {
+		fmt.Printf("ユーザ更新失敗 %v", result.Error)
+		return result.Error
+	}
+	return nil
+}
+
 // ユーザのアップデート
-func (UserService) UpdateUser(userID int, email string) error {
-	fmt.Println("updateUser")
+func (UserService) UpdateUser(updatedUser *model.User, userId int64) error {
 
 	DbEngine := connect()
 	closer, err := DbEngine.DB()
@@ -79,7 +94,21 @@ func (UserService) UpdateUser(userID int, email string) error {
 		return err
 	}
 	defer closer.Close()
-	result := DbEngine.Model(&model.User{}).Where("id = ?", userID).Update("email", email)
+	user := model.User{}
+	result := DbEngine.First(&user, userId)
+	if result.Error != nil {
+		return result.Error
+	}
+	// user = *updatedUser
+	user.UUID = updatedUser.UUID
+	user.Name = updatedUser.Name
+	user.Email = updatedUser.Email
+	user.Role = updatedUser.Role
+	user.BeaconTypeId = updatedUser.BeaconTypeId
+	user.CommunityId = updatedUser.CommunityId
+
+	// result := DbEngine.Model(&model.User{}).Where("id = ?", userId).Update("email", email)
+	result = DbEngine.Save(&user)
 	if result.Error != nil {
 		fmt.Printf("ユーザ更新失敗 %v", result.Error)
 		return result.Error
@@ -323,6 +352,24 @@ func (UserService) GetUserIDByEmail(email string) (int64, error) {
 
 	return int64(user.ID), nil
 
+}
+
+func (UserService) GetEmailByUserId(userId int64) (string, error) {
+	DbEngine := connect()
+	closer, err := DbEngine.DB()
+	if err != nil {
+		return "", err
+	}
+	defer closer.Close()
+
+	user := model.User{}
+	result := DbEngine.Where("id=?", userId).Take(&user)
+	if result.Error != nil {
+		fmt.Printf("メールアドレス取得失敗 %v", result.Error)
+		return "", result.Error
+	}
+
+	return user.Email, nil
 }
 
 func (UserService) IsEmailAlreadyRegistered(email string) (bool, error) {

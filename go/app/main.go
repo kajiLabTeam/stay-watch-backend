@@ -48,6 +48,7 @@ func SetUpServer() *gin.Engine {
 		versionEngine.GET("/users/extended", controller.ExtendedUserList)
 		// versionEngine.POST("/users", controller.PastCreateUser)
 		versionEngine.POST("/users", controller.CreateUser)
+		versionEngine.PUT("/users", controller.UpdateUser)
 		versionEngine.DELETE("/users/:userId", controller.DeleteUser)
 		versionEngine.GET("/check", controller.Check)
 		versionEngine.POST("/attendance", controller.Attendance)

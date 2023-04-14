@@ -119,7 +119,7 @@ func PastCreateUser(c *gin.Context) {
 	//userIDがあるなら更新
 	if RegistrationUserForm.ID != 0 {
 		//userNameが空なので、userIDからuserNameを取得する
-		err := UserService.UpdateUser(
+		err := UserService.PastUpdateUser(
 			int(RegistrationUserForm.ID),
 			RegistrationUserForm.Email,
 		)
@@ -180,6 +180,95 @@ func DeleteUser(c *gin.Context) {
 	if err != nil {
 		c.String(http.StatusInternalServerError, "Server Error")
 		return
+	}
+
+	c.JSON(http.StatusCreated, gin.H{
+		"status": "ok",
+	})
+
+}
+
+func UpdateUser(c *gin.Context) {
+	UserUpdateRequest := model.UserUpdateRequest{}
+	c.Bind(&UserUpdateRequest)
+
+	UserService := service.UserService{}
+	BeaconService := service.BeaconService{}
+	TagService := service.TagService{}
+
+	beaconTypeId, err := BeaconService.GetBeaconTypeIdByBeaconName(UserUpdateRequest.BeaconName)
+	// もしbeaconTypeIdが取得できたらerrがnilになる
+	if err != nil {
+		c.String(http.StatusInternalServerError, "Server Error")
+		return
+	}
+
+	// 現在のユーザのメールアドレス
+	registerdEmail, err := UserService.GetEmailByUserId(UserUpdateRequest.ID)
+	if err != nil {
+		c.String(http.StatusInternalServerError, "Server Error")
+		return
+	}
+
+	// メールアドレスに変更がある場合、そのメールアドレスが他のユーザに既に使われているかをチェックする処理をプラスする
+	if registerdEmail != UserUpdateRequest.Email {
+		isRegisterdEmail, err := UserService.IsEmailAlreadyRegistered(UserUpdateRequest.Email)
+		if err != nil {
+			c.String(http.StatusInternalServerError, "Server Error")
+			return
+		} else if isRegisterdEmail {
+			// 同じメールアドレスが既に登録済みの場合
+			c.String(http.StatusConflict, "Arleady Registered Email")
+			return
+		}
+	}
+
+	user := model.User{
+		Name:         UserUpdateRequest.Name,
+		Email:        UserUpdateRequest.Email,
+		Role:         UserUpdateRequest.Role,
+		UUID:         UserUpdateRequest.Uuid,
+		BeaconTypeId: beaconTypeId,
+		CommunityId:  UserUpdateRequest.CommunityId,
+	}
+
+	// usersテーブルにユーザ情報を保存
+	err = UserService.UpdateUser(&user, UserUpdateRequest.ID)
+	if err != nil {
+		c.String(http.StatusInternalServerError, "Server Error")
+		return
+	}
+
+	/* タグマップ関連 */
+	// タグマップIDを取得
+	tagMapIds, err := TagService.GetTagMapIdsByUserId(UserUpdateRequest.ID)
+	if err != nil {
+		c.String(http.StatusInternalServerError, "Server Error")
+		return
+	}
+
+	// tag_mapsテーブルの変更前のマップを削除
+	for _, tagMapId := range tagMapIds {
+		err = TagService.DeleteTagMap(tagMapId)
+		if err != nil {
+			fmt.Printf("Cannot register tagMap: %v", err)
+			c.String(http.StatusInternalServerError, "Server Error")
+			return
+		}
+	}
+
+	// tag_mapsテーブルに新しいタグのマップを保存
+	for _, tagId := range UserUpdateRequest.TagIds {
+		tagMap := model.TagMap{
+			UserID: int64(UserUpdateRequest.ID),
+			TagID:  int64(tagId),
+		}
+		err = TagService.CreateTagMap(&tagMap)
+		if err != nil {
+			fmt.Printf("Cannot register tagMap: %v", err)
+			c.String(http.StatusInternalServerError, "Server Error")
+			return
+		}
 	}
 
 	c.JSON(http.StatusCreated, gin.H{
