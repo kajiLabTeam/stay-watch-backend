@@ -117,12 +117,7 @@ type UserCreateRequest struct {
 }
 
 // フロントからバックエンドへ送られてきた更新するユーザ情報
-type UserUpdateResponse struct {
-	Id int64 `json:"id"`
-}
-
-// フロントからバックエンドへ送られてきた削除するユーザ情報
-type UserDeleteResponse struct {
+type UserUpdateRequest struct {
 	Id int64 `json:"id"`
 }
 
@@ -137,19 +132,19 @@ type Beacon struct {
 }
 
 type RoomEditorForm struct {
-	RoomID     int64  `json:"roomId"`
-	RoomName   string `json:"roomName"`
+	RoomID     int64     `json:"roomId"`
+	RoomName   string    `json:"roomName"`
 	Polygon    [][]int64 `json:"polygon"`
-	BuildingID int64  `json:"buildingId"`
+	BuildingID int64     `json:"buildingId"`
 }
 
 type RoomsGetResponse struct {
-	RoomID        int64  `json:"roomId"`
-	Name          string `json:"roomName"`
-	CommunityName string `json:"communityName"`
-	BuildingName  string `json:"buildingName"`
+	RoomID        int64     `json:"roomId"`
+	Name          string    `json:"roomName"`
+	CommunityName string    `json:"communityName"`
+	BuildingName  string    `json:"buildingName"`
 	Polygon       [][]int64 `json:"polygon"`
-	BuildingId    int64  `json:"buildingId"`
+	BuildingId    int64     `json:"buildingId"`
 }
 
 type BuildingsEditorGetResponse struct {

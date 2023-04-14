@@ -53,7 +53,7 @@ func (UserService) NewUUID() string {
 
 }
 
-// ユーザ登録処理 ユーザIDも返す
+// ユーザ登録処理
 func (UserService) RegisterUser(user *model.User) error {
 	DbEngine := connect()
 	closer, err := DbEngine.DB()
@@ -82,6 +82,24 @@ func (UserService) UpdateUser(userID int, email string) error {
 	result := DbEngine.Model(&model.User{}).Where("id = ?", userID).Update("email", email)
 	if result.Error != nil {
 		fmt.Printf("ユーザ更新失敗 %v", result.Error)
+		return result.Error
+	}
+	return nil
+}
+
+// ユーザの削除
+func (UserService) DeleteUser(userId int64) error {
+	fmt.Println("ユーザ削除サービス")
+
+	DbEngine := connect()
+	closer, err := DbEngine.DB()
+	if err != nil {
+		return err
+	}
+	defer closer.Close()
+	result := DbEngine.Unscoped().Delete(&model.User{}, userId)
+	if result.Error != nil {
+		fmt.Printf("ユーザ削除処理失敗 %v", result.Error)
 		return result.Error
 	}
 	return nil
@@ -392,6 +410,22 @@ func (UserService) GetUserByEmail(email string) (model.User, error) {
 	result := DbEngine.Where("email=?", email).Take(&user)
 	if result.Error != nil {
 		fmt.Printf("ユーザ名取得失敗 %v", result.Error)
+		return model.User{}, result.Error
+	}
+	return user, nil
+}
+
+func (UserService) GetUserByUserId(userId int64) (model.User, error) {
+	DbEngine := connect()
+	closer, err := DbEngine.DB()
+	if err != nil {
+		return model.User{}, err
+	}
+	defer closer.Close()
+	user := model.User{}
+	result := DbEngine.Where("id=?", userId).Take(&user)
+	if result.Error != nil {
+		fmt.Printf("ユーザ取得失敗 %v", result.Error)
 		return model.User{}, result.Error
 	}
 	return user, nil

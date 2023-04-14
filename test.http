@@ -31,6 +31,9 @@ content-type: application/json
     "tagIds":[1,5,10]
 }
 
+###
+DELETE {{baseURL}}/api/v1/users/16 HTTP/1.1
+
 
 ###
 Get {{baseURL}}/api/v1/users/extended
