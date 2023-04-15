@@ -207,9 +207,9 @@ func TestPutUser(t *testing.T) {
 
 	user := model.UserUpdateRequest{
 		ID:          1,
-		Name:        "test-tarou",
-		Uuid:        "dmfnfkffodkvffajjsdjfoeafab00",
-		Email:       "toge7113+unoverlap@gmail.com",
+		Name:        "test",
+		Uuid:        "e7d61ea3f8dd49c88f2ff2484c07ab00",
+		Email:       "toge7113+test-stay-watch@gmail.com",
 		Role:        1,
 		CommunityId: 1,
 		BeaconName:  "FCS1301",
