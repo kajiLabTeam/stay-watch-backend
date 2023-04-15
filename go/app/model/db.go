@@ -64,7 +64,8 @@ type Stayer struct {
 
 type Tag struct {
 	gorm.Model
-	Name string
+	Name        string
+	CommunityId int64
 }
 
 type TagMap struct {
@@ -89,4 +90,9 @@ type BeaconType struct {
 	gorm.Model
 	Name         string
 	UuidEditable bool
+}
+
+type Community struct {
+	gorm.Model
+	Name string
 }
