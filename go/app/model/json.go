@@ -159,3 +159,7 @@ type BuildingsEditorGetResponse struct {
 	Name         string `json:"buildingName"`
 	MapImagePath string `json:"buildingImagePath"`
 }
+
+type TagsNamesGetResponse struct {
+	Name string `json:"tagName"`
+}

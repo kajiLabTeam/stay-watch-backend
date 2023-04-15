@@ -165,3 +165,6 @@ content-type: application/json
 
 ### 建物の情報を全て取得する
 GET {{baseURL}}/api/v1/buildings/editor
+
+### コミュニティ（共用も）のタグの名前を取得する 
+GET {{baseURL}}/api/v1/tags/1/names

@@ -53,3 +53,22 @@ func (TagService) GetTagMapIdsByUserId(userId int64) ([]int64, error) {
 
 	return tagMapIds, nil
 }
+
+func (TagService) GetTagNamesByCommunityId(communityId int64) ([]string, error) {
+	DbEngine := connect()
+	closer, err := DbEngine.DB()
+	if err != nil {
+		return nil, err
+	}
+	defer closer.Close()
+	tagNames := make([]string, 0)
+
+	// tagsテーブルからcommunity_idカラムがcommunityIdのnameの値をtagNamesに格納
+	result := DbEngine.Table("tags").Where("community_id=?", communityId).Select("name").Find(&tagNames)
+	if result.Error != nil {
+		fmt.Printf("タグ名一覧取得失敗 %v", result.Error)
+		return nil, result.Error
+	}
+
+	return tagNames, nil
+}

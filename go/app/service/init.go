@@ -20,7 +20,7 @@ func init() {
 		return
 	}
 	defer closer.Close()
-	db.AutoMigrate(&model.User{}, &model.Log{}, &model.Room{}, &model.Stayer{}, &model.Tag{}, &model.TagMap{}, &model.Building{}, &model.BeaconType{}, &model.DeletedUser{})
+	db.AutoMigrate(&model.User{}, &model.Log{}, &model.Room{}, &model.Stayer{}, &model.Tag{}, &model.TagMap{}, &model.Building{}, &model.BeaconType{}, &model.DeletedUser{}, &model.Community{})
 
 	var count int64
 	db.Model(&model.User{}).Count(&count)
@@ -335,40 +335,52 @@ func init() {
 	if count == 0 {
 		tags := []model.Tag{
 			{
-				Name: "テストタグ",
+				Name:        "テストタグ",
+				CommunityId: 1,
 			},
 			{
-				Name: "梶研",
+				Name:        "B1",
+				CommunityId: -1,
 			},
 			{
-				Name: "ロケーション",
+				Name:        "B2",
+				CommunityId: -1,
 			},
 			{
-				Name: "インタラクション",
+				Name:        "B3",
+				CommunityId: -1,
 			},
 			{
-				Name: "センシング",
+				Name:        "B4",
+				CommunityId: -1,
 			},
 			{
-				Name: "B1",
+				Name:        "M1",
+				CommunityId: -1,
 			},
 			{
-				Name: "B2",
+				Name:        "M2",
+				CommunityId: -1,
 			},
 			{
-				Name: "B3",
+				Name:        "Professor",
+				CommunityId: -1,
 			},
 			{
-				Name: "B4",
+				Name:        "梶研",
+				CommunityId: 2,
 			},
 			{
-				Name: "M1",
+				Name:        "ロケーション",
+				CommunityId: 2,
 			},
 			{
-				Name: "M2",
+				Name:        "インタラクション",
+				CommunityId: 2,
 			},
 			{
-				Name: "Professor",
+				Name:        "センシング",
+				CommunityId: 2,
 			},
 		}
 		db.Create(&tags)
