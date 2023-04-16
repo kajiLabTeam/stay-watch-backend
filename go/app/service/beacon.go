@@ -7,6 +7,23 @@ import (
 
 type BeaconService struct{}
 
+// 全てのビーコンを取得する
+func (BeaconService) GetAllBeaconType() ([]model.BeaconType, error) {
+	DbEngine := connect()
+	closer, err := DbEngine.DB()
+	if err != nil {
+		return nil, err
+	}
+	defer closer.Close()
+	beaconTypes := make([]model.BeaconType, 0)
+	result := DbEngine.Find(&beaconTypes)
+	if result.Error != nil {
+		fmt.Printf("ビーコン取得失敗 %v", result.Error)
+		return nil, result.Error
+	}
+	return beaconTypes, nil
+}
+
 // ビーコンIDからビーコン情報を取得する
 func (BeaconService) GetBeaconByBeaconId(beaconId int64) (model.BeaconType, error) {
 	DbEngine := connect()

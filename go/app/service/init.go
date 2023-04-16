@@ -692,6 +692,19 @@ func init() {
 		db.Create(&tags)
 	}
 
+	db.Model(&model.Community{}).Count(&count)
+	if count == 0 {
+		buildings := []model.Community{
+			{
+				Name: "テスト",
+			},
+			{
+				Name: "梶研究室",
+			},
+		}
+		db.Create(&buildings)
+	}
+
 	// db.Model(&model.User{}).Count()
 
 }
