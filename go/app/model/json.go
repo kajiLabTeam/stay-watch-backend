@@ -138,6 +138,12 @@ type Beacon struct {
 	Rssi int64  `json:"rssi" form:"rssi"`
 }
 
+type BeaconGetResponse struct {
+	BeaconId     int64  `json:"beaconId"`
+	BeaconName   string `json:"beaconName"`
+	UuidEditable bool   `json:"uuidEditable"`
+}
+
 type RoomEditorForm struct {
 	RoomID     int64     `json:"roomId"`
 	RoomName   string    `json:"roomName"`
@@ -158,6 +164,11 @@ type BuildingsEditorGetResponse struct {
 	BuildingID   int64  `json:"buildingId"`
 	Name         string `json:"buildingName"`
 	MapImagePath string `json:"buildingImagePath"`
+}
+
+type CommunityGetResponse struct {
+	CommunityId int64  `json:"id"`
+	Name        string `json:"name"`
 }
 
 type TagsNamesGetResponse struct {

@@ -477,3 +477,19 @@ func (UserService) GetUserByUserId(userId int64) (model.User, error) {
 	}
 	return user, nil
 }
+
+func (UserService) GetCommunityIdByUserId(userId int64) (int64, error) {
+	DbEngine := connect()
+	closer, err := DbEngine.DB()
+	if err != nil {
+		return 0, err
+	}
+	defer closer.Close()
+	user := model.User{}
+	result := DbEngine.Where("id=?", userId).Take(&user)
+	if result.Error != nil {
+		fmt.Printf("ユーザ取得失敗 %v", result.Error)
+		return 0, result.Error
+	}
+	return int64(user.CommunityId), nil
+}
