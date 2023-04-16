@@ -312,6 +312,61 @@ func TestGetTagNames(t *testing.T) {
 	fmt.Println("TestGetTagNames通過")
 }
 
+func TestGetBeacons(t *testing.T) {
+
+	response := httptest.NewRecorder()
+	ginContext, _ := gin.CreateTestContext(response)
+
+	// リクエストの生成
+	// 今回はmiddlewareのテストのためpathはなんでも可
+	req, _ := http.NewRequest(http.MethodGet, "/beacons", nil)
+
+	// リクエスト情報をコンテキストに入れる
+	ginContext.Request = req
+	controller.GetBeaconType(ginContext)
+
+	asserts := assert.New(t)
+
+	// レスポンスのステータスコードの確認
+	asserts.Equal(http.StatusOK, response.Code)
+
+	// レスポンスのボディを構造体に変換
+	var responseBeacon []model.BeaconGetResponse
+
+	json.Unmarshal(response.Body.Bytes(), &responseBeacon)
+	// レスポンスのボディの確認
+	asserts.Equal("FCS1301", responseBeacon[0].BeaconName)
+
+	fmt.Println("TestGetBeacon通過")
+}
+
+func TestGetCommunityByUserId(t *testing.T) {
+
+	router := gin.Default()
+	router.GET("/api/v1/communities/:userId", controller.GetCommunityByUserId)
+
+	asserts := assert.New(t)
+
+	// HTTPリクエストの生成
+	req, _ := http.NewRequest(http.MethodGet, "/api/v1/communities/"+strconv.Itoa(1), nil)
+
+	// レスポンスのレコーダーを作成
+	res := httptest.NewRecorder()
+
+	// リクエストをハンドル
+	router.ServeHTTP(res, req)
+	// レスポンスのステータスコードの確認
+	asserts.Equal(http.StatusOK, res.Code)
+
+	// レスポンスのボディを構造体に変換
+	var responseCommunity model.CommunityGetResponse
+	json.Unmarshal(res.Body.Bytes(), &responseCommunity)
+
+	asserts.Equal("テスト", responseCommunity.Name)
+
+	fmt.Println("TestGetCommunityByUserId通過")
+}
+
 // func TestCreateUserUnRegistered(t *testing.T) {
 
 // 	response := httptest.NewRecorder()
