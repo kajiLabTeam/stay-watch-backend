@@ -131,7 +131,7 @@ func TestGetUser(t *testing.T) {
 func TestGetEditorUser(t *testing.T) {
 
 	router := gin.Default()
-	router.GET("/api/v1/users/:communityId", controller.UserList)
+	router.GET("/api/v1/admin/users/:communityId", controller.AdminUserList)
 
 	asserts := assert.New(t)
 
@@ -140,7 +140,7 @@ func TestGetEditorUser(t *testing.T) {
 
 	for i := 0; i < 10; i++ {
 		// HTTPリクエストの生成
-		req, _ := http.NewRequest(http.MethodGet, "/api/v1/users/"+strconv.Itoa(i)+"?fields=admin", nil)
+		req, _ := http.NewRequest(http.MethodGet, "/api/v1/admin/users/"+strconv.Itoa(i), nil)
 
 		// レスポンスのレコーダーを作成
 		res := httptest.NewRecorder()
