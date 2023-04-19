@@ -11,11 +11,10 @@ Get {{baseURL}}/api/v1/stayers
 Get {{baseURL}}/api/v1/logs
 
 ###
-Get {{baseURL}}/api/v1/users
+GET {{baseURL}}/api/v1/users/2
 
 ### 管理者画面でのユーザ情報の取得
-GET {{baseURL}}/api/v1/users/1?fields=admin
-content-type: application/json
+GET {{baseURL}}/api/v1/admin/users/2
 
 ###
 POST {{baseURL}}/api/v1/users HTTP/1.1
