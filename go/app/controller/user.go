@@ -280,107 +280,105 @@ func UpdateUser(c *gin.Context) {
 func UserList(c *gin.Context) {
 
 	UserService := service.UserService{}
-	BeaconService := service.BeaconService{}
-	communityId, _ := strconv.ParseInt(c.Param("communityId"), 10, 64) // string -> int64
 
-	if c.Query("fields") == "admin" {
-		// 編集画面のユーザの情報を返す
+	users, err := UserService.GetAllUser()
+	if err != nil {
+		c.String(http.StatusInternalServerError, "Server Error")
+		return
+	}
 
-		edit_users, err := UserService.GetEditUsersByCommunityId(communityId)
-		if err != nil {
-			c.String(http.StatusInternalServerError, "Server Error")
-		}
+	userInformationGetResponse := []model.UserInformationGetResponse{}
 
-		userEditorResponse := []model.UserEditorResponse{}
+	for _, user := range users {
 
-		for _, user := range edit_users {
-
-			tags := make([]model.TagGetResponse, 0)
-			tagsID, err := UserService.GetUserTagsID(int64(user.Model.ID))
-			if err != nil {
-				c.String(http.StatusInternalServerError, "Server Error")
-				return
-			}
-
-			for _, tagID := range tagsID {
-				//タグIDからタグ名を取得する
-				tagName, err := UserService.GetTagName(tagID)
-				if err != nil {
-					c.String(http.StatusInternalServerError, "Server Error")
-					return
-				}
-				tag := model.TagGetResponse{
-					ID:   tagID,
-					Name: tagName,
-				}
-				tags = append(tags, tag)
-			}
-
-			if err != nil {
-				c.String(http.StatusInternalServerError, "Server Error")
-				return
-			}
-
-			beacon, err := BeaconService.GetBeaconByBeaconId(user.BeaconTypeId)
-			if err != nil {
-				c.String(http.StatusInternalServerError, "Server Error")
-				return
-			}
-
-			userEditorResponse = append(userEditorResponse, model.UserEditorResponse{
-				ID:                 int64(user.ID),
-				Name:               user.Name,
-				Uuid:               user.UUID,
-				Email:              user.Email,
-				Role:               user.Role,
-				BeaconUuidEditable: beacon.UuidEditable,
-				BeaconName:         beacon.Name,
-				Tags:               tags,
-			})
-		}
-		c.JSON(http.StatusOK, userEditorResponse)
-
-	} else {
-		// 一覧画面でのユーザ情報
-		users, err := UserService.GetAllUser()
+		tags := make([]model.TagGetResponse, 0)
+		tagsID, err := UserService.GetUserTagsID(int64(user.Model.ID))
 		if err != nil {
 			c.String(http.StatusInternalServerError, "Server Error")
 			return
 		}
 
-		userInformationGetResponse := []model.UserInformationGetResponse{}
-
-		for _, user := range users {
-
-			tags := make([]model.TagGetResponse, 0)
-			tagsID, err := UserService.GetUserTagsID(int64(user.Model.ID))
+		for _, tagID := range tagsID {
+			//タグIDからタグ名を取得する
+			tagName, err := UserService.GetTagName(tagID)
 			if err != nil {
 				c.String(http.StatusInternalServerError, "Server Error")
 				return
 			}
-
-			for _, tagID := range tagsID {
-				//タグIDからタグ名を取得する
-				tagName, err := UserService.GetTagName(tagID)
-				if err != nil {
-					c.String(http.StatusInternalServerError, "Server Error")
-					return
-				}
-				tag := model.TagGetResponse{
-					ID:   tagID,
-					Name: tagName,
-				}
-				tags = append(tags, tag)
+			tag := model.TagGetResponse{
+				ID:   tagID,
+				Name: tagName,
 			}
-
-			userInformationGetResponse = append(userInformationGetResponse, model.UserInformationGetResponse{
-				ID:   int64(user.ID),
-				Name: user.Name,
-				Tags: tags,
-			})
+			tags = append(tags, tag)
 		}
-		c.JSON(http.StatusOK, userInformationGetResponse)
+
+		userInformationGetResponse = append(userInformationGetResponse, model.UserInformationGetResponse{
+			ID:   int64(user.ID),
+			Name: user.Name,
+			Tags: tags,
+		})
 	}
+	c.JSON(http.StatusOK, userInformationGetResponse)
+}
+
+func AdminUserList(c *gin.Context) {
+	UserService := service.UserService{}
+	BeaconService := service.BeaconService{}
+	communityId, _ := strconv.ParseInt(c.Param("communityId"), 10, 64) // string -> int64
+
+	edit_users, err := UserService.GetEditUsersByCommunityId(communityId)
+	if err != nil {
+		c.String(http.StatusInternalServerError, "Server Error")
+	}
+
+	userEditorResponse := []model.UserEditorResponse{}
+
+	for _, user := range edit_users {
+
+		tags := make([]model.TagGetResponse, 0)
+		tagsID, err := UserService.GetUserTagsID(int64(user.Model.ID))
+		if err != nil {
+			c.String(http.StatusInternalServerError, "Server Error")
+			return
+		}
+
+		for _, tagID := range tagsID {
+			//タグIDからタグ名を取得する
+			tagName, err := UserService.GetTagName(tagID)
+			if err != nil {
+				c.String(http.StatusInternalServerError, "Server Error")
+				return
+			}
+			tag := model.TagGetResponse{
+				ID:   tagID,
+				Name: tagName,
+			}
+			tags = append(tags, tag)
+		}
+
+		if err != nil {
+			c.String(http.StatusInternalServerError, "Server Error")
+			return
+		}
+
+		beacon, err := BeaconService.GetBeaconByBeaconId(user.BeaconTypeId)
+		if err != nil {
+			c.String(http.StatusInternalServerError, "Server Error")
+			return
+		}
+
+		userEditorResponse = append(userEditorResponse, model.UserEditorResponse{
+			ID:                 int64(user.ID),
+			Name:               user.Name,
+			Uuid:               user.UUID,
+			Email:              user.Email,
+			Role:               user.Role,
+			BeaconUuidEditable: beacon.UuidEditable,
+			BeaconName:         beacon.Name,
+			Tags:               tags,
+		})
+	}
+	c.JSON(http.StatusOK, userEditorResponse)
 }
 
 func ExtendedUserList(c *gin.Context) {
