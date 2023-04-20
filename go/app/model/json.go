@@ -174,3 +174,8 @@ type CommunityGetResponse struct {
 type TagsNamesGetResponse struct {
 	Name string `json:"tagName"`
 }
+
+type TagsGetResponse struct {
+	Id   int64  `json:"id"`
+	Name string `json:"name"`
+}
