@@ -54,6 +54,25 @@ func (TagService) GetTagMapIdsByUserId(userId int64) ([]int64, error) {
 	return tagMapIds, nil
 }
 
+func (TagService) GetTagsByCommunityId(communityId int64) ([]model.Tag, error) {
+	DbEngine := connect()
+	closer, err := DbEngine.DB()
+	if err != nil {
+		return nil, err
+	}
+	defer closer.Close()
+	tags := make([]model.Tag, 0)
+
+	// tagsテーブルからcommunity_idカラムがcommunityIdのnameの値をtagNamesに格納
+	result := DbEngine.Where("community_id = ?", communityId).Find(&tags)
+	if result.Error != nil {
+		fmt.Printf("タグ一覧取得失敗 %v", result.Error)
+		return nil, result.Error
+	}
+
+	return tags, nil
+}
+
 func (TagService) GetTagNamesByCommunityId(communityId int64) ([]string, error) {
 	DbEngine := connect()
 	closer, err := DbEngine.DB()

@@ -11,6 +11,37 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+func GetTagsByCommunityId(c *gin.Context) {
+	communityId, _ := strconv.ParseInt(c.Param("communityId"), 10, 64) // string -> int64
+	TagService := service.TagService{}
+
+	// DBからどこのコミュニティにも該当するタグを持ってくる
+	publicTags, err := TagService.GetTagsByCommunityId(-1)
+	if err != nil {
+		c.String(http.StatusInternalServerError, "Server Error")
+		return
+	}
+	// DBからコミュニティのタグネームを持ってくる
+	communityTags, err := TagService.GetTagsByCommunityId(communityId)
+	if err != nil {
+		c.String(http.StatusInternalServerError, "Server Error")
+		return
+	}
+	tags := append(publicTags, communityTags...)
+
+	tagsResponse := []model.TagsGetResponse{}
+
+	for _, tag := range tags {
+
+		tagsResponse = append(tagsResponse, model.TagsGetResponse{
+			Id:   int64(tag.ID),
+			Name: tag.Name,
+		})
+	}
+
+	c.JSON(200, tagsResponse)
+}
+
 func GetTagNamesByCommunityId(c *gin.Context) {
 	communityId, _ := strconv.ParseInt(c.Param("communityId"), 10, 64) // string -> int64
 	TagService := service.TagService{}
