@@ -42,6 +42,23 @@ func (BeaconService) GetBeaconByBeaconId(beaconId int64) (model.BeaconType, erro
 	return beacon, nil
 }
 
+func (BeaconService) GetBeaconTypeByBeaconName(beaconName string) (model.BeaconType, error) {
+	DbEngine := connect()
+	close, err := DbEngine.DB()
+	if err != nil {
+		return model.BeaconType{}, err
+	}
+	defer close.Close()
+	beacon := model.BeaconType{}
+	result := DbEngine.Where("name=?", beaconName).Take(&beacon)
+	if result.Error != nil {
+		fmt.Printf("ビーコン情報取得失敗 %v", result.Error)
+		return model.BeaconType{}, result.Error
+	}
+
+	return beacon, nil
+}
+
 func (BeaconService) GetBeaconTypeIdByBeaconName(beaconName string) (int64, error) {
 	DbEngine := connect()
 	close, err := DbEngine.DB()

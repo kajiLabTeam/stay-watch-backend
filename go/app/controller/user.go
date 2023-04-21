@@ -26,19 +26,27 @@ func CreateUser(c *gin.Context) {
 	BeaconService := service.BeaconService{}
 	TagService := service.TagService{}
 
-	beaconTypeId, err := BeaconService.GetBeaconTypeIdByBeaconName(UserCreateRequest.BeaconName)
-	// もしbeaconTypeIdが取得できたらerrがnilになる
+	beaconType, err := BeaconService.GetBeaconTypeByBeaconName(UserCreateRequest.BeaconName)
+	// もしbeaconTypeが取得できたらerrがnilになる
 	if err != nil {
 		c.String(http.StatusInternalServerError, "Server Error")
 		return
+	}
+
+	// もしUUIDが編集可能のビーコンならばUUIDはリクエストのを使用
+	uuid := ""
+	if beaconType.UuidEditable {
+		uuid = UserCreateRequest.Uuid
+	} else {
+		uuid = UserService.NewUUID()
 	}
 
 	user := model.User{
 		Name:         UserCreateRequest.Name,
 		Email:        UserCreateRequest.Email,
 		Role:         UserCreateRequest.Role,
-		UUID:         UserService.NewUUID(),
-		BeaconTypeId: beaconTypeId,
+		UUID:         uuid,
+		BeaconTypeId: int64(beaconType.ID),
 		CommunityId:  UserCreateRequest.CommunityId,
 	}
 
