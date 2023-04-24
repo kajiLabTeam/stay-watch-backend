@@ -53,8 +53,8 @@ func (UserService) NewUUID() string {
 
 }
 
-// ユーザ登録処理
-func (UserService) RegisterUser(user *model.User) error {
+// ユーザ登録処理(削除予定)
+func (UserService) PastRegisterUser(user *model.User) error {
 	DbEngine := connect()
 	closer, err := DbEngine.DB()
 	if err != nil {
@@ -67,6 +67,22 @@ func (UserService) RegisterUser(user *model.User) error {
 		return result.Error
 	}
 	return nil
+}
+
+// ユーザ登録処理new（）
+func (UserService) RegisterUser(user *model.User) (int64, error) {
+	DbEngine := connect()
+	closer, err := DbEngine.DB()
+	if err != nil {
+		return -1, err
+	}
+	defer closer.Close()
+	result := DbEngine.Create(user)
+	if result.Error != nil {
+		fmt.Printf("ユーザ登録処理失敗 %v", result.Error)
+		return -1, result.Error
+	}
+	return int64(user.ID), nil
 }
 
 // ユーザのアップデート（以前の）
@@ -111,6 +127,23 @@ func (UserService) UpdateUser(updatedUser *model.User, userId int64) error {
 	result = DbEngine.Save(&user)
 	if result.Error != nil {
 		fmt.Printf("ユーザ更新失敗 %v", result.Error)
+		return result.Error
+	}
+	return nil
+}
+
+// Uuidの更新
+func (UserService) UpdateUuid(newUuid string, userId int64) error {
+
+	DbEngine := connect()
+	closer, err := DbEngine.DB()
+	if err != nil {
+		return err
+	}
+	defer closer.Close()
+	user := model.User{}
+	result := DbEngine.Model(&user).Where("id = ?", userId).Update("uuid", newUuid)
+	if result.Error != nil {
 		return result.Error
 	}
 	return nil

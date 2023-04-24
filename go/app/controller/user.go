@@ -33,19 +33,11 @@ func CreateUser(c *gin.Context) {
 		return
 	}
 
-	// もしUUIDが編集可能のビーコンならばUUIDはリクエストのを使用
-	uuid := ""
-	if beaconType.UuidEditable {
-		uuid = UserCreateRequest.Uuid
-	} else {
-		uuid = UserService.NewUUID()
-	}
-
 	user := model.User{
 		Name:         UserCreateRequest.Name,
 		Email:        UserCreateRequest.Email,
 		Role:         UserCreateRequest.Role,
-		UUID:         uuid,
+		UUID:         "",
 		BeaconTypeId: int64(beaconType.ID),
 		CommunityId:  UserCreateRequest.CommunityId,
 	}
@@ -62,19 +54,34 @@ func CreateUser(c *gin.Context) {
 	}
 
 	// usersテーブルにユーザ情報を保存
-	err = UserService.RegisterUser(&user)
+	registerdUserId, err := UserService.RegisterUser(&user)
 	if err != nil {
 		fmt.Printf("Cannnot register user: %v", err)
 		c.String(http.StatusInternalServerError, "Server Error")
 		return
 	}
 
-	// 今登録したユーザのIDを取得
-	registerdUserId, err := UserService.GetUserIDByEmail(UserCreateRequest.Email)
+	// UUIDの作成
+	// コミュニティID取得
+	communityId := UserCreateRequest.CommunityId
+	// コミュニティIDを16進数3桁
+	communityIdHex := fmt.Sprintf("%03x", communityId)
+	newUuid := ""
+	if beaconType.UuidEditable {
+		// 編集可能（物理）の場合ユーザがフォームで入力した値を用いる
+		newUuid = "e7d61ea3f8dd49c88f2ff24f" + communityIdHex + UserCreateRequest.Uuid
+	} else {
+		// 編集不可（アプリ）の場合ユーザIDから取得した値を用いる
+		// ユーザIDを16進数5桁に変換
+		registerdUserIdHex := fmt.Sprintf("%05x", registerdUserId)
+		newUuid = "e7d61ea3f8dd49c88f2ff24a" + communityIdHex + registerdUserIdHex
+	}
+
+	// UUIDを上書き
+	err = UserService.UpdateUuid(newUuid, registerdUserId)
 	if err != nil {
-		fmt.Printf("Cannnot get userId: %v", err)
+		fmt.Printf("Cannot update uuid: %v", err)
 		c.String(http.StatusInternalServerError, "Server Error")
-		return
 	}
 
 	// tag_mapsテーブルにタグのマップを保存
@@ -116,7 +123,7 @@ func PastCreateUser(c *gin.Context) {
 			UUID:  UserService.NewUUID(),
 		}
 
-		err := UserService.RegisterUser(&user)
+		err := UserService.PastRegisterUser(&user)
 		if err != nil {
 			fmt.Printf("Cannnot register user: %v", err)
 			c.String(http.StatusInternalServerError, "Server Error")
