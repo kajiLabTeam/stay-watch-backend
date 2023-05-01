@@ -28,14 +28,6 @@ func init() {
 		//複数のユーザーを作成
 		users := []model.User{
 			{
-				Name:         "test",
-				Email:        "toge7113+test-stay-watch@gmail.com",
-				Role:         1,
-				UUID:         "e7d61ea3f8dd49c88f2ff2484c07ab00",
-				BeaconTypeId: 1,
-				CommunityId:  1,
-			},
-			{
 				Name:         "kaji",
 				Email:        "",
 				Role:         1,
