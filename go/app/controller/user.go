@@ -47,7 +47,8 @@ func CreateUser(c *gin.Context) {
 	if err != nil {
 		c.String(http.StatusInternalServerError, "Server Error")
 		return
-	} else if isRegisterd {
+	}
+	if (isRegisterd) {
 		// 同じメールアドレスが既に登録済みの場合
 		c.String(http.StatusConflict, "Arleady Registered Email")
 		return
@@ -211,22 +212,28 @@ func UpdateUser(c *gin.Context) {
 	BeaconService := service.BeaconService{}
 	TagService := service.TagService{}
 
-	beaconTypeId, err := BeaconService.GetBeaconTypeIdByBeaconName(UserUpdateRequest.BeaconName)
-	// もしbeaconTypeIdが取得できたらerrがnilになる
+	beaconType, err := BeaconService.GetBeaconTypeByBeaconName(UserUpdateRequest.BeaconName)
 	if err != nil {
 		c.String(http.StatusInternalServerError, "Server Error")
 		return
 	}
 
-	// 現在のユーザのメールアドレス
-	registerdEmail, err := UserService.GetEmailByUserId(UserUpdateRequest.ID)
+	// beaconTypeId, err := BeaconService.GetBeaconTypeIdByBeaconName(UserUpdateRequest.BeaconName)
+	// // もしbeaconTypeIdが取得できたらerrがnilになる
+	// if err != nil {
+	// 	c.String(http.StatusInternalServerError, "Server Error")
+	// 	return
+	// }
+	
+	// 更新前のユーザの情報を取得
+	currentUser, err := UserService.GetUserByUserId(UserUpdateRequest.ID)
 	if err != nil {
 		c.String(http.StatusInternalServerError, "Server Error")
 		return
 	}
 
 	// メールアドレスに変更がある場合、そのメールアドレスが他のユーザに既に使われているかをチェックする処理をプラスする
-	if registerdEmail != UserUpdateRequest.Email {
+	if currentUser.Email != UserUpdateRequest.Email {
 		isRegisterdEmail, err := UserService.IsEmailAlreadyRegistered(UserUpdateRequest.Email)
 		if err != nil {
 			c.String(http.StatusInternalServerError, "Server Error")
@@ -238,12 +245,28 @@ func UpdateUser(c *gin.Context) {
 		}
 	}
 
+	// UUIDの作成
+	// コミュニティID取得
+	communityId := UserUpdateRequest.CommunityId
+	// コミュニティIDを16進数3桁
+	communityIdHex := fmt.Sprintf("%03x", communityId)
+	newUuid := ""
+	if beaconType.UuidEditable {
+		// 編集可能（物理）の場合ユーザがフォームで入力した値を用いる
+		newUuid = "e7d61ea3f8dd49c88f2ff24f" + communityIdHex + UserUpdateRequest.Uuid
+	} else {
+		// 編集不可（アプリ）の場合ユーザIDから取得した値を用いる
+		// ユーザIDを16進数5桁に変換
+		registerdUserIdHex := fmt.Sprintf("%05x", UserUpdateRequest.ID)
+		newUuid = "e7d61ea3f8dd49c88f2ff24a" + communityIdHex + registerdUserIdHex
+	}
+
 	user := model.User{
 		Name:         UserUpdateRequest.Name,
 		Email:        UserUpdateRequest.Email,
 		Role:         UserUpdateRequest.Role,
-		UUID:         UserUpdateRequest.Uuid,
-		BeaconTypeId: beaconTypeId,
+		UUID:         newUuid,
+		BeaconTypeId: int64(beaconType.ID),
 		CommunityId:  UserUpdateRequest.CommunityId,
 	}
 
