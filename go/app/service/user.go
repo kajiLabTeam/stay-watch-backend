@@ -409,14 +409,14 @@ func (UserService) IsEmailAlreadyRegistered(email string) (bool, error) {
 	DbEngine := connect()
 	closer, err := DbEngine.DB()
 	if err != nil {
-		// 接続できなかった場合もtrueとする
+		// 接続できなかった場合もtrueとする(どちらにしてもいい)
 		return true, err
 	}
 	defer closer.Close()
 	user := model.User{}
 	result := DbEngine.Where("email=?", email).Take(&user)
 	// エラーの時はメールアドレスが見つからなかった時と同じなため
-	if result.Error != nil {
+	if (result.Error != nil || email == "") {
 		return false, nil
 	}
 	return true, nil
