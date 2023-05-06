@@ -28,6 +28,14 @@ func init() {
 		//複数のユーザーを作成
 		users := []model.User{
 			{
+				Name:         "test",
+				Email:        "",
+				Role:         1,
+				UUID:         "a7d61ea3f8dd49c88f2ff2484c07ac00",
+				BeaconTypeId: 1,
+				CommunityId:  1,
+			},
+			{
 				Name:         "kaji",
 				Email:        "",
 				Role:         1,
@@ -688,7 +696,7 @@ func init() {
 	if count == 0 {
 		buildings := []model.Community{
 			{
-				Name: "テスト",
+				Name: "テスト研究室",
 			},
 			{
 				Name: "梶研究室",
