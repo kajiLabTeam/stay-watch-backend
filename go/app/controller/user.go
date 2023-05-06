@@ -315,7 +315,7 @@ func UpdateUser(c *gin.Context) {
 
 }
 
-func UserList(c *gin.Context) {
+func PastUserList(c *gin.Context) {
 
 	UserService := service.UserService{}
 
@@ -348,6 +348,55 @@ func UserList(c *gin.Context) {
 				Name: tagName,
 			}
 			tags = append(tags, tag)
+		}
+
+		userInformationGetResponse = append(userInformationGetResponse, model.UserInformationGetResponse{
+			ID:   int64(user.ID),
+			Name: user.Name,
+			Tags: tags,
+		})
+	}
+	c.JSON(http.StatusOK, userInformationGetResponse)
+}
+
+func UserList(c *gin.Context) {
+
+	UserService := service.UserService{}
+	communityId, _ := strconv.ParseInt(c.Param("communityId"), 10, 64) // string -> int64
+
+	users, err := UserService.GetEditUsersByCommunityId(communityId)
+	if err != nil {
+		c.String(http.StatusInternalServerError, "Server Error")
+	}
+
+	userInformationGetResponse := []model.UserInformationGetResponse{}
+
+	for _, user := range users {
+
+		tags := make([]model.TagGetResponse, 0)
+		tagsID, err := UserService.GetUserTagsID(int64(user.Model.ID))
+		if err != nil {
+			c.String(http.StatusInternalServerError, "Server Error")
+			return
+		}
+
+		for _, tagID := range tagsID {
+			//タグIDからタグ名を取得する
+			tagName, err := UserService.GetTagName(tagID)
+			if err != nil {
+				c.String(http.StatusInternalServerError, "Server Error")
+				return
+			}
+			tag := model.TagGetResponse{
+				ID:   tagID,
+				Name: tagName,
+			}
+			tags = append(tags, tag)
+		}
+
+		if err != nil {
+			c.String(http.StatusInternalServerError, "Server Error")
+			return
 		}
 
 		userInformationGetResponse = append(userInformationGetResponse, model.UserInformationGetResponse{
