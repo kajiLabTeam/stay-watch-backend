@@ -10,6 +10,9 @@ Get {{baseURL}}/api/v1/stayers
 ###
 Get {{baseURL}}/api/v1/logs
 
+### 以前まで使われていたAPI
+GET {{baseURL}}/api/v1/users
+
 ###
 GET {{baseURL}}/api/v1/users/2
 
