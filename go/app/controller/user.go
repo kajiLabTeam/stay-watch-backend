@@ -26,7 +26,7 @@ func CreateUser(c *gin.Context) {
 	BeaconService := service.BeaconService{}
 	TagService := service.TagService{}
 
-	beaconType, err := BeaconService.GetBeaconTypeByBeaconName(UserCreateRequest.BeaconName)
+	beacon, err := BeaconService.GetBeaconByBeaconName(UserCreateRequest.BeaconName)
 	// もしbeaconTypeが取得できたらerrがnilになる
 	if err != nil {
 		c.String(http.StatusInternalServerError, "Server Error")
@@ -38,7 +38,7 @@ func CreateUser(c *gin.Context) {
 		Email:        UserCreateRequest.Email,
 		Role:         UserCreateRequest.Role,
 		UUID:         "",
-		BeaconTypeId: int64(beaconType.ID),
+		BeaconId: int64(beacon.ID),
 		CommunityId:  UserCreateRequest.CommunityId,
 	}
 
@@ -68,7 +68,7 @@ func CreateUser(c *gin.Context) {
 	// コミュニティIDを16進数3桁
 	communityIdHex := fmt.Sprintf("%03x", communityId)
 	newUuid := ""
-	if beaconType.UuidEditable {
+	if beacon.UuidEditable {
 		// 編集可能（物理）の場合ユーザがフォームで入力した値を用いる
 		newUuid = "e7d61ea3f8dd49c88f2ff24f" + communityIdHex + UserCreateRequest.Uuid
 	} else {
@@ -179,7 +179,7 @@ func DeleteUser(c *gin.Context) {
 		Email:        user.Email,
 		Role:         user.Role,
 		UUID:         user.UUID,
-		BeaconTypeId: user.BeaconTypeId,
+		BeaconId: user.BeaconId,
 		CommunityId:  user.CommunityId,
 		UserId:       userId,
 	}
@@ -212,13 +212,13 @@ func UpdateUser(c *gin.Context) {
 	BeaconService := service.BeaconService{}
 	TagService := service.TagService{}
 
-	beaconType, err := BeaconService.GetBeaconTypeByBeaconName(UserUpdateRequest.BeaconName)
+	beacon, err := BeaconService.GetBeaconByBeaconName(UserUpdateRequest.BeaconName)
 	if err != nil {
 		c.String(http.StatusInternalServerError, "Server Error")
 		return
 	}
 
-	// beaconTypeId, err := BeaconService.GetBeaconTypeIdByBeaconName(UserUpdateRequest.BeaconName)
+	// BeaconId, err := BeaconService.GetBeaconIdByBeaconName(UserUpdateRequest.BeaconName)
 	// // もしbeaconTypeIdが取得できたらerrがnilになる
 	// if err != nil {
 	// 	c.String(http.StatusInternalServerError, "Server Error")
@@ -251,7 +251,7 @@ func UpdateUser(c *gin.Context) {
 	// コミュニティIDを16進数3桁
 	communityIdHex := fmt.Sprintf("%03x", communityId)
 	newUuid := ""
-	if beaconType.UuidEditable {
+	if beacon.UuidEditable {
 		// 編集可能（物理）の場合ユーザがフォームで入力した値を用いる
 		newUuid = "e7d61ea3f8dd49c88f2ff24f" + communityIdHex + UserUpdateRequest.Uuid
 	} else {
@@ -266,7 +266,7 @@ func UpdateUser(c *gin.Context) {
 		Email:        UserUpdateRequest.Email,
 		Role:         UserUpdateRequest.Role,
 		UUID:         newUuid,
-		BeaconTypeId: int64(beaconType.ID),
+		BeaconId: int64(beacon.ID),
 		CommunityId:  UserUpdateRequest.CommunityId,
 	}
 
@@ -448,7 +448,7 @@ func AdminUserList(c *gin.Context) {
 			return
 		}
 
-		beacon, err := BeaconService.GetBeaconByBeaconId(user.BeaconTypeId)
+		beacon, err := BeaconService.GetBeaconByBeaconId(user.BeaconId)
 		if err != nil {
 			c.String(http.StatusInternalServerError, "Server Error")
 			return
@@ -461,7 +461,7 @@ func AdminUserList(c *gin.Context) {
 			Email:              user.Email,
 			Role:               user.Role,
 			BeaconUuidEditable: beacon.UuidEditable,
-			BeaconName:         beacon.Name,
+			BeaconName:         beacon.Type,
 			Tags:               tags,
 		})
 	}

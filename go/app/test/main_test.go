@@ -323,7 +323,7 @@ func TestGetBeacons(t *testing.T) {
 
 	// リクエスト情報をコンテキストに入れる
 	ginContext.Request = req
-	controller.GetBeaconType(ginContext)
+	controller.GetBeacon(ginContext)
 
 	asserts := assert.New(t)
 

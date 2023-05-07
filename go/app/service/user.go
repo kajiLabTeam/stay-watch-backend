@@ -120,7 +120,7 @@ func (UserService) UpdateUser(updatedUser *model.User, userId int64) error {
 	user.Name = updatedUser.Name
 	user.Email = updatedUser.Email
 	user.Role = updatedUser.Role
-	user.BeaconTypeId = updatedUser.BeaconTypeId
+	user.BeaconId = updatedUser.BeaconId
 	user.CommunityId = updatedUser.CommunityId
 
 	// result := DbEngine.Model(&model.User{}).Where("id = ?", userId).Update("email", email)
