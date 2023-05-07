@@ -129,11 +129,11 @@ type UserUpdateRequest struct {
 }
 
 type BeaconRoom struct {
-	Beacons []*Beacon `json:"beacons"`
+	Beacons []*BeaconSignal `json:"beacons"`
 	RoomID  int64     `json:"roomId"`
 }
 
-type Beacon struct {
+type BeaconSignal struct {
 	Uuid string `json:"uuid" form:"uuid"`
 	Rssi int64  `json:"rssi" form:"rssi"`
 }

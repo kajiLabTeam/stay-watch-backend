@@ -23,7 +23,7 @@ func TestPostStayer(t *testing.T) {
 	ginContext, _ := gin.CreateTestContext(response)
 
 	beaconsRoom := model.BeaconRoom{
-		Beacons: []*model.Beacon{
+		Beacons: []*model.BeaconSignal{
 			{
 				Uuid: "e7d61ea3f8dd49c88f2ff2484c07ac00",
 				Rssi: -60,
