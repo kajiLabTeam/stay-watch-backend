@@ -8,65 +8,66 @@ import (
 type BeaconService struct{}
 
 // 全てのビーコンを取得する
-func (BeaconService) GetAllBeaconType() ([]model.BeaconType, error) {
+func (BeaconService) GetAllBeacon() ([]model.Beacon, error) {
 	DbEngine := connect()
 	closer, err := DbEngine.DB()
 	if err != nil {
 		return nil, err
 	}
 	defer closer.Close()
-	beaconTypes := make([]model.BeaconType, 0)
-	result := DbEngine.Find(&beaconTypes)
+	beacons := make([]model.Beacon, 0)
+	result := DbEngine.Find(&beacons)
 	if result.Error != nil {
 		fmt.Printf("ビーコン取得失敗 %v", result.Error)
 		return nil, result.Error
 	}
-	return beaconTypes, nil
+	return beacons, nil
 }
 
 // ビーコンIDからビーコン情報を取得する
-func (BeaconService) GetBeaconByBeaconId(beaconId int64) (model.BeaconType, error) {
+func (BeaconService) GetBeaconByBeaconId(beaconId int64) (model.Beacon, error) {
 	DbEngine := connect()
 	closer, err := DbEngine.DB()
 	if err != nil {
-		return model.BeaconType{}, err
+		return model.Beacon{}, err
 	}
 	defer closer.Close()
-	beacon := model.BeaconType{}
+	beacon := model.Beacon{}
 	result := DbEngine.Where("id=?", beaconId).Take(&beacon)
 	if result.Error != nil {
 		fmt.Printf("ユーザ取得失敗 %v", result.Error)
-		return model.BeaconType{}, result.Error
+		return model.Beacon{}, result.Error
 	}
 
 	return beacon, nil
 }
 
-func (BeaconService) GetBeaconTypeByBeaconName(beaconName string) (model.BeaconType, error) {
+func (BeaconService) GetBeaconByBeaconName(beaconName string) (model.Beacon, error) {
 	DbEngine := connect()
 	close, err := DbEngine.DB()
 	if err != nil {
-		return model.BeaconType{}, err
+		return model.Beacon{}, err
 	}
 	defer close.Close()
-	beacon := model.BeaconType{}
-	result := DbEngine.Where("name=?", beaconName).Take(&beacon)
+	beacon := model.Beacon{}
+	result := DbEngine.Where("type=?", beaconName).Take(&beacon)
 	if result.Error != nil {
 		fmt.Printf("ビーコン情報取得失敗 %v", result.Error)
-		return model.BeaconType{}, result.Error
+		return model.Beacon{}, result.Error
 	}
 
-	return beacon, nil
+	return beacon, nil	
 }
 
-func (BeaconService) GetBeaconTypeIdByBeaconName(beaconName string) (int64, error) {
+func (BeaconService) GetBeaconIdByBeaconName(beaconName string) (int64, error) {
 	DbEngine := connect()
 	close, err := DbEngine.DB()
+
 	if err != nil {
 		return 0, err
 	}
 	defer close.Close()
-	beacon := model.BeaconType{}
+	beacon := model.Beacon{}
 	result := DbEngine.Where("name=?", beaconName).Take(&beacon)
 	if result.Error != nil {
 		fmt.Printf("ユーザ名取得失敗 %v", result.Error)

@@ -15,7 +15,7 @@ type User struct {
 	Name         string
 	Email        string
 	Role         int64
-	BeaconTypeId int64
+	BeaconId 		 int64
 	CommunityId  int64
 }
 
@@ -26,7 +26,7 @@ type DeletedUser struct {
 	Name         string
 	Email        string
 	Role         int64
-	BeaconTypeId int64
+	BeaconId 		 int64
 	CommunityId  int64
 	UserId       int64
 }
@@ -86,9 +86,9 @@ type AttendanceTmp struct {
 	Flag   int64 `json:"exit" xorm:"flag"`
 }
 
-type BeaconType struct {
+type Beacon struct {
 	gorm.Model
-	Name         string
+	Type         string
 	UuidEditable bool
 }
 

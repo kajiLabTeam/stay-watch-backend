@@ -244,10 +244,10 @@ func Beacon(c *gin.Context) {
 	})
 }
 
-func GetBeaconType(c *gin.Context) {
+func GetBeacon(c *gin.Context) {
 
 	BeaconService := service.BeaconService{}
-	beaconTypes, err := BeaconService.GetAllBeaconType()
+	beacons, err := BeaconService.GetAllBeacon()
 	if err != nil {
 		c.String(http.StatusInternalServerError, "Server Error")
 		return
@@ -255,12 +255,12 @@ func GetBeaconType(c *gin.Context) {
 
 	beaconGetResponses := []model.BeaconGetResponse{}
 
-	for _, beaconType := range beaconTypes {
+	for _, beacon := range beacons {
 
 		beaconGetResponses = append(beaconGetResponses, model.BeaconGetResponse{
-			BeaconId:     int64(beaconType.ID),
-			BeaconName:   beaconType.Name,
-			UuidEditable: beaconType.UuidEditable,
+			BeaconId:     int64(beacon.ID),
+			BeaconName:   beacon.Type,
+			UuidEditable: beacon.UuidEditable,
 		})
 	}
 

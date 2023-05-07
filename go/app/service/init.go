@@ -20,7 +20,7 @@ func init() {
 		return
 	}
 	defer closer.Close()
-	db.AutoMigrate(&model.User{}, &model.Log{}, &model.Room{}, &model.Stayer{}, &model.Tag{}, &model.TagMap{}, &model.Building{}, &model.BeaconType{}, &model.DeletedUser{}, &model.Community{})
+	db.AutoMigrate(&model.User{}, &model.Log{}, &model.Room{}, &model.Stayer{}, &model.Tag{}, &model.TagMap{}, &model.Building{}, &model.Beacon{}, &model.DeletedUser{}, &model.Community{})
 
 	var count int64
 	db.Model(&model.User{}).Count(&count)
@@ -32,7 +32,7 @@ func init() {
 				Email:        "",
 				Role:         1,
 				UUID:         "a7d61ea3f8dd49c88f2ff2484c07ac00",
-				BeaconTypeId: 1,
+				BeaconId: 		1,
 				CommunityId:  1,
 			},
 			{
@@ -40,7 +40,7 @@ func init() {
 				Email:        "",
 				Role:         1,
 				UUID:         "e7d61ea3f8dd49c88f2ff2484c07ac00",
-				BeaconTypeId: 1,
+				BeaconId: 		1,
 				CommunityId:  2,
 			},
 			{
@@ -48,7 +48,7 @@ func init() {
 				Email:        "",
 				Role:         1,
 				UUID:         "e7d61ea3f8dd49c88f2ff2484c07ac01",
-				BeaconTypeId: 1,
+				BeaconId: 		1,
 				CommunityId:  2,
 			},
 			{
@@ -56,7 +56,7 @@ func init() {
 				Email:        "",
 				Role:         1,
 				UUID:         "e7d61ea3f8dd49c88f2ff2484c07ac02",
-				BeaconTypeId: 1,
+				BeaconId: 		1,
 				CommunityId:  2,
 			},
 			{
@@ -64,7 +64,7 @@ func init() {
 				Email:        "",
 				Role:         1,
 				UUID:         "e7d61ea3f8dd49c88f2ff2484c07ac03",
-				BeaconTypeId: 1,
+				BeaconId: 		1,
 				CommunityId:  2,
 			},
 			{
@@ -72,7 +72,7 @@ func init() {
 				Email:        "",
 				Role:         1,
 				UUID:         "e7d61ea3f8dd49c88f2ff2484c07ac04",
-				BeaconTypeId: 1,
+				BeaconId: 		1,
 				CommunityId:  2,
 			},
 			{
@@ -80,7 +80,7 @@ func init() {
 				Email:        "",
 				Role:         1,
 				UUID:         "e7d61ea3f8dd49c88f2ff2484c07ac05",
-				BeaconTypeId: 1,
+				BeaconId: 		1,
 				CommunityId:  2,
 			},
 			{
@@ -88,7 +88,7 @@ func init() {
 				Email:        "",
 				Role:         1,
 				UUID:         "e7d61ea3f8dd49c88f2ff2484c07ac06",
-				BeaconTypeId: 1,
+				BeaconId: 		1,
 				CommunityId:  2,
 			},
 			{
@@ -96,7 +96,7 @@ func init() {
 				Email:        "",
 				Role:         1,
 				UUID:         "e7d61ea3f8dd49c88f2ff2484c07ac07",
-				BeaconTypeId: 1,
+				BeaconId: 		1,
 				CommunityId:  2,
 			},
 			{
@@ -104,7 +104,7 @@ func init() {
 				Email:        "",
 				Role:         1,
 				UUID:         "e7d61ea3f8dd49c88f2ff2484c07ac08",
-				BeaconTypeId: 1,
+				BeaconId: 		1,
 				CommunityId:  2,
 			},
 			{
@@ -112,7 +112,7 @@ func init() {
 				Email:        "",
 				Role:         1,
 				UUID:         "e7d61ea3f8dd49c88f2ff2484c07ac09",
-				BeaconTypeId: 1,
+				BeaconId: 		1,
 				CommunityId:  2,
 			},
 			{
@@ -120,7 +120,7 @@ func init() {
 				Email:        "",
 				Role:         1,
 				UUID:         "e7d61ea3f8dd49c88f2ff2484c07ac0a",
-				BeaconTypeId: 1,
+				BeaconId:  		1,
 				CommunityId:  2,
 			},
 			{
@@ -128,7 +128,7 @@ func init() {
 				Email:        "",
 				Role:         1,
 				UUID:         "e7d61ea3f8dd49c88f2ff2484c07ac0b",
-				BeaconTypeId: 1,
+				BeaconId:			1,
 				CommunityId:  2,
 			},
 			{
@@ -136,7 +136,7 @@ func init() {
 				Email:        "",
 				Role:         1,
 				UUID:         "e7d61ea3f8dd49c88f2ff2484c07ac0c",
-				BeaconTypeId: 1,
+				BeaconId: 		1,
 				CommunityId:  2,
 			},
 			{
@@ -144,7 +144,7 @@ func init() {
 				Email:        "",
 				Role:         1,
 				UUID:         "e7d61ea3f8dd49c88f2ff2484c07ac0d",
-				BeaconTypeId: 1,
+				BeaconId: 		1,
 				CommunityId:  2,
 			},
 			{
@@ -152,7 +152,7 @@ func init() {
 				Email:        "tatu2425@gmail.com",
 				Role:         2,
 				UUID:         "e7d61ea3f8dd49c88f2ff2484c07ac0e",
-				BeaconTypeId: 1,
+				BeaconId: 		1,
 				CommunityId:  2,
 			},
 			{
@@ -160,7 +160,7 @@ func init() {
 				Email:        "",
 				Role:         1,
 				UUID:         "e7d61ea3f8dd49c88f2ff2484c07ac0f",
-				BeaconTypeId: 1,
+				BeaconId: 		1,
 				CommunityId:  2,
 			},
 			{
@@ -168,7 +168,7 @@ func init() {
 				Email:        "",
 				Role:         1,
 				UUID:         "e7d61ea3f8dd49c88f2ff2484c07ac10",
-				BeaconTypeId: 1,
+				BeaconId: 		1,
 				CommunityId:  2,
 			},
 			{
@@ -176,7 +176,7 @@ func init() {
 				Email:        "",
 				Role:         1,
 				UUID:         "e7d61ea3f8dd49c88f2ff2484c07ac11",
-				BeaconTypeId: 1,
+				BeaconId: 1,
 				CommunityId:  2,
 			},
 			{
@@ -184,7 +184,7 @@ func init() {
 				Email:        "",
 				Role:         1,
 				UUID:         "e7d61ea3f8dd49c88f2ff2484c07ac12",
-				BeaconTypeId: 1,
+				BeaconId: 		1,
 				CommunityId:  2,
 			},
 			{
@@ -192,7 +192,7 @@ func init() {
 				Email:        "",
 				Role:         1,
 				UUID:         "e7d61ea3f8dd49c88f2ff2484c07ac13",
-				BeaconTypeId: 1,
+				BeaconId: 		1,
 				CommunityId:  2,
 			},
 			{
@@ -200,7 +200,7 @@ func init() {
 				Email:        "",
 				Role:         1,
 				UUID:         "e7d61ea3f8dd49c88f2ff2484c07ac14",
-				BeaconTypeId: 1,
+				BeaconId: 		1,
 				CommunityId:  2,
 			},
 			{
@@ -208,7 +208,7 @@ func init() {
 				Email:        "toge7113@gmail.com",
 				Role:         1,
 				UUID:         "e7d61ea3f8dd49c88f2ff2484c07ac15",
-				BeaconTypeId: 1,
+				BeaconId: 		1,
 				CommunityId:  2,
 			},
 			{
@@ -216,7 +216,7 @@ func init() {
 				Email:        "",
 				Role:         1,
 				UUID:         "e7d61ea3f8dd49c88f2ff2484c07ac16",
-				BeaconTypeId: 1,
+				BeaconId: 		1,
 				CommunityId:  2,
 			},
 			{
@@ -224,7 +224,7 @@ func init() {
 				Email:        "",
 				Role:         1,
 				UUID:         "e7d61ea3f8dd49c88f2ff2484c07ac17",
-				BeaconTypeId: 1,
+				BeaconId:			1,
 				CommunityId:  2,
 			},
 			{
@@ -232,7 +232,7 @@ func init() {
 				Email:        "",
 				Role:         1,
 				UUID:         "e7d61ea3f8dd49c88f2ff2484c07ac18",
-				BeaconTypeId: 1,
+				BeaconId: 		1,
 				CommunityId:  2,
 			},
 			{
@@ -240,7 +240,7 @@ func init() {
 				Email:        "",
 				Role:         1,
 				UUID:         "e7d61ea3f8dd49c88f2ff2484c07ac19",
-				BeaconTypeId: 1,
+				BeaconId: 		1,
 				CommunityId:  2,
 			},
 			{
@@ -248,7 +248,7 @@ func init() {
 				Email:        "",
 				Role:         1,
 				UUID:         "e7d61ea3f8dd49c88f2ff2484c07ac1a",
-				BeaconTypeId: 1,
+				BeaconId: 		1,
 				CommunityId:  2,
 			},
 			{
@@ -256,7 +256,7 @@ func init() {
 				Email:        "",
 				Role:         1,
 				UUID:         "e7d61ea3f8dd49c88f2ff2484c07ac1b",
-				BeaconTypeId: 1,
+				BeaconId: 		1,
 				CommunityId:  2,
 			},
 		}
@@ -271,7 +271,7 @@ func init() {
 				Email:        "deleted-test-staywatch@gmail.com",
 				Role:         1,
 				UUID:         "e7d61ea3f8dd49c88f2ff2484c07deleted-test",
-				BeaconTypeId: 1,
+				BeaconId: 		1,
 				CommunityId:  1,
 				UserId:       0,
 			},
@@ -673,23 +673,23 @@ func init() {
 		db.Create(&tagMaps)
 	}
 
-	db.Model(&model.BeaconType{}).Count(&count)
+	db.Model(&model.Beacon{}).Count(&count)
 	if count == 0 {
-		tags := []model.BeaconType{
+		beacons := []model.Beacon{
 			{
-				Name:         "FCS1301",
+				Type:         "FCS1301",
 				UuidEditable: true,
 			},
 			{
-				Name:         "Android",
+				Type:         "Android",
 				UuidEditable: false,
 			},
 			{
-				Name:         "iPhone",
+				Type:         "iPhone",
 				UuidEditable: false,
 			},
 		}
-		db.Create(&tags)
+		db.Create(&beacons)
 	}
 
 	db.Model(&model.Community{}).Count(&count)
