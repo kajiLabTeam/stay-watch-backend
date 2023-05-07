@@ -79,14 +79,14 @@ Get {{baseURL}}/api/v1/list/simultaneous/1
 ###
 Get {{baseURL}}/api/v1/list/simultaneous/2
 
-### 入室
+### 入室も退室も同じAPI
 POST {{baseURL}}/api/v1/stayers HTTP/1.1
 content-type: application/json
 
 {
     "beacons":[
         {
-            "uuid": "e7d61ea3f8dd49c88f2ff2484c07ac00",
+            "uuid": "e7d61ea3f8dd49c88f2ff24f0027ac02",
             "rssi": -50
         }
     ],
@@ -99,31 +99,6 @@ content-type: application/json
 
 {
     "beacons":[
-    ],
-    "roomId": 2
-}
-
-### 入室
-POST {{baseURL}}/api/v1/stayers HTTP/1.1
-content-type: application/json
-
-{
-    "beacons":[
-        {
-            "uuid": "e7d61ea3f8dd49c88f2ff2484c07ac13",
-            "rssi": -50
-        }
-    ],
-    "roomId": 2
-}
-
-###
-POST {{baseURL}}/api/v1/stayers HTTP/1.1
-content-type: application/json
-
-{
-    "beacons":[
-
     ],
     "roomId": 2
 }
