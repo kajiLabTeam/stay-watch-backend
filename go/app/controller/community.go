@@ -21,14 +21,14 @@ func GetCommunityByUserId(c *gin.Context) {
 	// ユーザのコミュニティIDを取得する
 	communityId, err := UserService.GetCommunityIdByUserId(userId)
 	if err != nil {
-		c.String(http.StatusInternalServerError, "Server Error")
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Failed to get communityId"})
 		return
 	}
 
 	// コミュニティIDからコミュニティ情報を取得する
 	community, err := CommunityService.GetCommunityById(communityId)
 	if err != nil {
-		c.String(http.StatusInternalServerError, "Server Error")
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Failed to get communigy"})
 		return
 	}
 

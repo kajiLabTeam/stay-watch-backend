@@ -18,13 +18,13 @@ func GetTagsByCommunityId(c *gin.Context) {
 	// DBからどこのコミュニティにも該当するタグを持ってくる
 	publicTags, err := TagService.GetTagsByCommunityId(-1)
 	if err != nil {
-		c.String(http.StatusInternalServerError, "Server Error")
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Failed to get public tags"})
 		return
 	}
 	// DBからコミュニティのタグネームを持ってくる
 	communityTags, err := TagService.GetTagsByCommunityId(communityId)
 	if err != nil {
-		c.String(http.StatusInternalServerError, "Server Error")
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Failed to get private tags"})
 		return
 	}
 	tags := append(publicTags, communityTags...)
@@ -49,13 +49,13 @@ func GetTagNamesByCommunityId(c *gin.Context) {
 	// DBからどこのコミュニティにも該当するタグネームを持ってくる
 	publicTagNames, err := TagService.GetTagNamesByCommunityId(-1)
 	if err != nil {
-		c.String(http.StatusInternalServerError, "Server Error")
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Failed to get public tag name"})
 		return
 	}
 	// DBからコミュニティのタグネームを持ってくる
 	communityTagNames, err := TagService.GetTagNamesByCommunityId(communityId)
 	if err != nil {
-		c.String(http.StatusInternalServerError, "Server Error")
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Failed to get private tag name"})
 		return
 	}
 	tagNames := append(publicTagNames, communityTagNames...)

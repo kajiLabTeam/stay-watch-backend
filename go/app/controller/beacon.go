@@ -33,7 +33,7 @@ func Beacon(c *gin.Context) {
 
 	if err != nil {
 		fmt.Printf("failed: Cannnot get stayer %v", err)
-		c.String(http.StatusInternalServerError, "Server Error")
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Failed to get stayer"})
 		return
 	}
 
@@ -45,7 +45,7 @@ func Beacon(c *gin.Context) {
 			pastUUID, err := UserService.GetUserUUIDByUserID(pastStayer.UserID)
 			if err != nil {
 				fmt.Printf("failed: Cannnot get user uuid %v", err)
-				c.String(http.StatusInternalServerError, "Server Error")
+				c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Failed to get uuid"})
 				return
 			}
 			// 1つ前のstgayerテーブルにもいた場合
@@ -67,7 +67,7 @@ func Beacon(c *gin.Context) {
 				})
 				if err != nil {
 					fmt.Printf("failed: Cannnot update stayer %v", err)
-					c.String(http.StatusInternalServerError, "Server Error")
+					c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Failed to update stayer"})
 					return
 				}
 			} else {
@@ -76,31 +76,31 @@ func Beacon(c *gin.Context) {
 				err := RoomService.DeleteStayer(pastStayer.UserID)
 				if err != nil {
 					fmt.Println("failed: Cannnot delete stayer")
-					c.String(http.StatusInternalServerError, "Server Error")
+					c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Failed to delete stayer"})
 				}
 				// logテーブルのendAtを更新する
 				err = RoomService.UpdateEndAt(pastStayer.UserID)
 				if err != nil {
 					fmt.Println("failed: Cannnot update endAt")
-					c.String(http.StatusInternalServerError, "Server Error")
+					c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Failed to update endAt"})
 				}
 
 				pastStayerUserName, err := UserService.GetUserNameByUserID(pastStayer.UserID)
 				if err != nil {
 					fmt.Println("failed: Cannnot get user name")
-					c.String(http.StatusInternalServerError, "Server Error")
+					c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Failed to get user name"})
 					return
 				}
 				pastRoomName, err := RoomService.GetRoomNameByRoomID(pastStayer.RoomID)
 				if err != nil {
 					fmt.Println("failed: Cannnot get room name")
-					c.String(http.StatusInternalServerError, "Server Error")
+					c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Failed to get room name"})
 					return
 				}
 				err = BotService.SendMessage(fmt.Sprintf("%sさんが%sから退室しました", pastStayerUserName, pastRoomName), "B03J95EL3ME/9MLCZ8VTkEFGDVwTxkqYLKyj")
 				if err != nil {
 					fmt.Println("failed: Cannnot send message")
-					c.String(http.StatusInternalServerError, "Server Error")
+					c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Failed to send message"})
 					return
 				}
 			}
@@ -117,7 +117,7 @@ func Beacon(c *gin.Context) {
 		// 			Rssi:   int64(targetUserRssi),
 		// 		})
 		// 		if err != nil {
-		// 			c.String(http.StatusInternalServerError, "Server Error")
+		// 			c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Failed to"})
 		// 			return
 		// 		}
 		// 	}
@@ -142,19 +142,19 @@ func Beacon(c *gin.Context) {
 			pastStayerUserName, err := UserService.GetUserNameByUserID(pastStayer.UserID)
 			if err != nil {
 				fmt.Println("failed: Cannnot get user name")
-				c.String(http.StatusInternalServerError, "Server Error")
+				c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Failed to get user name"})
 				return
 			}
 			pastRoomName, err := RoomService.GetRoomNameByRoomID(pastStayer.RoomID)
 			if err != nil {
 				fmt.Println("failed: Cannnot get room name")
-				c.String(http.StatusInternalServerError, "Server Error")
+				c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Failed to get room name"})
 				return
 			}
 			err = BotService.SendMessage(fmt.Sprintf("%sさんが%sから退室しました", pastStayerUserName, pastRoomName), "B03J95EL3ME/9MLCZ8VTkEFGDVwTxkqYLKyj")
 			if err != nil {
 				fmt.Println("failed: Cannnot send message")
-				c.String(http.StatusInternalServerError, "Server Error")
+				c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Failed to send message"})
 				return
 			}
 		}
@@ -166,7 +166,7 @@ func Beacon(c *gin.Context) {
 		currentUserID, err := UserService.GetUserIDByUUID(currentStayer.Uuid)
 		if err != nil {
 			fmt.Println("failed: Cannnot get user id")
-			c.String(http.StatusInternalServerError, "Server Error")
+			c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Failed to get user id"})
 			return
 		}
 
@@ -214,28 +214,28 @@ func Beacon(c *gin.Context) {
 			currentUserName, err := UserService.GetUserNameByUserID(currentUserID)
 			if err != nil {
 				fmt.Println("failed: Cannnot get user name")
-				c.String(http.StatusInternalServerError, "Server Error")
+				c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Failed to get user name"})
 				return
 			}
 
 			currentRoomName, err := RoomService.GetRoomNameByRoomID(beaconRoom.RoomID)
 			if err != nil {
 				fmt.Println("failed: Cannnot get room name")
-				c.String(http.StatusInternalServerError, "Server Error")
+				c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Failed to get room name"})
 				return
 			}
 
 			err = BotService.SendMessage(fmt.Sprintf("%sさんが%sに入室しました", currentUserName, currentRoomName), "B03J95EL3ME/9MLCZ8VTkEFGDVwTxkqYLKyj")
 			if err != nil {
 				fmt.Println("failed: Cannnot send message")
-				c.String(http.StatusInternalServerError, "Server Error")
+				c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Failed to send message"})
 				return
 			}
 		}
 	}
 
 	if err != nil {
-		c.String(http.StatusInternalServerError, "Server Error")
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Failed"})
 		return
 	}
 
@@ -249,7 +249,7 @@ func GetBeacon(c *gin.Context) {
 	BeaconService := service.BeaconService{}
 	beacons, err := BeaconService.GetAllBeacon()
 	if err != nil {
-		c.String(http.StatusInternalServerError, "Server Error")
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Failed to get beacons"})
 		return
 	}
 
