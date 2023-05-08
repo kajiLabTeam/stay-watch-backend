@@ -29,28 +29,28 @@ func CreateUser(c *gin.Context) {
 	beacon, err := BeaconService.GetBeaconByBeaconName(UserCreateRequest.BeaconName)
 	// もしbeaconTypeが取得できたらerrがnilになる
 	if err != nil {
-		c.String(http.StatusInternalServerError, "Server Error")
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Failed to get beacon by name"})
 		return
 	}
 
 	user := model.User{
-		Name:         UserCreateRequest.Name,
-		Email:        UserCreateRequest.Email,
-		Role:         UserCreateRequest.Role,
-		UUID:         "",
-		BeaconId: int64(beacon.ID),
-		CommunityId:  UserCreateRequest.CommunityId,
+		Name:        UserCreateRequest.Name,
+		Email:       UserCreateRequest.Email,
+		Role:        UserCreateRequest.Role,
+		UUID:        "",
+		BeaconId:    int64(beacon.ID),
+		CommunityId: UserCreateRequest.CommunityId,
 	}
 
 	// 同じメールアドレスのユーザが既に登録済みだったら409を返す
 	isRegisterd, err := UserService.IsEmailAlreadyRegistered(UserCreateRequest.Email)
 	if err != nil {
-		c.String(http.StatusInternalServerError, "Server Error")
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Failed to check email is arleady registerd"})
 		return
 	}
-	if (isRegisterd) {
+	if isRegisterd {
 		// 同じメールアドレスが既に登録済みの場合
-		c.String(http.StatusConflict, "Arleady Registered Email")
+		c.AbortWithStatusJSON(http.StatusConflict, gin.H{"error": "Arleady Registered Email"})
 		return
 	}
 
@@ -58,7 +58,7 @@ func CreateUser(c *gin.Context) {
 	registerdUserId, err := UserService.RegisterUser(&user)
 	if err != nil {
 		fmt.Printf("Cannnot register user: %v", err)
-		c.String(http.StatusInternalServerError, "Server Error")
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Failed to register user"})
 		return
 	}
 
@@ -82,7 +82,7 @@ func CreateUser(c *gin.Context) {
 	err = UserService.UpdateUuid(newUuid, registerdUserId)
 	if err != nil {
 		fmt.Printf("Cannot update uuid: %v", err)
-		c.String(http.StatusInternalServerError, "Server Error")
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Failed to update uuid"})
 	}
 
 	// tag_mapsテーブルにタグのマップを保存
@@ -94,7 +94,7 @@ func CreateUser(c *gin.Context) {
 		err = TagService.CreateTagMap(&tag)
 		if err != nil {
 			fmt.Printf("Cannot register tagMap: %v", err)
-			c.String(http.StatusInternalServerError, "Server Error")
+			c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Failed to create tagMap"})
 			return
 		}
 	}
@@ -169,32 +169,32 @@ func DeleteUser(c *gin.Context) {
 	// 削除するユーザの情報の取得
 	user, err := UserService.GetUserByUserId(userId)
 	if err != nil {
-		c.String(http.StatusInternalServerError, "Server Error")
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Failed to delete user"})
 		return
 	}
 
 	// ユーザ情報をDeletedUserの型に格納
 	deletedUser := model.DeletedUser{
-		Name:         user.Name,
-		Email:        user.Email,
-		Role:         user.Role,
-		UUID:         user.UUID,
-		BeaconId: user.BeaconId,
-		CommunityId:  user.CommunityId,
-		UserId:       userId,
+		Name:        user.Name,
+		Email:       user.Email,
+		Role:        user.Role,
+		UUID:        user.UUID,
+		BeaconId:    user.BeaconId,
+		CommunityId: user.CommunityId,
+		UserId:      userId,
 	}
 
 	// deletedUserテーブルに登録
 	err = DeletedUserService.CreateDeletedUser(&deletedUser)
 	if err != nil {
-		c.String(http.StatusInternalServerError, "Server Error")
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Failed to create deleted user"})
 		return
 	}
 
 	// usersテーブルから削除
 	err = UserService.DeleteUser(userId)
 	if err != nil {
-		c.String(http.StatusInternalServerError, "Server Error")
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Failed to delete user"})
 		return
 	}
 
@@ -214,21 +214,14 @@ func UpdateUser(c *gin.Context) {
 
 	beacon, err := BeaconService.GetBeaconByBeaconName(UserUpdateRequest.BeaconName)
 	if err != nil {
-		c.String(http.StatusInternalServerError, "Server Error")
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Failed to update user"})
 		return
 	}
 
-	// BeaconId, err := BeaconService.GetBeaconIdByBeaconName(UserUpdateRequest.BeaconName)
-	// // もしbeaconTypeIdが取得できたらerrがnilになる
-	// if err != nil {
-	// 	c.String(http.StatusInternalServerError, "Server Error")
-	// 	return
-	// }
-	
 	// 更新前のユーザの情報を取得
 	currentUser, err := UserService.GetUserByUserId(UserUpdateRequest.ID)
 	if err != nil {
-		c.String(http.StatusInternalServerError, "Server Error")
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Failed to get user"})
 		return
 	}
 
@@ -236,11 +229,11 @@ func UpdateUser(c *gin.Context) {
 	if currentUser.Email != UserUpdateRequest.Email {
 		isRegisterdEmail, err := UserService.IsEmailAlreadyRegistered(UserUpdateRequest.Email)
 		if err != nil {
-			c.String(http.StatusInternalServerError, "Server Error")
+			c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Failed to check email is arleady registerd"})
 			return
 		} else if isRegisterdEmail {
 			// 同じメールアドレスが既に登録済みの場合
-			c.String(http.StatusConflict, "Arleady Registered Email")
+			c.AbortWithStatusJSON(http.StatusConflict, gin.H{"error": "Arleady Registered Email"})
 			return
 		}
 	}
@@ -262,18 +255,18 @@ func UpdateUser(c *gin.Context) {
 	}
 
 	user := model.User{
-		Name:         UserUpdateRequest.Name,
-		Email:        UserUpdateRequest.Email,
-		Role:         UserUpdateRequest.Role,
-		UUID:         newUuid,
-		BeaconId: int64(beacon.ID),
-		CommunityId:  UserUpdateRequest.CommunityId,
+		Name:        UserUpdateRequest.Name,
+		Email:       UserUpdateRequest.Email,
+		Role:        UserUpdateRequest.Role,
+		UUID:        newUuid,
+		BeaconId:    int64(beacon.ID),
+		CommunityId: UserUpdateRequest.CommunityId,
 	}
 
 	// usersテーブルにユーザ情報を保存
 	err = UserService.UpdateUser(&user, UserUpdateRequest.ID)
 	if err != nil {
-		c.String(http.StatusInternalServerError, "Server Error")
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Failed to update user"})
 		return
 	}
 
@@ -281,7 +274,7 @@ func UpdateUser(c *gin.Context) {
 	// タグマップIDを取得
 	tagMapIds, err := TagService.GetTagMapIdsByUserId(UserUpdateRequest.ID)
 	if err != nil {
-		c.String(http.StatusInternalServerError, "Server Error")
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Failed to get tagMap"})
 		return
 	}
 
@@ -289,8 +282,8 @@ func UpdateUser(c *gin.Context) {
 	for _, tagMapId := range tagMapIds {
 		err = TagService.DeleteTagMap(tagMapId)
 		if err != nil {
-			fmt.Printf("Cannot register tagMap: %v", err)
-			c.String(http.StatusInternalServerError, "Server Error")
+			fmt.Printf("Cannot delete tagMap: %v", err)
+			c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Failed to delete tagMap"})
 			return
 		}
 	}
@@ -304,7 +297,7 @@ func UpdateUser(c *gin.Context) {
 		err = TagService.CreateTagMap(&tagMap)
 		if err != nil {
 			fmt.Printf("Cannot register tagMap: %v", err)
-			c.String(http.StatusInternalServerError, "Server Error")
+			c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Failed to registered tagMap"})
 			return
 		}
 	}
@@ -362,11 +355,14 @@ func PastUserList(c *gin.Context) {
 func UserList(c *gin.Context) {
 
 	UserService := service.UserService{}
-	communityId, _ := strconv.ParseInt(c.Param("communityId"), 10, 64) // string -> int64
+	communityId, err := strconv.ParseInt(c.Param("communityId"), 10, 64) // string -> int64
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": "Type is not number"})
+	}
 
 	users, err := UserService.GetEditUsersByCommunityId(communityId)
 	if err != nil {
-		c.String(http.StatusInternalServerError, "Server Error")
+		c.String(http.StatusInternalServerError, "Cannot Get Users")
 	}
 
 	userInformationGetResponse := []model.UserInformationGetResponse{}
@@ -376,7 +372,7 @@ func UserList(c *gin.Context) {
 		tags := make([]model.TagGetResponse, 0)
 		tagsID, err := UserService.GetUserTagsID(int64(user.Model.ID))
 		if err != nil {
-			c.String(http.StatusInternalServerError, "Server Error")
+			c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Failed to get user tags"})
 			return
 		}
 
@@ -384,7 +380,7 @@ func UserList(c *gin.Context) {
 			//タグIDからタグ名を取得する
 			tagName, err := UserService.GetTagName(tagID)
 			if err != nil {
-				c.String(http.StatusInternalServerError, "Server Error")
+				c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Failed to get tag"})
 				return
 			}
 			tag := model.TagGetResponse{
@@ -392,11 +388,6 @@ func UserList(c *gin.Context) {
 				Name: tagName,
 			}
 			tags = append(tags, tag)
-		}
-
-		if err != nil {
-			c.String(http.StatusInternalServerError, "Server Error")
-			return
 		}
 
 		userInformationGetResponse = append(userInformationGetResponse, model.UserInformationGetResponse{
@@ -415,7 +406,7 @@ func AdminUserList(c *gin.Context) {
 
 	edit_users, err := UserService.GetEditUsersByCommunityId(communityId)
 	if err != nil {
-		c.String(http.StatusInternalServerError, "Server Error")
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Failed to get users"})
 	}
 
 	userEditorResponse := []model.UserEditorResponse{}
@@ -425,7 +416,7 @@ func AdminUserList(c *gin.Context) {
 		tags := make([]model.TagGetResponse, 0)
 		tagsID, err := UserService.GetUserTagsID(int64(user.Model.ID))
 		if err != nil {
-			c.String(http.StatusInternalServerError, "Server Error")
+			c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Failed to get user tags"})
 			return
 		}
 
@@ -433,7 +424,7 @@ func AdminUserList(c *gin.Context) {
 			//タグIDからタグ名を取得する
 			tagName, err := UserService.GetTagName(tagID)
 			if err != nil {
-				c.String(http.StatusInternalServerError, "Server Error")
+				c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Failed to get tag"})
 				return
 			}
 			tag := model.TagGetResponse{
@@ -443,14 +434,9 @@ func AdminUserList(c *gin.Context) {
 			tags = append(tags, tag)
 		}
 
-		if err != nil {
-			c.String(http.StatusInternalServerError, "Server Error")
-			return
-		}
-
 		beacon, err := BeaconService.GetBeaconByBeaconId(user.BeaconId)
 		if err != nil {
-			c.String(http.StatusInternalServerError, "Server Error")
+			c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Failed to get beacon"})
 			return
 		}
 
@@ -473,7 +459,7 @@ func ExtendedUserList(c *gin.Context) {
 	UserService := service.UserService{}
 	users, err := UserService.GetAllUser()
 	if err != nil {
-		c.String(http.StatusInternalServerError, "Server Error")
+		c.String(http.StatusInternalServerError, "Cannot GetAllUser")
 		return
 	}
 
@@ -485,7 +471,7 @@ func ExtendedUserList(c *gin.Context) {
 		tags := make([]model.TagGetResponse, 0)
 		tagsID, err := UserService.GetUserTagsID(int64(user.Model.ID))
 		if err != nil {
-			c.String(http.StatusInternalServerError, "Server Error")
+			c.String(http.StatusInternalServerError, "Cannot GetUserTagsID")
 			return
 		}
 
@@ -493,7 +479,7 @@ func ExtendedUserList(c *gin.Context) {
 			//タグIDからタグ名を取得する
 			tagName, err := UserService.GetTagName(tagID)
 			if err != nil {
-				c.String(http.StatusInternalServerError, "Server Error")
+				c.String(http.StatusInternalServerError, "Cannot GetTagName")
 				return
 			}
 			tag := model.TagGetResponse{
