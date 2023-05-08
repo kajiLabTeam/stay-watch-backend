@@ -158,7 +158,10 @@ func PastCreateUser(c *gin.Context) {
 
 func DeleteUser(c *gin.Context) {
 
-	userId, _ := strconv.ParseInt(c.Param("userId"), 10, 64) // string -> int64
+	userId, err := strconv.ParseInt(c.Param("userId"), 10, 64) // string -> int64
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusBadRequest, "Type is not number")
+	}
 
 	fmt.Print("userId: ")
 	fmt.Println(userId)
@@ -402,7 +405,10 @@ func UserList(c *gin.Context) {
 func AdminUserList(c *gin.Context) {
 	UserService := service.UserService{}
 	BeaconService := service.BeaconService{}
-	communityId, _ := strconv.ParseInt(c.Param("communityId"), 10, 64) // string -> int64
+	communityId, err := strconv.ParseInt(c.Param("communityId"), 10, 64) // string -> int64
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusBadRequest, "Type is not number")
+	}
 
 	edit_users, err := UserService.GetEditUsersByCommunityId(communityId)
 	if err != nil {

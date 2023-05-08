@@ -13,7 +13,10 @@ import (
 )
 
 func GetCommunityByUserId(c *gin.Context) {
-	userId, _ := strconv.ParseInt(c.Param("userId"), 10, 64) // string -> int64
+	userId, err := strconv.ParseInt(c.Param("userId"), 10, 64) // string -> int64
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusBadRequest, "Type is not number")
+	}
 
 	CommunityService := service.CommunityService{}
 	UserService := service.UserService{}

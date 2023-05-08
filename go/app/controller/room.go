@@ -49,7 +49,11 @@ func UpdateRoom(c *gin.Context) {
 }
 
 func GetRoomsByCommunityID(c *gin.Context) {
-	communityID, _ := strconv.ParseInt(c.Param("communityID"), 10, 64) // string -> int64
+	communityID, err := strconv.ParseInt(c.Param("communityID"), 10, 64) // string -> int64
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusBadRequest, "Type is not number")
+	}
+
 	RoomService := service.RoomService{}
 	rooms, err := RoomService.GetAllRooms()
 	if err != nil {
