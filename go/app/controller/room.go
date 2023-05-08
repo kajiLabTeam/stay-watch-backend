@@ -87,7 +87,7 @@ func GetRoomsByCommunityID(c *gin.Context) {
 			})
 		}
 	}
-	c.JSON(200, roomsGetResponse)
+	c.JSON(http.StatusOK, roomsGetResponse)
 
 }
 
@@ -149,7 +149,7 @@ func Stayer(c *gin.Context) {
 			Tags:   tagsGetResponse,
 		})
 	}
-	c.JSON(200, stayerGetResponse)
+	c.JSON(http.StatusOK, stayerGetResponse)
 }
 
 func Log(c *gin.Context) {
@@ -193,7 +193,7 @@ func Log(c *gin.Context) {
 			EndAt:   log.EndAt.Format("2006-01-02 15:04:05"),
 		})
 	}
-	c.JSON(200, logGetResponse)
+	c.JSON(http.StatusOK, logGetResponse)
 }
 
 // func SimultaneousList(c *gin.Context) {
