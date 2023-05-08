@@ -11,7 +11,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func GetTagsByCommunityId(c *gin.Context) {
+func GetTagsByCommunityIdHandler(c *gin.Context) {
 	communityId, err := strconv.ParseInt(c.Param("communityId"), 10, 64) // string -> int64
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusBadRequest, "Type is not number")

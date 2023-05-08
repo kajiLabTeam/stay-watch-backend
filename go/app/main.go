@@ -43,7 +43,7 @@ func SetUpServer() *gin.Engine {
 		versionEngine.POST("/stayers", controller.Beacon)
 		versionEngine.GET("/logs", controller.Log)
 		versionEngine.GET("/logs/gantt", controller.LogGantt)
-		versionEngine.GET("/users", controller.PastUserList)	// 編集機能のフロントのブランチがマージされたら消す
+		versionEngine.GET("/users", controller.PastUserList) // 編集機能のフロントのブランチがマージされたら消す
 		versionEngine.GET("/users/:communityId", controller.UserList)
 		versionEngine.GET("/users/extended", controller.ExtendedUserList)
 		versionEngine.POST("/users", controller.CreateUser)
@@ -55,9 +55,9 @@ func SetUpServer() *gin.Engine {
 		versionEngine.GET("/rooms/:communityID", controller.GetRoomsByCommunityID)
 		versionEngine.PUT("/rooms", controller.UpdateRoom)
 		versionEngine.GET("/tags/:communityId/names", controller.GetTagNamesByCommunityId)
-		versionEngine.GET("/tags/:communityId", controller.GetTagsByCommunityId)
+		versionEngine.GET("/tags/:communityId", controller.GetTagsByCommunityIdHandler)
 		versionEngine.GET("/beacons", controller.GetBeacon)
-		versionEngine.GET("/communities/:userId", controller.GetCommunityByUserId)
+		versionEngine.GET("/communities/:userId", controller.GetCommunityByUserIdHandler)
 		versionEngine.GET("/buildings/editor", controller.GetBuildingsEditor)
 		versionEngine.GET("/signup", controller.SignUp)
 	}
