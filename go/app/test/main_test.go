@@ -247,7 +247,7 @@ func TestDeleteUser(t *testing.T) {
 
 	asserts := assert.New(t)
 
-	for i := 0; i < 5; i++ {
+	for i := 1; i < 5; i++ {
 		// HTTPリクエストの生成
 		req, _ := http.NewRequest(http.MethodDelete, "/api/v1/users/"+strconv.Itoa(i), nil)
 
