@@ -175,99 +175,6 @@ func TestGetEditorUser(t *testing.T) {
 	fmt.Println("TestGetEditorUser通過")
 }
 
-// ユーザの新規登録API
-// 未登録の場合
-func TestCreateUser(t *testing.T) {
-
-	response := httptest.NewRecorder()
-	ginContext, _ := gin.CreateTestContext(response)
-
-	// 未登録ユーザ
-	unregisteredUser := model.UserCreateRequest{
-		Name:        "tarou",
-		Uuid:        "",
-		Email:       "toge7113+unregistaserd@gmail.com",
-		Role:        1,
-		CommunityId: 1,
-		BeaconName:  "FCS1301",
-		TagIds:      []int64{1, 2, 5},
-	}
-	jsonUnegisteredUser, err := json.Marshal(unregisteredUser)
-	if err != nil {
-		t.Fatal(err)
-	}
-	// リクエスト情報をコンテキストに入れる
-	ginContext.Request, _ = http.NewRequest(http.MethodPost, "/users", nil)
-	ginContext.Request.Header.Set("Content-Type", "application/json")
-	ginContext.Request.Body = ioutil.NopCloser(bytes.NewBuffer(jsonUnegisteredUser))
-	controller.CreateUser(ginContext)
-	asserts := assert.New(t)
-	fmt.Println(response)
-	// レスポンスのステータスコードの確認(未登録ユーザ)
-	asserts.Equal(http.StatusCreated, response.Code)
-
-	fmt.Println("TestCreateUser通過")
-}
-
-// ユーザの更新API
-func TestPutUser(t *testing.T) {
-
-	response := httptest.NewRecorder()
-	ginContext, _ := gin.CreateTestContext(response)
-
-	user := model.UserUpdateRequest{
-		ID:          10,
-		Name:        "test",
-		Uuid:        "e7d61ea3f8dd49c88f2ffaefae484c07ab00",
-		Email:       "toge7113+test-put-user@gmail.com",
-		Role:        1,
-		CommunityId: 1,
-		BeaconName:  "FCS1301",
-		TagIds:      []int64{1, 2, 5},
-	}
-	jsonUser, err := json.Marshal(user)
-	if err != nil {
-		t.Fatal(err)
-	}
-	// リクエスト情報をコンテキストに入れる
-	ginContext.Request, _ = http.NewRequest(http.MethodPost, "/users", nil)
-	ginContext.Request.Header.Set("Content-Type", "application/json")
-	ginContext.Request.Body = ioutil.NopCloser(bytes.NewBuffer(jsonUser))
-	controller.UpdateUser(ginContext)
-	asserts := assert.New(t)
-	// レスポンスのステータスコードの確認
-	asserts.Equal(http.StatusCreated, response.Code)
-	fmt.Println("TestPutUser通過")
-}
-
-func TestDeleteUser(t *testing.T) {
-
-	router := gin.Default()
-	router.DELETE("/api/v1/users/:userId", controller.DeleteUser)
-
-	asserts := assert.New(t)
-
-	for i := 1; i < 5; i++ {
-		// HTTPリクエストの生成
-		req, _ := http.NewRequest(http.MethodDelete, "/api/v1/users/"+strconv.Itoa(i), nil)
-
-		// レスポンスのレコーダーを作成
-		res := httptest.NewRecorder()
-
-		// リクエストをハンドル
-		router.ServeHTTP(res, req)
-		// レスポンスのステータスコードの確認
-		asserts.Equal(http.StatusCreated, res.Code)
-
-		// レスポンスのボディを構造体に変換
-		var responseUser []model.UserEditorResponse
-		json.Unmarshal(res.Body.Bytes(), &responseUser)
-
-	}
-
-	fmt.Println("TestDeleteUser通過")
-}
-
 func TestGetTagNames(t *testing.T) {
 
 	router := gin.Default()
@@ -365,6 +272,99 @@ func TestGetCommunityByUserId(t *testing.T) {
 	asserts.Equal("テスト研究室", responseCommunity.Name)
 
 	fmt.Println("TestGetCommunityByUserId通過")
+}
+
+// ユーザの新規登録API
+// 未登録の場合
+func TestCreateUser(t *testing.T) {
+
+	response := httptest.NewRecorder()
+	ginContext, _ := gin.CreateTestContext(response)
+
+	// 未登録ユーザ
+	unregisteredUser := model.UserCreateRequest{
+		Name:        "tarou",
+		Uuid:        "",
+		Email:       "toge7113+unregistaserd@gmail.com",
+		Role:        1,
+		CommunityId: 1,
+		BeaconName:  "FCS1301",
+		TagIds:      []int64{1, 2, 5},
+	}
+	jsonUnegisteredUser, err := json.Marshal(unregisteredUser)
+	if err != nil {
+		t.Fatal(err)
+	}
+	// リクエスト情報をコンテキストに入れる
+	ginContext.Request, _ = http.NewRequest(http.MethodPost, "/users", nil)
+	ginContext.Request.Header.Set("Content-Type", "application/json")
+	ginContext.Request.Body = ioutil.NopCloser(bytes.NewBuffer(jsonUnegisteredUser))
+	controller.CreateUser(ginContext)
+	asserts := assert.New(t)
+	fmt.Println(response)
+	// レスポンスのステータスコードの確認(未登録ユーザ)
+	asserts.Equal(http.StatusCreated, response.Code)
+
+	fmt.Println("TestCreateUser通過")
+}
+
+// ユーザの更新API
+func TestPutUser(t *testing.T) {
+
+	response := httptest.NewRecorder()
+	ginContext, _ := gin.CreateTestContext(response)
+
+	user := model.UserUpdateRequest{
+		ID:          10,
+		Name:        "test",
+		Uuid:        "e7d61ea3f8dd49c88f2ffaefae484c07ab00",
+		Email:       "toge7113+test-put-user@gmail.com",
+		Role:        1,
+		CommunityId: 1,
+		BeaconName:  "FCS1301",
+		TagIds:      []int64{1, 2, 5},
+	}
+	jsonUser, err := json.Marshal(user)
+	if err != nil {
+		t.Fatal(err)
+	}
+	// リクエスト情報をコンテキストに入れる
+	ginContext.Request, _ = http.NewRequest(http.MethodPost, "/users", nil)
+	ginContext.Request.Header.Set("Content-Type", "application/json")
+	ginContext.Request.Body = ioutil.NopCloser(bytes.NewBuffer(jsonUser))
+	controller.UpdateUser(ginContext)
+	asserts := assert.New(t)
+	// レスポンスのステータスコードの確認
+	asserts.Equal(http.StatusCreated, response.Code)
+	fmt.Println("TestPutUser通過")
+}
+
+func TestDeleteUser(t *testing.T) {
+
+	router := gin.Default()
+	router.DELETE("/api/v1/users/:userId", controller.DeleteUser)
+
+	asserts := assert.New(t)
+
+	for i := 1; i < 5; i++ {
+		// HTTPリクエストの生成
+		req, _ := http.NewRequest(http.MethodDelete, "/api/v1/users/"+strconv.Itoa(i), nil)
+
+		// レスポンスのレコーダーを作成
+		res := httptest.NewRecorder()
+
+		// リクエストをハンドル
+		router.ServeHTTP(res, req)
+		// レスポンスのステータスコードの確認
+		asserts.Equal(http.StatusCreated, res.Code)
+
+		// レスポンスのボディを構造体に変換
+		var responseUser []model.UserEditorResponse
+		json.Unmarshal(res.Body.Bytes(), &responseUser)
+
+	}
+
+	fmt.Println("TestDeleteUser通過")
 }
 
 // func TestCreateUserUnRegistered(t *testing.T) {
