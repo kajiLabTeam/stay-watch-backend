@@ -39,7 +39,7 @@ func GetTagsByCommunityId(c *gin.Context) {
 		})
 	}
 
-	c.JSON(200, tagsResponse)
+	c.JSON(http.StatusOK, tagsResponse)
 }
 
 func GetTagNamesByCommunityId(c *gin.Context) {
@@ -69,5 +69,5 @@ func GetTagNamesByCommunityId(c *gin.Context) {
 		})
 	}
 
-	c.JSON(200, tagNamesResponse)
+	c.JSON(http.StatusOK, tagNamesResponse)
 }

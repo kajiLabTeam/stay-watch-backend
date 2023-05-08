@@ -13,7 +13,7 @@ import (
 )
 
 func Detail(c *gin.Context) {
-	c.JSON(200, gin.H{
+	c.JSON(http.StatusOK, gin.H{
 		"message": "Hello, World!",
 	})
 }
@@ -612,7 +612,7 @@ func Attendance(c *gin.Context) {
 // 		return
 // 	}
 
-// 	c.JSON(200, simultaneousStayUserGetResponses)
+// 	c.JSON(http.StatusOK, simultaneousStayUserGetResponses)
 // }
 
 func Check(c *gin.Context) {

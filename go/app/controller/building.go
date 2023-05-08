@@ -33,6 +33,6 @@ func GetBuildingsEditor(c *gin.Context) {
 		})
 	}
 
-	c.JSON(200, buildingsEditorGetResponse)
+	c.JSON(http.StatusOK, buildingsEditorGetResponse)
 
 }
