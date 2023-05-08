@@ -12,7 +12,11 @@ import (
 )
 
 func GetTagsByCommunityId(c *gin.Context) {
-	communityId, _ := strconv.ParseInt(c.Param("communityId"), 10, 64) // string -> int64
+	communityId, err := strconv.ParseInt(c.Param("communityId"), 10, 64) // string -> int64
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusBadRequest, "Type is not number")
+	}
+
 	TagService := service.TagService{}
 
 	// DBからどこのコミュニティにも該当するタグを持ってくる
@@ -43,7 +47,11 @@ func GetTagsByCommunityId(c *gin.Context) {
 }
 
 func GetTagNamesByCommunityId(c *gin.Context) {
-	communityId, _ := strconv.ParseInt(c.Param("communityId"), 10, 64) // string -> int64
+	communityId, err := strconv.ParseInt(c.Param("communityId"), 10, 64) // string -> int64
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusBadRequest, "Type is not number")
+	}
+
 	TagService := service.TagService{}
 
 	// DBからどこのコミュニティにも該当するタグネームを持ってくる
