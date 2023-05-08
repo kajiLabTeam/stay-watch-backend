@@ -12,7 +12,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func GetCommunityByUserId(c *gin.Context) {
+func GetCommunityByUserIdHandler(c *gin.Context) {
 	userId, err := strconv.ParseInt(c.Param("userId"), 10, 64) // string -> int64
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusBadRequest, "Type is not number")

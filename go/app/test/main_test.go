@@ -250,7 +250,7 @@ func TestGetBeacons(t *testing.T) {
 func TestGetCommunityByUserId(t *testing.T) {
 
 	router := gin.Default()
-	router.GET("/api/v1/communities/:userId", controller.GetCommunityByUserId)
+	router.GET("/api/v1/communities/:userId", controller.GetCommunityByUserIdHandler)
 
 	asserts := assert.New(t)
 
