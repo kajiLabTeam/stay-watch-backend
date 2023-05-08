@@ -94,7 +94,7 @@ func CreateUser(c *gin.Context) {
 		err = TagService.CreateTagMap(&tag)
 		if err != nil {
 			fmt.Printf("Cannot register tagMap: %v", err)
-			c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Failed to create tagMap"})
+			c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Failed to create tag map"})
 			return
 		}
 	}
@@ -127,7 +127,7 @@ func PastCreateUser(c *gin.Context) {
 		err := UserService.PastRegisterUser(&user)
 		if err != nil {
 			fmt.Printf("Cannnot register user: %v", err)
-			c.String(http.StatusInternalServerError, "Server Error")
+			c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Failed to register user"})
 			return
 		}
 	}
@@ -141,7 +141,7 @@ func PastCreateUser(c *gin.Context) {
 		)
 
 		if err != nil {
-			c.String(http.StatusInternalServerError, "Server Error")
+			c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Failed to"})
 			return
 		}
 	}
@@ -314,7 +314,7 @@ func PastUserList(c *gin.Context) {
 
 	users, err := UserService.GetAllUser()
 	if err != nil {
-		c.String(http.StatusInternalServerError, "Server Error")
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Failed to get user"})
 		return
 	}
 
@@ -325,7 +325,7 @@ func PastUserList(c *gin.Context) {
 		tags := make([]model.TagGetResponse, 0)
 		tagsID, err := UserService.GetUserTagsID(int64(user.Model.ID))
 		if err != nil {
-			c.String(http.StatusInternalServerError, "Server Error")
+			c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Failed to get user tags"})
 			return
 		}
 
@@ -333,7 +333,7 @@ func PastUserList(c *gin.Context) {
 			//タグIDからタグ名を取得する
 			tagName, err := UserService.GetTagName(tagID)
 			if err != nil {
-				c.String(http.StatusInternalServerError, "Server Error")
+				c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Failed to get tag name"})
 				return
 			}
 			tag := model.TagGetResponse{
@@ -506,7 +506,7 @@ func ExtendedUserList(c *gin.Context) {
 // 	tags := make([]model.TagGetResponse, 0)
 // 	tagsID, err := UserService.GetUserTagsID(int64(user.Model.ID))
 // 	if err != nil {
-// 		c.String(http.StatusInternalServerError, "Server Error")
+// 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Failed to "})
 // 		return
 // 	}
 
@@ -514,7 +514,7 @@ func ExtendedUserList(c *gin.Context) {
 // 		//タグIDからタグ名を取得する
 // 		tagName, err := UserService.GetTagName(tagID)
 // 		if err != nil {
-// 			c.String(http.StatusInternalServerError, "Server Error")
+// 			c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Failed to "})
 // 			return
 // 		}
 // 		tag := model.TagGetResponse{
@@ -552,7 +552,7 @@ func Attendance(c *gin.Context) {
 	//attendaance_tmpテーブルから全てのデータを取得する
 	allAttendancesTmp, err := UserService.GetAllAttendancesTmp()
 	if err != nil {
-		c.String(http.StatusInternalServerError, "Server Error")
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Failed to get attendance"})
 		return
 	}
 
@@ -594,7 +594,7 @@ func Attendance(c *gin.Context) {
 // 	//int64に変換
 // 	userIDInt64, err := strconv.ParseInt(userID, 10, 64)
 // 	if err != nil {
-// 		c.String(http.StatusInternalServerError, "Server Error")
+// 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Failed to "})
 // 		return
 // 	}
 
@@ -603,12 +603,12 @@ func Attendance(c *gin.Context) {
 
 // 	logs, err := RoomService.GetLogByUserAndDate(userIDInt64, 14)
 // 	if err != nil {
-// 		c.String(http.StatusInternalServerError, "Server Error")
+// 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Failed to "})
 // 		return
 // 	}
 // 	simultaneousStayUserGetResponses, err := UserService.GetSameTimeUser(logs)
 // 	if err != nil {
-// 		c.String(http.StatusInternalServerError, "Server Error")
+// 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Failed to "})
 // 		return
 // 	}
 
@@ -629,7 +629,7 @@ func Check(c *gin.Context) {
 	user, err := UserService.GetUserByEmail(firebaseUserInfo["Email"])
 	if err != nil {
 		fmt.Printf("Cannnot find user: %v", err)
-		c.String(http.StatusInternalServerError, "Server Error")
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Failed to get user"})
 		return
 	}
 	fmt.Println(user)
@@ -666,7 +666,7 @@ func SignUp(c *gin.Context) {
 	user, err := UserService.GetUserByEmail(firebaseUserInfo["Email"])
 	if err != nil {
 		fmt.Printf("Cannnot find user: %v", err)
-		c.String(http.StatusInternalServerError, "Server Error")
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Failed to get user"})
 		return
 	}
 	fmt.Println(user)

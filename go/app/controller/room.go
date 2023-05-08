@@ -4,30 +4,28 @@ import (
 	"Stay_watch/model"
 	"Stay_watch/service"
 	"fmt"
-	"strings"
 	"net/http"
 	"strconv"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 )
 
 // 例："100,101-200,201" -> [[100,101],[200,201]]
 func ParseStringToIntSlice(str string) [][]int64 {
-	polygonStringArray := strings.Split(str,"-")
+	polygonStringArray := strings.Split(str, "-")
 	polygonIntArray := [][]int64{}
 	for _, pointString := range polygonStringArray {
-		parts := strings.Split(pointString, ",")	// parts: ["100","101"]
+		parts := strings.Split(pointString, ",") // parts: ["100","101"]
 		pointIntArray := []int64{}
 		for _, part := range parts {
 			tmp, _ := strconv.Atoi(part)
 			pointIntArray = append(pointIntArray, int64(tmp))
 		}
-		polygonIntArray = append(polygonIntArray,pointIntArray)
+		polygonIntArray = append(polygonIntArray, pointIntArray)
 	}
 	return polygonIntArray
 }
-
-
 
 func UpdateRoom(c *gin.Context) {
 
@@ -43,7 +41,7 @@ func UpdateRoom(c *gin.Context) {
 	storePolygon := strconv.FormatInt(RoomForm.Polygon[0][0], 10) + "," + strconv.FormatInt(RoomForm.Polygon[0][1], 10) + "-" + strconv.FormatInt(RoomForm.Polygon[1][0], 10) + "," + strconv.FormatInt(RoomForm.Polygon[1][1], 10)
 
 	RoomService := service.RoomService{}
-	RoomService.UpdateRoom(int(RoomForm.RoomID) ,RoomForm.RoomName, int(RoomForm.BuildingID), storePolygon)
+	RoomService.UpdateRoom(int(RoomForm.RoomID), RoomForm.RoomName, int(RoomForm.BuildingID), storePolygon)
 
 	c.JSON(http.StatusCreated, gin.H{
 		"status": "ok",
@@ -51,16 +49,16 @@ func UpdateRoom(c *gin.Context) {
 }
 
 func GetRoomsByCommunityID(c *gin.Context) {
-	communityID, _ := strconv.ParseInt(c.Param("communityID"), 10, 64)	// string -> int64
+	communityID, _ := strconv.ParseInt(c.Param("communityID"), 10, 64) // string -> int64
 	RoomService := service.RoomService{}
 	rooms, err := RoomService.GetAllRooms()
 	if err != nil {
 		fmt.Printf("failed: Cannnot get stayer %v", err)
-		c.String(http.StatusInternalServerError, "Server Error")
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Failed to get rooms"})
 		return
 	}
 	roomsGetResponse := []model.RoomsGetResponse{}
-	
+
 	//---communityIDからコミュニティの名前を調べる機能実装予定---
 
 	//----------------------------------------------------
@@ -72,27 +70,26 @@ func GetRoomsByCommunityID(c *gin.Context) {
 		// fmt.Println(room.Polygon)
 
 		// コミュニティIDが一致した部屋情報だけ返す
-		if(room.CommunityID == communityID){
+		if room.CommunityID == communityID {
 			roomName := room.Name
 			roomID := int64(room.ID)
-			
+
 			//---roomIDから建物の名前,IDを調べる機能実装予定---
 
 			//----------------------------------------
 			roomsGetResponse = append(roomsGetResponse, model.RoomsGetResponse{
-				RoomID: roomID,
-				Name: roomName,
+				RoomID:        roomID,
+				Name:          roomName,
 				CommunityName: "梶研究室",
-				BuildingName: "4号館",
-				Polygon: ParseStringToIntSlice(room.Polygon),
-				BuildingId: room.BuildingID,
+				BuildingName:  "4号館",
+				Polygon:       ParseStringToIntSlice(room.Polygon),
+				BuildingId:    room.BuildingID,
 			})
 		}
 	}
 	c.JSON(200, roomsGetResponse)
 
 }
-
 
 func Stayer(c *gin.Context) {
 
@@ -104,7 +101,7 @@ func Stayer(c *gin.Context) {
 	if err != nil {
 
 		fmt.Printf("failed: Cannnot get stayer %v", err)
-		c.String(http.StatusInternalServerError, "Server Error")
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Failed to get stayer"})
 		return
 	}
 
@@ -114,19 +111,19 @@ func Stayer(c *gin.Context) {
 
 		userName, err := UserService.GetUserNameByUserID(stayer.UserID)
 		if err != nil {
-			c.String(http.StatusInternalServerError, "Server Error")
+			c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Failed to get user name"})
 			return
 		}
 		roomName, err := RoomService.GetRoomNameByRoomID(stayer.RoomID)
 		if err != nil {
-			c.String(http.StatusInternalServerError, "Server Error")
+			c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Failed to get room name"})
 			return
 		}
 		tagsGetResponse := make([]model.TagGetResponse, 0)
 
 		tagsID, err := UserService.GetUserTagsID(stayer.UserID)
 		if err != nil {
-			c.String(http.StatusInternalServerError, "Server Error")
+			c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Failed to get user tags"})
 			return
 		}
 
@@ -134,7 +131,7 @@ func Stayer(c *gin.Context) {
 			//タグIDからタグ名を取得する
 			tagName, err := UserService.GetTagName(tagID)
 			if err != nil {
-				c.String(http.StatusInternalServerError, "Server Error")
+				c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Failed to get tag name"})
 				return
 			}
 			tag := model.TagGetResponse{
@@ -169,7 +166,7 @@ func Log(c *gin.Context) {
 	//ページごとにLogテーブルからデータを取得する
 	pageLog, err := RoomService.GetLogsByPage(pageInt)
 	if err != nil {
-		c.String(http.StatusInternalServerError, "Server Error")
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Failed to get logs"})
 		return
 	}
 
@@ -179,12 +176,12 @@ func Log(c *gin.Context) {
 
 		userName, err := UserService.GetUserNameByUserID(log.UserID)
 		if err != nil {
-			c.String(http.StatusInternalServerError, "Server Error")
+			c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Failed to get user name"})
 			return
 		}
 		roomName, err := RoomService.GetRoomNameByRoomID(log.RoomID)
 		if err != nil {
-			c.String(http.StatusInternalServerError, "Server Error")
+			c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Failed to get room name"})
 			return
 		}
 
@@ -213,7 +210,7 @@ func Log(c *gin.Context) {
 
 // 	SimultaneousList, err := RoomService.GetSimultaneousList(userIDInt)
 // 	if err != nil {
-// 		c.String(http.StatusInternalServerError, "Server Error")
+// 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Failed to "})
 // 		return
 // 	}
 
@@ -225,7 +222,7 @@ func LogGantt(c *gin.Context) {
 	RoomService := service.RoomService{}
 	GanttLogs, err := RoomService.GetGanttLog()
 	if err != nil {
-		c.String(http.StatusInternalServerError, "Server Error")
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Failed to get gantt log"})
 		return
 	}
 	c.JSON(http.StatusOK, GanttLogs)
