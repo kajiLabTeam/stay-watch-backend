@@ -234,8 +234,8 @@ func (UserService) GetUserNameByUserID(userID int64) (string, error) {
 	user := model.User{}
 	result := DbEngine.Where("id=?", userID).Take(&user)
 	if result.Error != nil {
-		fmt.Printf("ユーザ名取得失敗 %v", result.Error)
-		return "", result.Error
+		// 見つからない場合は削除されたユーザであるということになる
+		return "削除済みユーザ", nil
 	}
 	return user.Name, nil
 }
@@ -416,7 +416,7 @@ func (UserService) IsEmailAlreadyRegistered(email string) (bool, error) {
 	user := model.User{}
 	result := DbEngine.Where("email=?", email).Take(&user)
 	// エラーの時はメールアドレスが見つからなかった時と同じなため
-	if (result.Error != nil || email == "") {
+	if result.Error != nil || email == "" {
 		return false, nil
 	}
 	return true, nil
