@@ -243,7 +243,7 @@ func TestPutUser(t *testing.T) {
 func TestDeleteUser(t *testing.T) {
 
 	router := gin.Default()
-	router.DELETE("/api/v1/users/:userId", controller.UserList)
+	router.DELETE("/api/v1/users/:userId", controller.DeleteUser)
 
 	asserts := assert.New(t)
 
@@ -257,7 +257,7 @@ func TestDeleteUser(t *testing.T) {
 		// リクエストをハンドル
 		router.ServeHTTP(res, req)
 		// レスポンスのステータスコードの確認
-		asserts.Equal(http.StatusOK, res.Code)
+		asserts.Equal(http.StatusCreated, res.Code)
 
 		// レスポンスのボディを構造体に変換
 		var responseUser []model.UserEditorResponse
