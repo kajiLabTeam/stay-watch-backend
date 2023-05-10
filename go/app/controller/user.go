@@ -640,6 +640,13 @@ func Check(c *gin.Context) {
 	}
 	fmt.Println(user)
 
+	CommunityService := service.CommunityService{}
+	community, err := CommunityService.GetCommunityById(user.CommunityId)
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Failed to get community"})
+		return
+	}
+
 	//メールアドレスが存在しない場合はUserは存在しないのでリクエスト失敗
 	if (user == model.User{}) {
 		c.JSON(http.StatusForbidden, gin.H{
@@ -651,8 +658,8 @@ func Check(c *gin.Context) {
 	userRole := model.UserRoleCommunityGetResponse{
 		ID:            int64(user.ID),
 		Role:          user.Role,
-		CommunityId:   2,
-		CommunityName: "梶研究室",
+		CommunityId:   int64(community.ID),
+		CommunityName: community.Name,
 	}
 
 	c.JSON(http.StatusOK,
