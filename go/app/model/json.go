@@ -36,9 +36,11 @@ type ExtendedUserInformationGetResponse struct {
 	Role  int64            `json:"role"`
 }
 
-type UserRoleGetResponse struct {
-	ID   int64 `json:"id"`
-	Role int64 `json:"role"`
+type UserRoleCommunityGetResponse struct {
+	ID            int64  `json:"id"`
+	Role          int64  `json:"role"`
+	CommunityId   int64  `json:"communityId"`
+	CommunityName string `json:"communityName"`
 }
 
 type RoomStayTime struct {
@@ -130,7 +132,7 @@ type UserUpdateRequest struct {
 
 type BeaconRoom struct {
 	Beacons []*BeaconSignal `json:"beacons"`
-	RoomID  int64     `json:"roomId"`
+	RoomID  int64           `json:"roomId"`
 }
 
 type BeaconSignal struct {
