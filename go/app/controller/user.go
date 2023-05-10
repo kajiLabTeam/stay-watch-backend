@@ -648,9 +648,11 @@ func Check(c *gin.Context) {
 		return
 	}
 
-	userRole := model.UserRoleGetResponse{
-		ID:   int64(user.ID),
-		Role: user.Role,
+	userRole := model.UserRoleCommunityGetResponse{
+		ID:            int64(user.ID),
+		Role:          user.Role,
+		CommunityId:   2,
+		CommunityName: "梶研究室",
 	}
 
 	c.JSON(http.StatusOK,
