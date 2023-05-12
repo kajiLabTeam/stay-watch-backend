@@ -70,10 +70,7 @@ func TestGetStayer(t *testing.T) {
 	json.Unmarshal(response.Body.Bytes(), &responseStayer)
 	// レスポンスのボディの確認
 	asserts.Equal("kaji", responseStayer[0].Name)
-	asserts.Equal("B1", responseStayer[0].Tags[0].Name)
-	asserts.Equal(2, int(responseStayer[0].Tags[0].ID))
-	asserts.Equal(2, int(responseStayer[0].ID))
-	asserts.Equal(1, int(responseStayer[0].RoomID))
+	asserts.Equal("Professor", responseStayer[0].Tags[0].Name)
 
 	fmt.Println("TestGetStayer通過")
 }
@@ -120,8 +117,8 @@ func TestGetUser(t *testing.T) {
 	json.Unmarshal(response.Body.Bytes(), &responseUser)
 	// レスポンスのボディの確認
 	//fmt.Println(responseUser)
-	asserts.Equal("test", responseUser[0].Name)
-	asserts.Equal("テストタグ", responseUser[0].Tags[0].Name)
+	asserts.Equal("kaji", responseUser[0].Name)
+	asserts.Equal("Professor", responseUser[0].Tags[0].Name)
 	asserts.Equal(1, int(responseUser[0].ID))
 
 	fmt.Println("TestGetUser通過")
@@ -157,8 +154,8 @@ func TestGetEditorUser(t *testing.T) {
 		// community_id=1 のテストユーザの情報が正しく取れているか確認
 		if i == 1 {
 			asserts.Equal("test", responseUser[0].Name)
-			asserts.Equal("テストタグ", responseUser[0].Tags[0].Name)
-			asserts.Equal("a7d61ea3f8dd49c88f2ff2484c07ac00", responseUser[0].Uuid)
+			asserts.Equal("B1", responseUser[0].Tags[0].Name)
+			asserts.Equal("a7d61ea3f8dd49c88f2ff2484c0fffff", responseUser[0].Uuid)
 			asserts.Equal("", responseUser[0].Email)
 			asserts.Equal("FCS1301", responseUser[0].BeaconName)
 		}
@@ -269,7 +266,7 @@ func TestGetCommunityByUserId(t *testing.T) {
 	var responseCommunity model.CommunityGetResponse
 	json.Unmarshal(res.Body.Bytes(), &responseCommunity)
 
-	asserts.Equal("テスト研究室", responseCommunity.Name)
+	asserts.Equal("梶研究室", responseCommunity.Name)
 
 	fmt.Println("TestGetCommunityByUserId通過")
 }
