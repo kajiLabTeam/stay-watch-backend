@@ -11,10 +11,24 @@ import (
 type User struct {
 	gorm.Model
 
-	UUID  string
-	Name  string
-	Email string
-	Role  int64
+	UUID         string
+	Name         string
+	Email        string
+	Role         int64
+	BeaconId 		 int64
+	CommunityId  int64
+}
+
+type DeletedUser struct {
+	gorm.Model
+
+	UUID         string
+	Name         string
+	Email        string
+	Role         int64
+	BeaconId 		 int64
+	CommunityId  int64
+	UserId       int64
 }
 
 type Log struct {
@@ -28,16 +42,16 @@ type Log struct {
 
 type Room struct {
 	gorm.Model
-	Name string
-	BuildingID int64
+	Name        string
+	BuildingID  int64
 	CommunityID int64
-	Polygon string
-	RecieverID string
+	Polygon     string
+	RecieverID  string
 }
 
 type Building struct {
 	gorm.Model
-	Name string
+	Name    string
 	MapFile string
 }
 
@@ -50,7 +64,8 @@ type Stayer struct {
 
 type Tag struct {
 	gorm.Model
-	Name string
+	Name        string
+	CommunityId int64
 }
 
 type TagMap struct {
@@ -69,4 +84,15 @@ type Attendance struct {
 type AttendanceTmp struct {
 	UserID int64 `json:"userID" xorm:"user_id"`
 	Flag   int64 `json:"exit" xorm:"flag"`
+}
+
+type Beacon struct {
+	gorm.Model
+	Type         string
+	UuidEditable bool
+}
+
+type Community struct {
+	gorm.Model
+	Name string
 }
