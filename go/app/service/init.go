@@ -3,6 +3,7 @@ package service
 import (
 	"Stay_watch/model"
 	"fmt"
+	"log"
 	"os"
 	"strings"
 
@@ -19,7 +20,7 @@ func init() {
 		return
 	}
 	defer closer.Close()
-	db.AutoMigrate(&model.User{}, &model.Log{}, &model.Room{}, &model.Stayer{}, &model.Tag{}, &model.TagMap{}, &model.Building{})
+	db.AutoMigrate(&model.User{}, &model.Log{}, &model.Room{}, &model.Stayer{}, &model.Tag{}, &model.TagMap{}, &model.Building{}, &model.Beacon{}, &model.DeletedUser{}, &model.Community{})
 
 	var count int64
 	db.Model(&model.User{}).Count(&count)
@@ -27,176 +28,255 @@ func init() {
 		//複数のユーザーを作成
 		users := []model.User{
 			{
-				Name:  "kaji",
-				Email: "",
-				Role:  1,
-				UUID:  "e7d61ea3f8dd49c88f2ff2484c07ac00",
+				Name:        "kaji",
+				Email:       "",
+				Role:        1,
+				UUID:        "e7d61ea3f8dd49c88f2ff2484c07ac00",
+				BeaconId:    1,
+				CommunityId: 2,
 			},
 			{
-				Name:  "ogane",
-				Email: "",
-				Role:  1,
-				UUID:  "e7d61ea3f8dd49c88f2ff2484c07ac01",
+				Name:        "ogane",
+				Email:       "",
+				Role:        1,
+				UUID:        "e7d61ea3f8dd49c88f2ff2484c07ac01",
+				BeaconId:    1,
+				CommunityId: 2,
 			},
 			{
-				Name:  "miyagawa",
-				Email: "",
-				Role:  1,
-				UUID:  "e7d61ea3f8dd49c88f2ff2484c07ac02",
+				Name:        "miyagawa",
+				Email:       "",
+				Role:        1,
+				UUID:        "e7d61ea3f8dd49c88f2ff2484c07ac02",
+				BeaconId:    1,
+				CommunityId: 2,
 			},
 			{
-				Name:  "ayato",
-				Email: "",
-				Role:  1,
-				UUID:  "e7d61ea3f8dd49c88f2ff2484c07ac03",
+				Name:        "ayato",
+				Email:       "",
+				Role:        1,
+				UUID:        "e7d61ea3f8dd49c88f2ff2484c07ac03",
+				BeaconId:    1,
+				CommunityId: 2,
 			},
 			{
-				Name:  "ken",
-				Email: "",
-				Role:  1,
-				UUID:  "e7d61ea3f8dd49c88f2ff2484c07ac04",
+				Name:        "ken",
+				Email:       "",
+				Role:        1,
+				UUID:        "e7d61ea3f8dd49c88f2ff2484c07ac04",
+				BeaconId:    1,
+				CommunityId: 2,
 			},
 			{
-				Name:  "suzaki",
-				Email: "",
-				Role:  1,
-				UUID:  "e7d61ea3f8dd49c88f2ff2484c07ac05",
+				Name:        "suzaki",
+				Email:       "",
+				Role:        1,
+				UUID:        "e7d61ea3f8dd49c88f2ff2484c07ac05",
+				BeaconId:    1,
+				CommunityId: 2,
 			},
 			{
-				Name:  "akito",
-				Email: "",
-				Role:  1,
-				UUID:  "e7d61ea3f8dd49c88f2ff2484c07ac06",
+				Name:        "akito",
+				Email:       "",
+				Role:        1,
+				UUID:        "e7d61ea3f8dd49c88f2ff2484c07ac06",
+				BeaconId:    1,
+				CommunityId: 2,
 			},
 			{
-				Name:  "fueta",
-				Email: "",
-				Role:  1,
-				UUID:  "e7d61ea3f8dd49c88f2ff2484c07ac07",
+				Name:        "fueta",
+				Email:       "",
+				Role:        1,
+				UUID:        "e7d61ea3f8dd49c88f2ff2484c07ac07",
+				BeaconId:    1,
+				CommunityId: 2,
 			},
 			{
-				Name:  "kameda",
-				Email: "",
-				Role:  1,
-				UUID:  "e7d61ea3f8dd49c88f2ff2484c07ac08",
+				Name:        "kameda",
+				Email:       "",
+				Role:        1,
+				UUID:        "e7d61ea3f8dd49c88f2ff2484c07ac08",
+				BeaconId:    1,
+				CommunityId: 2,
 			},
 			{
-				Name:  "maruyama",
-				Email: "",
-				Role:  1,
-				UUID:  "e7d61ea3f8dd49c88f2ff2484c07ac09",
+				Name:        "maruyama",
+				Email:       "",
+				Role:        1,
+				UUID:        "e7d61ea3f8dd49c88f2ff2484c07ac09",
+				BeaconId:    1,
+				CommunityId: 2,
 			},
 			{
-				Name:  "ohashi",
-				Email: "",
-				Role:  1,
-				UUID:  "e7d61ea3f8dd49c88f2ff2484c07ac0a",
+				Name:        "ohashi",
+				Email:       "",
+				Role:        1,
+				UUID:        "e7d61ea3f8dd49c88f2ff2484c07ac0a",
+				BeaconId:    1,
+				CommunityId: 2,
 			},
 			{
-				Name:  "rui",
-				Email: "",
-				Role:  1,
-				UUID:  "e7d61ea3f8dd49c88f2ff2484c07ac0b",
+				Name:        "rui",
+				Email:       "",
+				Role:        1,
+				UUID:        "e7d61ea3f8dd49c88f2ff2484c07ac0b",
+				BeaconId:    1,
+				CommunityId: 2,
 			},
 			{
-				Name:  "shamo",
-				Email: "",
-				Role:  1,
-				UUID:  "e7d61ea3f8dd49c88f2ff2484c07ac0c",
+				Name:        "shamo",
+				Email:       "",
+				Role:        1,
+				UUID:        "e7d61ea3f8dd49c88f2ff2484c07ac0c",
+				BeaconId:    1,
+				CommunityId: 2,
 			},
 			{
-				Name:  "terada",
-				Email: "",
-				Role:  1,
-				UUID:  "e7d61ea3f8dd49c88f2ff2484c07ac0d",
+				Name:        "terada",
+				Email:       "",
+				Role:        1,
+				UUID:        "e7d61ea3f8dd49c88f2ff2484c07ac0d",
+				BeaconId:    1,
+				CommunityId: 2,
 			},
 			{
-				Name:  "toyama",
-				Email: "tatu2425@gmail.com",
-				Role:  2,
-				UUID:  "e7d61ea3f8dd49c88f2ff2484c07ac0e",
+				Name:        "toyama",
+				Email:       "tatu2425@gmail.com",
+				Role:        2,
+				UUID:        "e7d61ea3f8dd49c88f2ff2484c07ac0e",
+				BeaconId:    1,
+				CommunityId: 2,
 			},
 			{
-				Name:  "ukai",
-				Email: "",
-				Role:  1,
-				UUID:  "e7d61ea3f8dd49c88f2ff2484c07ac0f",
+				Name:        "ukai",
+				Email:       "",
+				Role:        1,
+				UUID:        "e7d61ea3f8dd49c88f2ff2484c07ac0f",
+				BeaconId:    1,
+				CommunityId: 2,
 			},
 			{
-				Name:  "isiguro",
-				Email: "",
-				Role:  1,
-				UUID:  "e7d61ea3f8dd49c88f2ff2484c07ac10",
+				Name:        "isiguro",
+				Email:       "",
+				Role:        1,
+				UUID:        "e7d61ea3f8dd49c88f2ff2484c07ac10",
+				BeaconId:    1,
+				CommunityId: 2,
 			},
 			{
-				Name:  "ao",
-				Email: "",
-				Role:  1,
-				UUID:  "e7d61ea3f8dd49c88f2ff2484c07ac11",
+				Name:        "ao",
+				Email:       "",
+				Role:        1,
+				UUID:        "e7d61ea3f8dd49c88f2ff2484c07ac11",
+				BeaconId:    1,
+				CommunityId: 2,
 			},
 			{
-				Name:  "fuma",
-				Email: "",
-				Role:  1,
-				UUID:  "e7d61ea3f8dd49c88f2ff2484c07ac12",
+				Name:        "fuma",
+				Email:       "",
+				Role:        1,
+				UUID:        "e7d61ea3f8dd49c88f2ff2484c07ac12",
+				BeaconId:    1,
+				CommunityId: 2,
 			},
 			{
-				Name:  "ueji",
-				Email: "",
-				Role:  1,
-				UUID:  "e7d61ea3f8dd49c88f2ff2484c07ac13",
+				Name:        "ueji",
+				Email:       "",
+				Role:        1,
+				UUID:        "e7d61ea3f8dd49c88f2ff2484c07ac13",
+				BeaconId:    1,
+				CommunityId: 2,
 			},
 			{
-				Name:  "oiwa",
-				Email: "",
-				Role:  1,
-				UUID:  "e7d61ea3f8dd49c88f2ff2484c07ac14",
+				Name:        "oiwa",
+				Email:       "",
+				Role:        1,
+				UUID:        "e7d61ea3f8dd49c88f2ff2484c07ac14",
+				BeaconId:    1,
+				CommunityId: 2,
 			},
 			{
-				Name:  "togawa",
-				Email: "",
-				Role:  1,
-				UUID:  "e7d61ea3f8dd49c88f2ff2484c07ac15",
+				Name:        "togawa",
+				Email:       "toge7113@gmail.com",
+				Role:        1,
+				UUID:        "e7d61ea3f8dd49c88f2ff2484c07ac15",
+				BeaconId:    1,
+				CommunityId: 2,
 			},
 			{
-				Name:  "yada",
-				Email: "",
-				Role:  1,
-				UUID:  "e7d61ea3f8dd49c88f2ff2484c07ac16",
+				Name:        "yada",
+				Email:       "",
+				Role:        1,
+				UUID:        "e7d61ea3f8dd49c88f2ff2484c07ac16",
+				BeaconId:    1,
+				CommunityId: 2,
 			},
 			{
-				Name:  "yokoyama",
-				Email: "",
-				Role:  1,
-				UUID:  "e7d61ea3f8dd49c88f2ff2484c07ac17",
+				Name:        "yokoyama",
+				Email:       "",
+				Role:        1,
+				UUID:        "e7d61ea3f8dd49c88f2ff2484c07ac17",
+				BeaconId:    1,
+				CommunityId: 2,
 			},
 			{
-				Name:  "kazuo",
-				Email: "",
-				Role:  1,
-				UUID:  "e7d61ea3f8dd49c88f2ff2484c07ac18",
+				Name:        "kazuo",
+				Email:       "",
+				Role:        1,
+				UUID:        "e7d61ea3f8dd49c88f2ff2484c07ac18",
+				BeaconId:    1,
+				CommunityId: 2,
 			},
 			{
-				Name:  "sakai",
-				Email: "",
-				Role:  1,
-				UUID:  "e7d61ea3f8dd49c88f2ff2484c07ac19",
+				Name:        "sakai",
+				Email:       "",
+				Role:        1,
+				UUID:        "e7d61ea3f8dd49c88f2ff2484c07ac19",
+				BeaconId:    1,
+				CommunityId: 2,
 			},
 			{
-				Name:  "iwaguti",
-				Email: "",
-				Role:  1,
-				UUID:  "e7d61ea3f8dd49c88f2ff2484c07ac1a",
+				Name:        "iwaguti",
+				Email:       "",
+				Role:        1,
+				UUID:        "e7d61ea3f8dd49c88f2ff2484c07ac1a",
+				BeaconId:    1,
+				CommunityId: 2,
 			},
 			{
-				Name:  "makino",
-				Email: "",
-				Role:  1,
-				UUID:  "e7d61ea3f8dd49c88f2ff2484c07ac1b",
+				Name:        "makino",
+				Email:       "",
+				Role:        1,
+				UUID:        "e7d61ea3f8dd49c88f2ff2484c07ac1b",
+				BeaconId:    1,
+				CommunityId: 2,
+			},
+			{
+				Name:        "test",
+				Email:       "",
+				Role:        1,
+				UUID:        "a7d61ea3f8dd49c88f2ff2484c0fffff",
+				BeaconId:    1,
+				CommunityId: 1,
 			},
 		}
 		db.Create(&users)
+	}
 
+	db.Model(&model.DeletedUser{}).Count(&count)
+	if count == 0 {
+		deletedUsers := []model.DeletedUser{
+			{
+				Name:        "deleted-test",
+				Email:       "deleted-test-staywatch@gmail.com",
+				Role:        1,
+				UUID:        "e7d61ea3f8dd49c88f2ff2484c07deleted-test",
+				BeaconId:    1,
+				CommunityId: 1,
+				UserId:      0,
+			},
+		}
+		db.Create(&deletedUsers)
 	}
 
 	db.Model(&model.Building{}).Count(&count)
@@ -255,37 +335,52 @@ func init() {
 	if count == 0 {
 		tags := []model.Tag{
 			{
-				Name: "梶研",
+				Name:        "テストタグ",
+				CommunityId: 1,
 			},
 			{
-				Name: "ロケーション",
+				Name:        "B1",
+				CommunityId: -1,
 			},
 			{
-				Name: "インタラクション",
+				Name:        "B2",
+				CommunityId: -1,
 			},
 			{
-				Name: "センシング",
+				Name:        "B3",
+				CommunityId: -1,
 			},
 			{
-				Name: "B1",
+				Name:        "B4",
+				CommunityId: -1,
 			},
 			{
-				Name: "B2",
+				Name:        "M1",
+				CommunityId: -1,
 			},
 			{
-				Name: "B3",
+				Name:        "M2",
+				CommunityId: -1,
 			},
 			{
-				Name: "B4",
+				Name:        "Professor",
+				CommunityId: -1,
 			},
 			{
-				Name: "M1",
+				Name:        "梶研",
+				CommunityId: 2,
 			},
 			{
-				Name: "M2",
+				Name:        "ロケーション",
+				CommunityId: 2,
 			},
 			{
-				Name: "Professor",
+				Name:        "インタラクション",
+				CommunityId: 2,
+			},
+			{
+				Name:        "センシング",
+				CommunityId: 2,
 			},
 		}
 		db.Create(&tags)
@@ -296,87 +391,79 @@ func init() {
 		tagMaps := []model.TagMap{
 			{
 				UserID: 1,
-				TagID:  1,
-			},
-			{
-				UserID: 1,
-				TagID:  11,
-			},
-			{
-				UserID: 2,
-				TagID:  1,
-			},
-			{
-				UserID: 2,
-				TagID:  2,
-			},
-			{
-				UserID: 2,
-				TagID:  10,
-			},
-			{
-				UserID: 3,
-				TagID:  1,
-			},
-			{
-				UserID: 3,
-				TagID:  2,
-			},
-			{
-				UserID: 3,
-				TagID:  10,
-			},
-			{
-				UserID: 4,
-				TagID:  1,
-			},
-			{
-				UserID: 4,
-				TagID:  4,
-			},
-			{
-				UserID: 4,
-				TagID:  9,
-			},
-			{
-				UserID: 5,
-				TagID:  1,
-			},
-			{
-				UserID: 5,
-				TagID:  4,
-			},
-			{
-				UserID: 5,
-				TagID:  9,
-			},
-			{
-				UserID: 6,
-				TagID:  1,
-			},
-			{
-				UserID: 6,
-				TagID:  2,
-			},
-			{
-				UserID: 6,
-				TagID:  9,
-			},
-			{
-				UserID: 7,
-				TagID:  1,
-			},
-			{
-				UserID: 7,
-				TagID:  2,
-			},
-			{
-				UserID: 7,
 				TagID:  8,
 			},
 			{
+				UserID: 2,
+				TagID:  2,
+			},
+			{
+				UserID: 2,
+				TagID:  12,
+			},
+			{
+				UserID: 3,
+				TagID:  2,
+			},
+			{
+				UserID: 3,
+				TagID:  3,
+			},
+			{
+				UserID: 4,
+				TagID:  12,
+			},
+			{
+				UserID: 5,
+				TagID:  3,
+			},
+			{
+				UserID: 5,
+				TagID:  4,
+			},
+			{
+				UserID: 5,
+				TagID:  12,
+			},
+			{
+				UserID: 5,
+				TagID:  2,
+			},
+			{
+				UserID: 5,
+				TagID:  5,
+			},
+			{
+				UserID: 5,
+				TagID:  10,
+			},
+			{
+				UserID: 6,
+				TagID:  2,
+			},
+			{
+				UserID: 6,
+				TagID:  5,
+			},
+			{
+				UserID: 6,
+				TagID:  10,
+			},
+			{
+				UserID: 7,
+				TagID:  2,
+			},
+			{
+				UserID: 7,
+				TagID:  3,
+			},
+			{
+				UserID: 7,
+				TagID:  10,
+			},
+			{
 				UserID: 8,
-				TagID:  1,
+				TagID:  2,
 			},
 			{
 				UserID: 8,
@@ -384,11 +471,7 @@ func init() {
 			},
 			{
 				UserID: 8,
-				TagID:  8,
-			},
-			{
-				UserID: 9,
-				TagID:  1,
+				TagID:  9,
 			},
 			{
 				UserID: 9,
@@ -396,75 +479,79 @@ func init() {
 			},
 			{
 				UserID: 9,
-				TagID:  8,
-			},
-			{
-				UserID: 10,
-				TagID:  1,
-			},
-			{
-				UserID: 10,
 				TagID:  4,
 			},
 			{
+				UserID: 9,
+				TagID:  9,
+			},
+			{
 				UserID: 10,
-				TagID:  8,
-			},
-			{
-				UserID: 11,
-				TagID:  1,
-			},
-			{
-				UserID: 11,
 				TagID:  2,
 			},
 			{
-				UserID: 11,
-				TagID:  8,
-			},
-			{
-				UserID: 12,
-				TagID:  1,
-			},
-			{
-				UserID: 12,
-				TagID:  4,
-			},
-			{
-				UserID: 12,
-				TagID:  8,
-			},
-			{
-				UserID: 13,
-				TagID:  1,
-			},
-			{
-				UserID: 13,
+				UserID: 10,
 				TagID:  3,
 			},
 			{
+				UserID: 10,
+				TagID:  9,
+			},
+			{
+				UserID: 11,
+				TagID:  2,
+			},
+			{
+				UserID: 11,
+				TagID:  5,
+			},
+			{
+				UserID: 11,
+				TagID:  9,
+			},
+			{
+				UserID: 12,
+				TagID:  2,
+			},
+			{
+				UserID: 12,
+				TagID:  3,
+			},
+			{
+				UserID: 12,
+				TagID:  9,
+			},
+			{
 				UserID: 13,
-				TagID:  8,
+				TagID:  2,
 			},
 			{
-				UserID: 14,
-				TagID:  1,
+				UserID: 13,
+				TagID:  5,
+			},
+			{
+				UserID: 13,
+				TagID:  9,
 			},
 			{
 				UserID: 14,
 				TagID:  2,
 			},
 			{
-				UserID: 15,
-				TagID:  1,
+				UserID: 14,
+				TagID:  4,
+			},
+			{
+				UserID: 14,
+				TagID:  9,
 			},
 			{
 				UserID: 15,
-				TagID:  8,
+				TagID:  2,
 			},
 			{
-				UserID: 16,
-				TagID:  1,
+				UserID: 15,
+				TagID:  3,
 			},
 			{
 				UserID: 16,
@@ -472,106 +559,150 @@ func init() {
 			},
 			{
 				UserID: 16,
+				TagID:  9,
+			},
+			{
+				UserID: 17,
+				TagID:  2,
+			},
+			{
+				UserID: 17,
+				TagID:  3,
+			},
+			{
+				UserID: 17,
+				TagID:  9,
+			},
+			{
+				UserID: 18,
+				TagID:  2,
+			},
+			{
+				UserID: 18,
 				TagID:  8,
 			},
 			{
-				UserID: 17,
-				TagID:  1,
-			},
-			{
-				UserID: 17,
-				TagID:  7,
-			},
-			{
-				UserID: 18,
-				TagID:  1,
-			},
-			{
-				UserID: 18,
-				TagID:  7,
+				UserID: 19,
+				TagID:  2,
 			},
 			{
 				UserID: 19,
-				TagID:  1,
-			},
-			{
-				UserID: 19,
-				TagID:  7,
+				TagID:  8,
 			},
 			{
 				UserID: 20,
-				TagID:  1,
+				TagID:  2,
 			},
 			{
 				UserID: 20,
-				TagID:  7,
+				TagID:  8,
 			},
 			{
 				UserID: 21,
-				TagID:  1,
+				TagID:  2,
 			},
 			{
 				UserID: 21,
-				TagID:  7,
+				TagID:  8,
 			},
 			{
 				UserID: 22,
-				TagID:  1,
+				TagID:  2,
 			},
 			{
 				UserID: 22,
-				TagID:  7,
+				TagID:  8,
 			},
 			{
 				UserID: 23,
-				TagID:  1,
+				TagID:  2,
 			},
 			{
 				UserID: 23,
-				TagID:  7,
+				TagID:  8,
 			},
 			{
 				UserID: 24,
-				TagID:  1,
+				TagID:  2,
 			},
 			{
 				UserID: 24,
-				TagID:  7,
+				TagID:  8,
 			},
 			{
 				UserID: 25,
-				TagID:  1,
+				TagID:  2,
 			},
 			{
 				UserID: 25,
-				TagID:  7,
+				TagID:  8,
 			},
 			{
 				UserID: 26,
-				TagID:  1,
+				TagID:  2,
 			},
 			{
 				UserID: 26,
-				TagID:  7,
+				TagID:  8,
 			},
 			{
 				UserID: 27,
-				TagID:  1,
+				TagID:  2,
 			},
 			{
 				UserID: 27,
-				TagID:  7,
+				TagID:  8,
 			},
 			{
 				UserID: 28,
-				TagID:  1,
+				TagID:  2,
 			},
 			{
 				UserID: 28,
-				TagID:  7,
+				TagID:  8,
+			},
+			{
+				UserID: 29,
+				TagID:  2,
+			},
+			{
+				UserID: 29,
+				TagID:  8,
 			},
 		}
 		db.Create(&tagMaps)
+	}
+
+	db.Model(&model.Beacon{}).Count(&count)
+	if count == 0 {
+		beacons := []model.Beacon{
+			{
+				Type:         "FCS1301",
+				UuidEditable: true,
+			},
+			{
+				Type:         "Android",
+				UuidEditable: false,
+			},
+			{
+				Type:         "iPhone",
+				UuidEditable: false,
+			},
+		}
+		db.Create(&beacons)
+	}
+
+	db.Model(&model.Community{}).Count(&count)
+	if count == 0 {
+		buildings := []model.Community{
+			{
+				Name: "テスト研究室",
+			},
+			{
+				Name: "梶研究室",
+			},
+		}
+		db.Create(&buildings)
 	}
 
 	// db.Model(&model.User{}).Count()
@@ -611,5 +742,7 @@ func connect() *gorm.DB {
 	if err != nil {
 		panic(err)
 	}
+
+	log.Println("DB connected")
 	return gormDB
 }

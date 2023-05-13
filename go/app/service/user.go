@@ -8,7 +8,6 @@ import (
 
 type UserService struct{}
 
-
 func (UserService) RegisterSampleUser(user *model.User) error {
 	DbEngine := connect()
 	closer, err := DbEngine.DB()
@@ -23,7 +22,6 @@ func (UserService) RegisterSampleUser(user *model.User) error {
 	}
 	return nil
 }
-
 
 // 新しいuuidを生成する
 func (UserService) NewUUID() string {
@@ -55,8 +53,8 @@ func (UserService) NewUUID() string {
 
 }
 
-// ユーザ登録処理
-func (UserService) RegisterUser(user *model.User) error {
+// ユーザ登録処理(削除予定)
+func (UserService) PastRegisterUser(user *model.User) error {
 	DbEngine := connect()
 	closer, err := DbEngine.DB()
 	if err != nil {
@@ -71,9 +69,40 @@ func (UserService) RegisterUser(user *model.User) error {
 	return nil
 }
 
+// ユーザ登録処理new（）
+func (UserService) RegisterUser(user *model.User) (int64, error) {
+	DbEngine := connect()
+	closer, err := DbEngine.DB()
+	if err != nil {
+		return -1, err
+	}
+	defer closer.Close()
+	result := DbEngine.Create(user)
+	if result.Error != nil {
+		fmt.Printf("ユーザ登録処理失敗 %v", result.Error)
+		return -1, result.Error
+	}
+	return int64(user.ID), nil
+}
+
+// ユーザのアップデート（以前の）
+func (UserService) PastUpdateUser(userId int, email string) error {
+	DbEngine := connect()
+	closer, err := DbEngine.DB()
+	if err != nil {
+		return err
+	}
+	defer closer.Close()
+	result := DbEngine.Model(&model.User{}).Where("id = ?", userId).Update("email", email)
+	if result.Error != nil {
+		fmt.Printf("ユーザ更新失敗 %v", result.Error)
+		return result.Error
+	}
+	return nil
+}
+
 // ユーザのアップデート
-func (UserService) UpdateUser(userID int, email string) error {
-	fmt.Println("updateUser")
+func (UserService) UpdateUser(updatedUser *model.User, userId int64) error {
 
 	DbEngine := connect()
 	closer, err := DbEngine.DB()
@@ -81,9 +110,58 @@ func (UserService) UpdateUser(userID int, email string) error {
 		return err
 	}
 	defer closer.Close()
-	result := DbEngine.Model(&model.User{}).Where("id = ?", userID).Update("email", email)
+	user := model.User{}
+	result := DbEngine.First(&user, userId)
+	if result.Error != nil {
+		return result.Error
+	}
+	// user = *updatedUser
+	user.UUID = updatedUser.UUID
+	user.Name = updatedUser.Name
+	user.Email = updatedUser.Email
+	user.Role = updatedUser.Role
+	user.BeaconId = updatedUser.BeaconId
+	user.CommunityId = updatedUser.CommunityId
+
+	// result := DbEngine.Model(&model.User{}).Where("id = ?", userId).Update("email", email)
+	result = DbEngine.Save(&user)
 	if result.Error != nil {
 		fmt.Printf("ユーザ更新失敗 %v", result.Error)
+		return result.Error
+	}
+	return nil
+}
+
+// Uuidの更新
+func (UserService) UpdateUuid(newUuid string, userId int64) error {
+
+	DbEngine := connect()
+	closer, err := DbEngine.DB()
+	if err != nil {
+		return err
+	}
+	defer closer.Close()
+	user := model.User{}
+	result := DbEngine.Model(&user).Where("id = ?", userId).Update("uuid", newUuid)
+	if result.Error != nil {
+		return result.Error
+	}
+	return nil
+}
+
+// ユーザの削除
+func (UserService) DeleteUser(userId int64) error {
+	fmt.Println("ユーザ削除サービス")
+
+	DbEngine := connect()
+	closer, err := DbEngine.DB()
+	if err != nil {
+		return err
+	}
+	defer closer.Close()
+	result := DbEngine.Unscoped().Delete(&model.User{}, userId)
+	if result.Error != nil {
+		fmt.Printf("ユーザ削除処理失敗 %v", result.Error)
 		return result.Error
 	}
 	return nil
@@ -99,6 +177,24 @@ func (UserService) GetAllUser() ([]model.User, error) {
 	defer closer.Close()
 	users := make([]model.User, 0)
 	result := DbEngine.Find(&users)
+	if result.Error != nil {
+		fmt.Printf("ユーザ取得失敗 %v", result.Error)
+		return nil, result.Error
+	}
+	return users, nil
+}
+
+// コミュニティのユーザの編集に必要な部分を取得する
+func (UserService) GetEditUsersByCommunityId(communityId int64) ([]model.User, error) {
+	DbEngine := connect()
+	closer, err := DbEngine.DB()
+	if err != nil {
+		return nil, err
+	}
+	defer closer.Close()
+	users := make([]model.User, 0)
+	//result := DbEngine.Find(&users)
+	result := DbEngine.Where("community_id = ?", communityId).Find(&users)
 	if result.Error != nil {
 		fmt.Printf("ユーザ取得失敗 %v", result.Error)
 		return nil, result.Error
@@ -138,8 +234,8 @@ func (UserService) GetUserNameByUserID(userID int64) (string, error) {
 	user := model.User{}
 	result := DbEngine.Where("id=?", userID).Take(&user)
 	if result.Error != nil {
-		fmt.Printf("ユーザ名取得失敗 %v", result.Error)
-		return "", result.Error
+		// 見つからない場合は削除されたユーザであるということになる
+		return "削除済みユーザ", nil
 	}
 	return user.Name, nil
 }
@@ -273,6 +369,59 @@ func (UserService) GetUserIDByUUID(uuid string) (int64, error) {
 	return int64(user.ID), nil
 }
 
+func (UserService) GetUserIDByEmail(email string) (int64, error) {
+	DbEngine := connect()
+	closer, err := DbEngine.DB()
+	if err != nil {
+		return 0, err
+	}
+	defer closer.Close()
+	user := model.User{}
+	result := DbEngine.Where("email=?", email).Take(&user)
+	if result.Error != nil {
+		fmt.Printf("ユーザID取得失敗 %v", result.Error)
+		return 0, result.Error
+	}
+
+	return int64(user.ID), nil
+
+}
+
+func (UserService) GetEmailByUserId(userId int64) (string, error) {
+	DbEngine := connect()
+	closer, err := DbEngine.DB()
+	if err != nil {
+		return "", err
+	}
+	defer closer.Close()
+
+	user := model.User{}
+	result := DbEngine.Where("id=?", userId).Take(&user)
+	if result.Error != nil {
+		fmt.Printf("メールアドレス取得失敗 %v", result.Error)
+		return "", result.Error
+	}
+
+	return user.Email, nil
+}
+
+func (UserService) IsEmailAlreadyRegistered(email string) (bool, error) {
+	DbEngine := connect()
+	closer, err := DbEngine.DB()
+	if err != nil {
+		// 接続できなかった場合もtrueとする(どちらにしてもいい)
+		return true, err
+	}
+	defer closer.Close()
+	user := model.User{}
+	result := DbEngine.Where("email=?", email).Take(&user)
+	// エラーの時はメールアドレスが見つからなかった時と同じなため
+	if result.Error != nil || email == "" {
+		return false, nil
+	}
+	return true, nil
+}
+
 //指定されたログリストと同じ時間にいたユーザを取得する
 // func (UserService) GetSameTimeUser(logs []model.Log) ([]model.SimultaneousStayUserGetResponse, error) {
 // 	targetLogs := make([]model.Log, 0)
@@ -344,4 +493,36 @@ func (UserService) GetUserByEmail(email string) (model.User, error) {
 		return model.User{}, result.Error
 	}
 	return user, nil
+}
+
+func (UserService) GetUserByUserId(userId int64) (model.User, error) {
+	DbEngine := connect()
+	closer, err := DbEngine.DB()
+	if err != nil {
+		return model.User{}, err
+	}
+	defer closer.Close()
+	user := model.User{}
+	result := DbEngine.Where("id=?", userId).Take(&user)
+	if result.Error != nil {
+		fmt.Printf("ユーザ取得失敗 %v", result.Error)
+		return model.User{}, result.Error
+	}
+	return user, nil
+}
+
+func (UserService) GetCommunityIdByUserId(userId int64) (int64, error) {
+	DbEngine := connect()
+	closer, err := DbEngine.DB()
+	if err != nil {
+		return 0, err
+	}
+	defer closer.Close()
+	user := model.User{}
+	result := DbEngine.Where("id=?", userId).Take(&user)
+	if result.Error != nil {
+		fmt.Printf("ユーザ取得失敗 %v", result.Error)
+		return 0, result.Error
+	}
+	return int64(user.CommunityId), nil
 }

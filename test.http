@@ -10,19 +10,46 @@ Get {{baseURL}}/api/v1/stayers
 ###
 Get {{baseURL}}/api/v1/logs
 
+### 以前まで使われていたAPI
+GET {{baseURL}}/api/v1/users
+
 ###
-Get {{baseURL}}/api/v1/users
+GET {{baseURL}}/api/v1/users/2
+
+### 管理者画面でのユーザ情報の取得
+GET {{baseURL}}/api/v1/admin/users/2
 
 ###
 POST {{baseURL}}/api/v1/users HTTP/1.1
 content-type: application/json
 
 {
-    "id":0,
-    "email":"aikout@gmail.com",
-    "name": "tarou",
-    "role": 1
+    "name":"tarou",
+    "uuid":"",
+    "email":"ssinya092222@gmail.com",
+    "role":1,
+    "communityId":1,
+    "beaconName":"FCS1301",
+    "tagIds":[1,5,10]
 }
+
+###
+PUT {{baseURL}}/api/v1/users HTTP/1.1
+content-type: application/json
+
+{
+    "id":10,
+    "name":"taadakadu",
+    "uuid":"adfawefasdfwefasdfwedefewd",
+    "email":"ssinya09fda22d2dadf2@gmail.com",
+    "role":1,
+    "communityId":1,
+    "beaconName":"FCS1301",
+    "tagIds":[1,5,10]
+}
+
+###
+DELETE {{baseURL}}/api/v1/users/16 HTTP/1.1
 
 
 ###
@@ -52,14 +79,14 @@ Get {{baseURL}}/api/v1/list/simultaneous/1
 ###
 Get {{baseURL}}/api/v1/list/simultaneous/2
 
-### 入室
+### 入室も退室も同じAPI
 POST {{baseURL}}/api/v1/stayers HTTP/1.1
 content-type: application/json
 
 {
     "beacons":[
         {
-            "uuid": "e7d61ea3f8dd49c88f2ff2484c07ac11",
+            "uuid": "e7d61ea3f8dd49c88f2ff24f0027ac02",
             "rssi": -50
         }
     ],
@@ -72,31 +99,6 @@ content-type: application/json
 
 {
     "beacons":[
-    ],
-    "roomId": 2
-}
-
-### 入室
-POST {{baseURL}}/api/v1/stayers HTTP/1.1
-content-type: application/json
-
-{
-    "beacons":[
-        {
-            "uuid": "e7d61ea3f8dd49c88f2ff2484c07ac13",
-            "rssi": -50
-        }
-    ],
-    "roomId": 2
-}
-
-###
-POST {{baseURL}}/api/v1/stayers HTTP/1.1
-content-type: application/json
-
-{
-    "beacons":[
-
     ],
     "roomId": 2
 }
@@ -140,3 +142,15 @@ content-type: application/json
 
 ### 建物の情報を全て取得する
 GET {{baseURL}}/api/v1/buildings/editor
+
+### ビーコンの情報を全て取得する
+GET {{baseURL}}/api/v1/beacons
+
+### IDからコミュニティ情報を取得する
+GET {{baseURL}}/api/v1/communities/1
+
+### コミュニティ（共用も）のタグの名前を取得する 
+GET {{baseURL}}/api/v1/tags/1/names
+
+### コミュニティ（共用も）のタグを取得する
+GET {{baseURL}}/api/v1/tags/2

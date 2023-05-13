@@ -5,6 +5,7 @@ import (
 	"Stay_watch/service"
 	"fmt"
 	"net/http"
+
 	// "strconv"
 
 	"github.com/gin-gonic/gin"
@@ -15,23 +16,23 @@ func GetBuildingsEditor(c *gin.Context) {
 	buildings, err := BuildingService.GetAllBuildings()
 	if err != nil {
 		fmt.Printf("failed: Cannnot get stayer %v", err)
-		c.String(http.StatusInternalServerError, "Server Error")
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Failed to get stayer"})
 		return
 	}
 	buildingsEditorGetResponse := []model.BuildingsEditorGetResponse{}
-	
+
 	for _, building := range buildings {
 		buildingId := int64(building.ID)
 		buildingName := building.Name
 		buildingImagePath := building.MapFile
 
 		buildingsEditorGetResponse = append(buildingsEditorGetResponse, model.BuildingsEditorGetResponse{
-			BuildingID: buildingId,
-			Name: buildingName,
+			BuildingID:   buildingId,
+			Name:         buildingName,
 			MapImagePath: buildingImagePath,
 		})
 	}
 
-	c.JSON(200, buildingsEditorGetResponse)
+	c.JSON(http.StatusOK, buildingsEditorGetResponse)
 
 }
