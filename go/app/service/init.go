@@ -198,7 +198,7 @@ func init() {
 			{
 				Name:        "togawa",
 				Email:       "toge7113@gmail.com",
-				Role:        1,
+				Role:        2,
 				UUID:        "e7d61ea3f8dd49c88f2ff2484c07ac15",
 				BeaconId:    1,
 				CommunityId: 2,
