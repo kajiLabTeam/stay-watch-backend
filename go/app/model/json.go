@@ -38,6 +38,8 @@ type ExtendedUserInformationGetResponse struct {
 
 type UserRoleCommunityGetResponse struct {
 	ID            int64  `json:"id"`
+	UUID          string `json:"uuid"`
+	Name          string `json:"name"`
 	Role          int64  `json:"role"`
 	CommunityId   int64  `json:"communityId"`
 	CommunityName string `json:"communityName"`
