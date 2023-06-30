@@ -658,6 +658,8 @@ func Check(c *gin.Context) {
 	userRole := model.UserRoleCommunityGetResponse{
 		ID:            int64(user.ID),
 		Role:          user.Role,
+		UUID:          user.UUID,
+		Name:          user.Name,
 		CommunityId:   int64(community.ID),
 		CommunityName: community.Name,
 	}
