@@ -18,6 +18,29 @@ func Detail(c *gin.Context) {
 	})
 }
 
+func createUuid(communityId int64, uuidEditable bool, beaconName string, userId int64, requestUuid string) string {
+	// コミュニティIDを16進数3桁に変換
+	communityIdHex := fmt.Sprintf("%03x", communityId)
+	newUuid := ""
+
+	if beaconName == "iPhone" {
+		// iPhoneの場合「8ebc21144abd00000000ff01000 + (userId(16進数))」
+		userIdHex := fmt.Sprintf("%05x", userId)
+		newUuid = "8ebc21144abd00000000ff01000" + userIdHex
+	} else if uuidEditable {
+		// 編集可能（物理）の場合ユーザがフォームで入力した値を用いる
+		//newUuid = "e7d61ea3f8dd49c88f2ff24f" + communityIdHex + requestUuid
+		newUuid = "8ebc21144abd" + "ba0d" + "b7c6" + "ff0f" + communityIdHex + requestUuid
+	} else {
+		// 編集不可（Android）の場合ユーザIDから取得した値を用いる
+		// ユーザIDを16進数5桁に変換
+		userIdHex := fmt.Sprintf("%05x", userId)
+		newUuid = "8ebc21144abd" + "ba0d" + "b7c6" + "ff0a" + communityIdHex + userIdHex
+	}
+
+	return newUuid
+}
+
 func CreateUser(c *gin.Context) {
 	UserCreateRequest := model.UserCreateRequest{}
 	c.Bind(&UserCreateRequest)
@@ -65,18 +88,7 @@ func CreateUser(c *gin.Context) {
 	// UUIDの作成
 	// コミュニティID取得
 	communityId := UserCreateRequest.CommunityId
-	// コミュニティIDを16進数3桁
-	communityIdHex := fmt.Sprintf("%03x", communityId)
-	newUuid := ""
-	if beacon.UuidEditable {
-		// 編集可能（物理）の場合ユーザがフォームで入力した値を用いる
-		newUuid = "e7d61ea3f8dd49c88f2ff24f" + communityIdHex + UserCreateRequest.Uuid
-	} else {
-		// 編集不可（アプリ）の場合ユーザIDから取得した値を用いる
-		// ユーザIDを16進数5桁に変換
-		registerdUserIdHex := fmt.Sprintf("%05x", registerdUserId)
-		newUuid = "e7d61ea3f8dd49c88f2ff24a" + communityIdHex + registerdUserIdHex
-	}
+	newUuid := createUuid(communityId, beacon.UuidEditable, UserCreateRequest.BeaconName, registerdUserId, UserCreateRequest.Uuid)
 
 	// UUIDを上書き
 	err = UserService.UpdateUuid(newUuid, registerdUserId)
@@ -242,20 +254,7 @@ func UpdateUser(c *gin.Context) {
 	}
 
 	// UUIDの作成
-	// コミュニティID取得
-	communityId := UserUpdateRequest.CommunityId
-	// コミュニティIDを16進数3桁
-	communityIdHex := fmt.Sprintf("%03x", communityId)
-	newUuid := ""
-	if beacon.UuidEditable {
-		// 編集可能（物理）の場合ユーザがフォームで入力した値を用いる
-		newUuid = "e7d61ea3f8dd49c88f2ff24f" + communityIdHex + UserUpdateRequest.Uuid
-	} else {
-		// 編集不可（アプリ）の場合ユーザIDから取得した値を用いる
-		// ユーザIDを16進数5桁に変換
-		registerdUserIdHex := fmt.Sprintf("%05x", UserUpdateRequest.ID)
-		newUuid = "e7d61ea3f8dd49c88f2ff24a" + communityIdHex + registerdUserIdHex
-	}
+	newUuid := createUuid(UserUpdateRequest.CommunityId, beacon.UuidEditable, UserUpdateRequest.BeaconName, UserUpdateRequest.ID, UserUpdateRequest.Uuid)
 
 	user := model.User{
 		Name:        UserUpdateRequest.Name,
