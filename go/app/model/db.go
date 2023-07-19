@@ -95,8 +95,8 @@ type Beacon struct {
 type UuidMap struct {
 	gorm.Model
 
-	Manufacture string
-	UUID        string
+	Manufacturer string
+	UUID         string
 }
 
 type Community struct {

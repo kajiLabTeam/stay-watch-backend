@@ -24,7 +24,7 @@ func convertBeacons(inputBeacons []*model.BeaconSignal) []model.BeaconSignal {
 		// iPhoneビーコンの場合UUIDを取得する処理が必要(例："4c000100000000010000000000000000000000" -> "8ebc21144abd00000000ff0100000001")
 		if len(inputBeacon.Uuid) == 38 {
 			fmt.Println("iPhoneビーコンデス")
-			tmpUuid, err := BeaconService.GetUUIDByManufucture(inputBeacon.Uuid)
+			tmpUuid, err := BeaconService.GetUUIDByManufacturer(inputBeacon.Uuid)
 			if err != nil {
 				fmt.Printf("failed: Cannnot get iphone uuid %v", err)
 				continue
