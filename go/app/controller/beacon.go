@@ -21,7 +21,7 @@ func convertBeacons(inputBeacons []*model.BeaconSignal) []model.BeaconSignal {
 
 		uuid := inputBeacon.Uuid
 
-		// iPhoneビーコンの場合UUIDを取得する処理が必要("4c000100000000010000000000000000000000" -> "8ebc21144abd00000000ff0100000001")
+		// iPhoneビーコンの場合UUIDを取得する処理が必要(例："4c000100000000010000000000000000000000" -> "8ebc21144abd00000000ff0100000001")
 		if len(inputBeacon.Uuid) == 38 {
 			fmt.Println("iPhoneビーコンデス")
 			tmpUuid, err := BeaconService.GetUUIDByManufucture(inputBeacon.Uuid)
@@ -29,8 +29,6 @@ func convertBeacons(inputBeacons []*model.BeaconSignal) []model.BeaconSignal {
 				fmt.Printf("failed: Cannnot get iphone uuid %v", err)
 				continue
 			}
-			fmt.Println("iPhoneビーコンのUUID")
-			fmt.Println(tmpUuid)
 			uuid = tmpUuid
 		}
 
@@ -57,10 +55,6 @@ func Beacon(c *gin.Context) {
 
 	requestBeacons := convertBeacons(beaconRoom.Beacons)
 	requestRoomId := beaconRoom.RoomID
-	fmt.Println("requestBeaconsの中身")
-	fmt.Println(requestBeacons)
-	fmt.Println("requestRoomIdの中身")
-	fmt.Println(requestRoomId)
 
 	RoomService := service.RoomService{}
 	UserService := service.UserService{}
@@ -83,8 +77,6 @@ func Beacon(c *gin.Context) {
 
 		// リクエストからの滞在者リスト(beaconRoom.Beacons)とStayerテーブルの滞在者リストを比較
 		for _, currentStayer := range requestBeacons {
-			// fmt.Println("currentStayerの中身")
-			// fmt.Println(currentStayer)
 			pastUUID, err := UserService.GetUserUUIDByUserID(pastStayer.UserID)
 			if err != nil {
 				fmt.Printf("failed: Cannnot get user uuid %v", err)
