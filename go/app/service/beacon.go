@@ -56,7 +56,7 @@ func (BeaconService) GetBeaconByBeaconName(beaconName string) (model.Beacon, err
 		return model.Beacon{}, result.Error
 	}
 
-	return beacon, nil	
+	return beacon, nil
 }
 
 func (BeaconService) GetBeaconIdByBeaconName(beaconName string) (int64, error) {
@@ -75,4 +75,21 @@ func (BeaconService) GetBeaconIdByBeaconName(beaconName string) (int64, error) {
 	}
 
 	return int64(beacon.ID), nil
+}
+
+func (BeaconService) GetUUIDByManufucture(manufacture string) (string, error) {
+	DbEngine := connect()
+	close, err := DbEngine.DB()
+
+	if err != nil {
+		return "", err
+	}
+	defer close.Close()
+	uuidMap := model.UuidMap{}
+	result := DbEngine.Where("manufacture=?", manufacture).Take(&uuidMap)
+	if result.Error != nil {
+		fmt.Printf("ManufacutureからUUID取得失敗 %v", result.Error)
+		return "", result.Error
+	}
+	return uuidMap.UUID, nil
 }
