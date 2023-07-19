@@ -12,6 +12,31 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+func convertBeacons(inputBeacons []*model.BeaconSignal) []model.BeaconSignal {
+
+	outBeacons := []model.BeaconSignal{}
+
+	for _, inputBeacon := range inputBeacons {
+		//fmt.Println("iPhoneUUIDの文字数：")
+		//fmt.Println(len("4c000100000000010000000000000000000000"))
+
+		tmpUuid := inputBeacon.Uuid
+
+		// iPhoneビーコンの場合UUIDを取得する処理が必要
+		if len(inputBeacon.Uuid) == 38 {
+			fmt.Println("iPhoneビーコンデス")
+		}
+
+		tmpBeacon := model.BeaconSignal{
+			Uuid: tmpUuid,
+			Rssi: inputBeacon.Rssi,
+		}
+		outBeacons = append(outBeacons, tmpBeacon)
+	}
+
+	return outBeacons
+}
+
 // ビーコン情報を受け取る
 func Beacon(c *gin.Context) {
 
@@ -23,12 +48,19 @@ func Beacon(c *gin.Context) {
 		return
 	}
 
+	requestBeacons := convertBeacons(beaconRoom.Beacons)
+	requestRoomId := beaconRoom.RoomID
+	fmt.Println("requestBeaconsの中身")
+	fmt.Println(requestBeacons)
+	fmt.Println("requestRoomIdの中身")
+	fmt.Println(requestRoomId)
+
 	RoomService := service.RoomService{}
 	UserService := service.UserService{}
 	BotService := service.BotService{}
 	Util := util.Util{}
 
-	// 事前にStayerテーブルのデータを取得する
+	// 事前にStayerテーブルのデータを全て取得する
 	pastAllStayer, err := RoomService.GetAllStayer()
 
 	if err != nil {
@@ -41,14 +73,18 @@ func Beacon(c *gin.Context) {
 
 		isExist := false
 		targetUserRssi := -200
-		for _, currentStayer := range beaconRoom.Beacons {
+
+		// リクエストからの滞在者リスト(beaconRoom.Beacons)とStayerテーブルの滞在者リストを比較
+		for _, currentStayer := range requestBeacons {
+			// fmt.Println("currentStayerの中身")
+			// fmt.Println(currentStayer)
 			pastUUID, err := UserService.GetUserUUIDByUserID(pastStayer.UserID)
 			if err != nil {
 				fmt.Printf("failed: Cannnot get user uuid %v", err)
 				c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Failed to get uuid"})
 				return
 			}
-			// 1つ前のstgayerテーブルにもいた場合
+			// 1つ前のstayerテーブルにもいた場合
 			if pastUUID == currentStayer.Uuid {
 				targetUserRssi = int(currentStayer.Rssi)
 				isExist = true
@@ -58,7 +94,7 @@ func Beacon(c *gin.Context) {
 		// RSSIが以前より強い場合
 		if isExist && targetUserRssi > int(pastStayer.Rssi) {
 			// 同じ部屋にいる場合は更新
-			if beaconRoom.RoomID == pastStayer.RoomID {
+			if requestRoomId == pastStayer.RoomID {
 				fmt.Println("同じ部屋にいる場合は更新 RSSI強くなる")
 				err := RoomService.UpdateStayer(&model.Stayer{
 					UserID: pastStayer.UserID,
@@ -109,7 +145,7 @@ func Beacon(c *gin.Context) {
 		// //RSSIが以前より弱い場合
 		// if isExist && targetUserRssi < int(pastStayer.Rssi) {
 		// 	//同じ部屋にいる場合は更新
-		// 	if beaconRoom.RoomID == pastStayer.RoomID {
+		// 	if requestRoomId == pastStayer.RoomID {
 		// 		fmt.Println("同じ部屋にいる場合はRSSIを更新 弱くなる")
 		// 		err := RoomService.UpdateStayer(&model.Stayer{
 		// 			UserID: pastStayer.UserID,
@@ -124,7 +160,7 @@ func Beacon(c *gin.Context) {
 		// }
 
 		// 以前いた部屋のデータに存在しない場合 {Beacons:[] ,RoomID:1}
-		if !isExist && pastStayer.RoomID == beaconRoom.RoomID {
+		if !isExist && pastStayer.RoomID == requestRoomId {
 			fmt.Println("以前いた部屋のデータに存在しない場合")
 
 			// Stayerテーブルから削除する
@@ -161,8 +197,9 @@ func Beacon(c *gin.Context) {
 
 	}
 
-	for _, currentStayer := range beaconRoom.Beacons {
+	for _, currentStayer := range requestBeacons {
 
+		// APIのリクエストのUUIDからuserIdを取得する
 		currentUserID, err := UserService.GetUserIDByUUID(currentStayer.Uuid)
 		if err != nil {
 			fmt.Println("failed: Cannnot get user id")
@@ -189,7 +226,7 @@ func Beacon(c *gin.Context) {
 
 		// 該当ユーザがいない場合はstayerテーブルとlogテーブルに新規に追加する
 		if !stayerFlag {
-			err = RoomService.CreateStayer(&model.Stayer{UserID: currentUserID, RoomID: beaconRoom.RoomID, Rssi: currentStayer.Rssi})
+			err = RoomService.CreateStayer(&model.Stayer{UserID: currentUserID, RoomID: requestRoomId, Rssi: currentStayer.Rssi})
 			if err != nil {
 				fmt.Println("failed: Cannnot set stayer")
 				c.String(http.StatusBadRequest, "Bad Request")
@@ -204,7 +241,7 @@ func Beacon(c *gin.Context) {
 				return
 			}
 
-			err = RoomService.CreateLog(&model.Log{RoomID: beaconRoom.RoomID, StartAt: currentTime, EndAt: endAt, UserID: currentUserID, Rssi: currentStayer.Rssi})
+			err = RoomService.CreateLog(&model.Log{RoomID: requestRoomId, StartAt: currentTime, EndAt: endAt, UserID: currentUserID, Rssi: currentStayer.Rssi})
 			if err != nil {
 				fmt.Println("failed: Cannnot set log")
 				c.String(http.StatusBadRequest, "Bad Request")
@@ -218,7 +255,7 @@ func Beacon(c *gin.Context) {
 				return
 			}
 
-			currentRoomName, err := RoomService.GetRoomNameByRoomID(beaconRoom.RoomID)
+			currentRoomName, err := RoomService.GetRoomNameByRoomID(requestRoomId)
 			if err != nil {
 				fmt.Println("failed: Cannnot get room name")
 				c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Failed to get room name"})
