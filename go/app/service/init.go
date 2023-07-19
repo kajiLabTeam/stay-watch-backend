@@ -710,15 +710,15 @@ func init() {
 		uuidMaps := []model.UuidMap{
 			{
 				Manufacture: "4c000100000000010000000000000000000000",
-				UUID:        "8ebc2114-4abd-0000-0000-ff0100000001",
+				UUID:        "8ebc21144abd00000000ff0100000001",
 			},
 			{
 				Manufacture: "4c000100000000000000080000000000000000",
-				UUID:        "8ebc2114-4abd-0000-0000-ff0100000002",
+				UUID:        "8ebc21144abd00000000ff0100000002",
 			},
 			{
 				Manufacture: "4c000100000000000004000000000000000000",
-				UUID:        "8ebc2114-4abd-0000-0000-ff0100000003",
+				UUID:        "8ebc21144abd00000000ff0100000003",
 			},
 		}
 		db.Create(&uuidMaps)
