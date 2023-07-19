@@ -14,21 +14,28 @@ import (
 
 func convertBeacons(inputBeacons []*model.BeaconSignal) []model.BeaconSignal {
 
+	BeaconService := service.BeaconService{}
+
 	outBeacons := []model.BeaconSignal{}
-
 	for _, inputBeacon := range inputBeacons {
-		//fmt.Println("iPhoneUUIDの文字数：")
-		//fmt.Println(len("4c000100000000010000000000000000000000"))
 
-		tmpUuid := inputBeacon.Uuid
+		uuid := inputBeacon.Uuid
 
-		// iPhoneビーコンの場合UUIDを取得する処理が必要
+		// iPhoneビーコンの場合UUIDを取得する処理が必要("4c000100000000010000000000000000000000" -> "8ebc21144abd00000000ff0100000001")
 		if len(inputBeacon.Uuid) == 38 {
 			fmt.Println("iPhoneビーコンデス")
+			tmpUuid, err := BeaconService.GetUUIDByManufucture(inputBeacon.Uuid)
+			if err != nil {
+				fmt.Printf("failed: Cannnot get iphone uuid %v", err)
+				continue
+			}
+			fmt.Println("iPhoneビーコンのUUID")
+			fmt.Println(tmpUuid)
+			uuid = tmpUuid
 		}
 
 		tmpBeacon := model.BeaconSignal{
-			Uuid: tmpUuid,
+			Uuid: uuid,
 			Rssi: inputBeacon.Rssi,
 		}
 		outBeacons = append(outBeacons, tmpBeacon)

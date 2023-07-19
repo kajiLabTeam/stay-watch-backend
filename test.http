@@ -86,11 +86,15 @@ content-type: application/json
 {
     "beacons":[
         {
-            "uuid": "e7d61ea3f8dd49c88f2ff24f0027ac02",
-            "rssi": -50
+            "uuid": "8ebc21144abdba0db7c6ff0f0027ac15",
+            "rssi": -49
+        },
+        {
+            "uuid": "4c000100000000000000080000000000000000",
+            "rssi": -49
         }
     ],
-    "roomId": 1
+    "roomId": 3
 }
 
 ### 受信したビーコンの情報を渡す
