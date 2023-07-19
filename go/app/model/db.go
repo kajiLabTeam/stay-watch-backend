@@ -11,24 +11,24 @@ import (
 type User struct {
 	gorm.Model
 
-	UUID         string
-	Name         string
-	Email        string
-	Role         int64
-	BeaconId 		 int64
-	CommunityId  int64
+	UUID        string
+	Name        string
+	Email       string
+	Role        int64
+	BeaconId    int64
+	CommunityId int64
 }
 
 type DeletedUser struct {
 	gorm.Model
 
-	UUID         string
-	Name         string
-	Email        string
-	Role         int64
-	BeaconId 		 int64
-	CommunityId  int64
-	UserId       int64
+	UUID        string
+	Name        string
+	Email       string
+	Role        int64
+	BeaconId    int64
+	CommunityId int64
+	UserId      int64
 }
 
 type Log struct {
@@ -90,6 +90,13 @@ type Beacon struct {
 	gorm.Model
 	Type         string
 	UuidEditable bool
+}
+
+type UuidMap struct {
+	gorm.Model
+
+	Manufacture string
+	UUID        string
 }
 
 type Community struct {
