@@ -20,7 +20,7 @@ func init() {
 		return
 	}
 	defer closer.Close()
-	db.AutoMigrate(&model.User{}, &model.Log{}, &model.Room{}, &model.Stayer{}, &model.Tag{}, &model.TagMap{}, &model.Building{}, &model.Beacon{}, &model.DeletedUser{}, &model.Community{})
+	db.AutoMigrate(&model.User{}, &model.Log{}, &model.Room{}, &model.Stayer{}, &model.Tag{}, &model.TagMap{}, &model.Building{}, &model.Beacon{}, &model.DeletedUser{}, &model.Community{}, &model.UuidMap{})
 
 	var count int64
 	db.Model(&model.User{}).Count(&count)
@@ -703,6 +703,25 @@ func init() {
 			},
 		}
 		db.Create(&buildings)
+	}
+
+	db.Model(&model.UuidMap{}).Count(&count)
+	if count == 0 {
+		uuidMaps := []model.UuidMap{
+			{
+				Manufacture: "4c000100000000010000000000000000000000",
+				UUID:        "8ebc2114-4abd-0000-0000-ff0100000001",
+			},
+			{
+				Manufacture: "4c000100000000000000080000000000000000",
+				UUID:        "8ebc2114-4abd-0000-0000-ff0100000002",
+			},
+			{
+				Manufacture: "4c000100000000000004000000000000000000",
+				UUID:        "8ebc2114-4abd-0000-0000-ff0100000003",
+			},
+		}
+		db.Create(&uuidMaps)
 	}
 
 	// db.Model(&model.User{}).Count()
