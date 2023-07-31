@@ -16,7 +16,7 @@ import (
 func getEndUUIDByManufacturer(manufacturer string) string {
 	slicedManufacturers := []int{}
 
-	// (例："4c000180000021000021000021000021000021" -> [33,33,33,33,33])
+	// (例："4c000180000021000021000021000022000021" -> [33,33,33,34,33])
 	for i := 0; i < 5; i++ {
 		slicedManufacturerNum, err := strconv.ParseInt(manufacturer[(5*i)+9+i:(5*i)+14+i], 16, 64)
 		if err != nil {
@@ -25,8 +25,8 @@ func getEndUUIDByManufacturer(manufacturer string) string {
 		}
 		slicedManufacturers = append(slicedManufacturers, int(slicedManufacturerNum))
 	}
-	fmt.Println(slicedManufacturers)
 
+	// 配列の一番小さいものがUUIDの末尾
 	minNumber := slicedManufacturers[0]
 	for _, slicedManufacturer := range slicedManufacturers {
 		if slicedManufacturer < minNumber {
@@ -34,6 +34,7 @@ func getEndUUIDByManufacturer(manufacturer string) string {
 		}
 	}
 
+	// 16進数整数から10進数5文字列へ(例：33 -> "00021")
 	resultManufacturer := fmt.Sprintf("%05x", minNumber)
 	return resultManufacturer
 }
@@ -49,15 +50,7 @@ func convertBeacons(inputBeacons []*model.BeaconSignal) []model.BeaconSignal {
 
 		// iPhoneビーコンの場合UUIDを取得する処理が必要(例："4c000180000021000021000021000021000021" -> "8ebc21144abd00000000ff0100000021")
 		if len(inputBeacon.Uuid) == 38 {
-			println("iphoneビーコンのManufacturer")
-			println(inputBeacon.Uuid)
-			println("[9:14]")
-			println(inputBeacon.Uuid[9:14])
-			println("[16:21]")
-			println(inputBeacon.Uuid[15:20])
-			println("[23:28]")
-			println(inputBeacon.Uuid[21:26])
-			// 6文字目が8以上なら発信中ってこと
+			// 6文字目が8以上なら発信中ってことを意味する
 			// 16進数の文字列を10進数の数字に変換
 			advertisingStatusHexStr := inputBeacon.Uuid[6:7]
 			advertisingStatusNum, err := strconv.ParseInt(advertisingStatusHexStr, 16, 64)
@@ -66,11 +59,8 @@ func convertBeacons(inputBeacons []*model.BeaconSignal) []model.BeaconSignal {
 				continue
 			}
 			if advertisingStatusNum >= 8 {
-				fmt.Print(advertisingStatusNum)
-				println("iPhoneビーコン発信中になっています")
 				// Manufacturerの5文字をUUID(8ebc21144abd00000000ff01000は固定値)の末尾へ追加
 				tmpUUID := getEndUUIDByManufacturer(inputBeacon.Uuid)
-				println(tmpUUID)
 				uuid = "8ebc21144abd00000000ff01000" + tmpUUID
 			}
 		}
