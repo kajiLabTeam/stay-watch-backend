@@ -92,13 +92,6 @@ type Beacon struct {
 	UuidEditable bool
 }
 
-type UuidMap struct {
-	gorm.Model
-
-	Manufacturer string
-	UUID         string
-}
-
 type Community struct {
 	gorm.Model
 	Name string
