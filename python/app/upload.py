@@ -6,7 +6,7 @@ import datetime
 
 
 # slackに画像をアップロードする
-def post_slack(image_path):
+def post_slack(image_path,message):
 
     # .envファイルを読み込む
     load_dotenv()
@@ -27,8 +27,9 @@ def post_slack(image_path):
             channel=os.environ.get('SLACK_CHANNEL'),
             file=image_path,
             title='Uploaded image',
-            initial_comment=f'{last_month}月の滞在時間割合'
+            initial_comment=f'{last_month}月の{message}'
         )
         print("File uploaded: {}".format(response['file']['name']))
     except SlackApiError as e:
         print("Error uploading file: {}".format(e))
+
