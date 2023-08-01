@@ -86,8 +86,12 @@ content-type: application/json
 {
     "beacons":[
         {
-            "uuid": "e7d61ea3f8dd49c88f2ff24f0027ac02",
-            "rssi": -50
+            "uuid": "4c000180000021000022000121000024000023",
+            "rssi": -49
+        },
+        {
+            "uuid": "8ebc21144abdba0db7c6ff0f0027ac00",
+            "rssi": -49
         }
     ],
     "roomId": 1
@@ -100,7 +104,7 @@ content-type: application/json
 {
     "beacons":[
     ],
-    "roomId": 2
+    "roomId": 1
 }
 
 
