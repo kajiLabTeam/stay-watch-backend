@@ -18,4 +18,3 @@ if __name__ == '__main__':
     message=f'滞在時間ランキング\n1位 {first_three_keys[0]}さん\n2位 {first_three_keys[1]}さん\n3位 {first_three_keys[2]}さん\nおめでとうございます!'
     image_path=chart.save_users_log_time_bar_chart(log_times)
     upload.post_slack(image_path,message)
-

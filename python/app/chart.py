@@ -52,6 +52,10 @@ def save_users_log_time_bar_chart(log_times: dict):
     user_names = [x[0] for x in sorted_log_times]
     log_times = [x[1] for x in sorted_log_times]
 
+
+    user_names=user_names[:15]
+    log_times=log_times[:15]
+
     # 棒グラフを描画
     plt.barh(user_names[::-1], log_times[::-1], color='#4363d8')
 
