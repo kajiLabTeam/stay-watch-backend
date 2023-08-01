@@ -704,7 +704,6 @@ func init() {
 		}
 		db.Create(&buildings)
 	}
-
 	// db.Model(&model.User{}).Count()
 
 }

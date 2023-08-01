@@ -56,7 +56,7 @@ func (BeaconService) GetBeaconByBeaconName(beaconName string) (model.Beacon, err
 		return model.Beacon{}, result.Error
 	}
 
-	return beacon, nil	
+	return beacon, nil
 }
 
 func (BeaconService) GetBeaconIdByBeaconName(beaconName string) (int64, error) {
