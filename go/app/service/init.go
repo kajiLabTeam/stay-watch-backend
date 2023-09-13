@@ -3,7 +3,6 @@ package service
 import (
 	"Stay_watch/model"
 	"fmt"
-	"log"
 	"os"
 	"strings"
 
@@ -742,6 +741,5 @@ func connect() *gorm.DB {
 		panic(err)
 	}
 
-	log.Println("DB connected")
 	return gormDB
 }
