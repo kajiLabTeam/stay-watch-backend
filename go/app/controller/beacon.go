@@ -234,8 +234,7 @@ func Beacon(c *gin.Context) {
 		// APIのリクエストのUUIDからuserIdを取得する
 		currentUserID, err := UserService.GetUserIDByUUID(currentStayer.Uuid)
 		if err != nil {
-			fmt.Println("failed: Cannnot get user id")
-			c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Failed to get user id"})
+			fmt.Println("failed: Cannnot get user id(UUID : " + currentStayer.Uuid + ")")
 			return
 		}
 
