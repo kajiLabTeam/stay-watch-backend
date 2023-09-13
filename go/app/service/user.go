@@ -344,7 +344,7 @@ func (UserService) GetUserUUIDByUserID(userID int64) (string, error) {
 	user := model.User{}
 	result := DbEngine.Where("id=?", userID).Take(&user)
 	if result.Error != nil {
-		fmt.Printf("ユーザ名取得失敗 %v", result.Error)
+		fmt.Printf("ユーザIDからユーザ名取得失敗 %v", result.Error)
 		return "", result.Error
 	}
 
@@ -362,7 +362,7 @@ func (UserService) GetUserIDByUUID(uuid string) (int64, error) {
 	user := model.User{}
 	result := DbEngine.Where("uuid=?", uuid).Take(&user)
 	if result.Error != nil {
-		fmt.Printf("ユーザ名取得失敗 %v", result.Error)
+		fmt.Printf("UUIDからユーザ名取得失敗 %v", result.Error)
 		return 0, result.Error
 	}
 
@@ -489,7 +489,7 @@ func (UserService) GetUserByEmail(email string) (model.User, error) {
 	user := model.User{}
 	result := DbEngine.Where("email=?", email).Take(&user)
 	if result.Error != nil {
-		fmt.Printf("ユーザ名取得失敗 %v", result.Error)
+		fmt.Printf("Emailからユーザ名取得失敗 %v", result.Error)
 		return model.User{}, result.Error
 	}
 	return user, nil

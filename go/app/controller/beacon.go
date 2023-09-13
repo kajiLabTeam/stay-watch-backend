@@ -235,7 +235,6 @@ func Beacon(c *gin.Context) {
 		currentUserID, err := UserService.GetUserIDByUUID(currentStayer.Uuid)
 		if err != nil {
 			fmt.Println("failed: Cannnot get user id(UUID : " + currentStayer.Uuid + ")")
-			return
 		}
 
 		currentTime := time.Now()
