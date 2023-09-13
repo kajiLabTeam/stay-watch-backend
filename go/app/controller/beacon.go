@@ -113,8 +113,7 @@ func Beacon(c *gin.Context) {
 			pastUUID, err := UserService.GetUserUUIDByUserID(pastStayer.UserID)
 			if err != nil {
 				fmt.Printf("failed: Cannnot get user uuid %v", err)
-				c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Failed to get uuid"})
-				return
+				continue
 			}
 			// 1つ前のstayerテーブルにもいた場合
 			if pastUUID == currentStayer.Uuid {
