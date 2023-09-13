@@ -112,7 +112,7 @@ func Beacon(c *gin.Context) {
 		for _, currentStayer := range requestBeacons {
 			pastUUID, err := UserService.GetUserUUIDByUserID(pastStayer.UserID)
 			if err != nil {
-				fmt.Printf("failed: Cannnot get user uuid %v", err)
+				fmt.Printf("Cannnot get user uuid %v", err)
 				continue
 			}
 			// 1つ前のstayerテーブルにもいた場合
