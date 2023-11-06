@@ -23,7 +23,7 @@ services:
     container_name: ${MYSQL_CONTAINER_NAME}
     build: ./mysql
     volumes:
-      - ./mysql/db:/docker-entrypoint-initdb.d
+      - staywatch_db_volume:/var/lib/mysql
     ports:
       - "${MYSQL_PORT}:3306"
     environment:
@@ -46,7 +46,7 @@ services:
     env_file:
       - .env
     command: 
-      - "python3"      
+      - "python3"
       - "main.py"
     depends_on:
       vol_mysql:
@@ -55,3 +55,5 @@ networks:
   default:
     external:
       name: vol_network
+volumes:
+  staywatch_db_volume:
