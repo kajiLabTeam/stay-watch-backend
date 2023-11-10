@@ -50,19 +50,8 @@ func convertBeacons(inputBeacons []*model.BeaconSignal) []model.BeaconSignal {
 
 		// iPhoneビーコンの場合UUIDを取得する処理が必要(例："4c000180000021000021000021000021000021" -> "8ebc21144abd00000000ff0100000021")
 		if len(inputBeacon.Uuid) == 38 {
-			// 6文字目が8以上なら発信中ってことを意味する
-			// 16進数の文字列を10進数の数字に変換
-			advertisingStatusHexStr := inputBeacon.Uuid[6:7]
-			advertisingStatusNum, err := strconv.ParseInt(advertisingStatusHexStr, 16, 64)
-			if err != nil {
-				fmt.Printf("failed: Cannnot convert hexStr to Int %v", err)
-				continue
-			}
-			if advertisingStatusNum >= 8 {
-				// Manufacturerの5文字をUUID(8ebc21144abd00000000ff01000は固定値)の末尾へ追加
-				tmpUUID := getEndUUIDByManufacturer(inputBeacon.Uuid)
-				uuid = "8ebc21144abd00000000ff01000" + tmpUUID
-			}
+			tmpUUID := getEndUUIDByManufacturer(inputBeacon.Uuid)
+			uuid = "8ebc21144abd00000000ff01000" + tmpUUID
 		}
 
 		tmpBeacon := model.BeaconSignal{
