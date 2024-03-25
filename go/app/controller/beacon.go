@@ -135,7 +135,7 @@ func Beacon(c *gin.Context) {
 					c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Failed to delete stayer"})
 				}
 				// logテーブルのendAtを更新する
-				err = RoomService.UpdateEndAt(pastStayer.UserID)
+				err = RoomService.UpdateEndAt(pastStayer.UserID, time.Now())
 				if err != nil {
 					fmt.Println("failed: Cannnot update endAt")
 					c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Failed to update endAt"})
@@ -190,7 +190,7 @@ func Beacon(c *gin.Context) {
 			}
 
 			// logテーブルのendAtを更新する
-			err = RoomService.UpdateEndAt(pastStayer.UserID)
+			err = RoomService.UpdateEndAt(pastStayer.UserID, time.Now())
 			if err != nil {
 				fmt.Println(err)
 			}
