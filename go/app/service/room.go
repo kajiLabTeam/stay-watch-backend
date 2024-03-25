@@ -163,7 +163,7 @@ func (RoomService) DeleteStayer(userID int64) error {
 	return nil
 }
 
-func (RoomService) UpdateEndAt(userID int64) error {
+func (RoomService) UpdateEndAt(userID int64, endAt time.Time) error {
 	DbEngine := connect()
 	closer, err := DbEngine.DB()
 	if err != nil {
@@ -171,9 +171,7 @@ func (RoomService) UpdateEndAt(userID int64) error {
 	}
 	defer closer.Close()
 
-	currentTime := time.Now()
-
-	result := DbEngine.Where("user_id=? ", userID).Last(&model.Log{}).Update("end_at", currentTime.Format("2006-01-02 15:04:05"))
+	result := DbEngine.Where("user_id=? ", userID).Last(&model.Log{}).Update("end_at", endAt)
 	if result.Error != nil {
 		return fmt.Errorf(" failed to update end_at: %w", result.Error)
 	}
