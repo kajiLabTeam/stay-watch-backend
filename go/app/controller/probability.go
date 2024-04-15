@@ -25,18 +25,6 @@ func GetProbability(c *gin.Context) {
 		return
 	}
 
-	UserService := service.UserService{}
-	uid, err := strconv.Atoi(user_id)
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "user_id is not number"})
-		return
-	}
-	user, err := UserService.GetUserNameByUserID(int64(uid))
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to get user name"})
-		return
-	}
-
 	url := "https://stay-estimate.kajilab.dev/app/probability/" + status + "/" + before + "?user_id=" + user_id + "&date=" + str_date + "&time=" + str_time
 	req, _ := http.NewRequest("GET", url, nil)
 	client := new(http.Client)
@@ -57,8 +45,6 @@ func GetProbability(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to unmarshal probability"})
 		return
 	}
-
-	probability.UserName = user
 
 	c.JSON(http.StatusOK, probability)
 }
