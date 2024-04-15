@@ -46,3 +46,36 @@ func GetProbability(c *gin.Context) {
 
 	c.JSON(http.StatusOK, probability)
 }
+
+// 全てのユーザがその日に学校に来る確率を算出
+func GetAllProbability(c *gin.Context) {
+	sta_date := c.Query("start_date")
+
+	if sta_date == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "start_date is empty"})
+		return
+	}
+
+	url := "https://stay-estimate.kajilab.dev/app/probability/all?date=" + sta_date
+	req, _ := http.NewRequest("GET", url, nil)
+	client := new(http.Client)
+	resp, err := client.Do(req)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to access the processing server"})
+		return
+	}
+	defer resp.Body.Close()
+	if resp.StatusCode != 200 {
+		c.JSON(resp.StatusCode, gin.H{"error": "Failed to get probability"})
+		return
+	}
+
+	body, _ := io.ReadAll(resp.Body)
+	var probabilities []model.ProbabilityStayingResponse
+	if err := json.Unmarshal(body, &probabilities); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to unmarshal probability"})
+		return
+	}
+
+	c.JSON(http.StatusOK, probabilities)
+}
