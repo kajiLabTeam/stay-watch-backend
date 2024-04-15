@@ -4,12 +4,10 @@ import (
 	"encoding/json"
 	"io"
 	"net/http"
-	"strconv"
 
 	"github.com/gin-gonic/gin"
 
 	"Stay_watch/model"
-	"Stay_watch/service"
 )
 
 // 特定のユーザが特定の時間以降(または'までに')学校に来る(または'帰る')確率を算出
