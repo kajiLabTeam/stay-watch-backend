@@ -12,6 +12,7 @@ import (
 	"Stay_watch/service"
 )
 
+// 特定のユーザが特定の時間以降(または'までに')学校に来る(または'帰る')確率を算出
 func GetProbability(c *gin.Context) {
 	status := c.Param("status") // "reporting" or "leave"
 	before := c.Param("before") // "before" or "after"
