@@ -19,7 +19,20 @@ func init() {
 		return
 	}
 	defer closer.Close()
-	db.AutoMigrate(&model.User{}, &model.Log{}, &model.Room{}, &model.Stayer{}, &model.Tag{}, &model.TagMap{}, &model.Building{}, &model.Beacon{}, &model.DeletedUser{}, &model.Community{})
+	db.AutoMigrate(
+		&model.User{},
+		&model.Log{},
+		&model.Room{},
+		&model.Stayer{},
+		&model.Tag{},
+		&model.TagMap{},
+		&model.Building{},
+		&model.Beacon{},
+		&model.DeletedUser{},
+		&model.Community{},
+		&model.Edited_log{},
+		&model.Cluster{},
+	)
 
 	var count int64
 	db.Model(&model.User{}).Count(&count)
