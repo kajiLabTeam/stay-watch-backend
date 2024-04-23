@@ -98,7 +98,7 @@ type Community struct {
 }
 
 type Edited_log struct {
-	Id        int64 `gorm:"primaryKey;autoIncrement"`
+	gorm.Model
 	User_id   int64
 	Date      time.Time `gorm:"type:date"`
 	Reporting time.Time `gorm:"type:time"`
@@ -106,7 +106,7 @@ type Edited_log struct {
 }
 
 type Cluster struct {
-	Id        int64     `gorm:"primaryKey;autoIncrement"`
+	gorm.Model
 	Date      time.Time `gorm:"type:date"`
 	Reporting bool
 	Average   float64
