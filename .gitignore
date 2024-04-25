@@ -226,8 +226,5 @@ backup/
 mysql/backup.sql
 mysql/test.sql
 
-# main.goをビルドしたファイル
-go/app/main
-
 
 __pycache__/
