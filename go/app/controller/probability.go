@@ -3,9 +3,13 @@ package controller
 import (
 	"encoding/json"
 	"io"
+	"log"
 	"net/http"
+	"os"
+	"strings"
 
 	"github.com/gin-gonic/gin"
+	"github.com/joho/godotenv"
 
 	"Stay_watch/model"
 )
@@ -23,7 +27,19 @@ func GetProbability(c *gin.Context) {
 		return
 	}
 
-	url := "https://stay-estimate.kajilab.dev/app/probability/" + status + "/" + before + "?user_id=" + user_id + "&date=" + str_date + "&time=" + str_time
+	envPath := "../../.env"
+	//test実行時はenvのディレクトリが変わる
+	if strings.HasSuffix(os.Args[0], ".test") {
+		envPath = "../../../.env"
+	}
+	err := godotenv.Load(
+		envPath,
+	)
+	if err != nil {
+		log.Fatalln("Error loading .env file")
+	}
+
+	url := os.Getenv("PROBABILITY_URL") + "/app/probability/" + status + "/" + before + "?user_id=" + user_id + "&date=" + str_date + "&time=" + str_time
 	req, _ := http.NewRequest("GET", url, nil)
 	client := new(http.Client)
 	resp, err := client.Do(req)
@@ -49,14 +65,27 @@ func GetProbability(c *gin.Context) {
 
 // 全てのユーザがその日に学校に来る確率を算出
 func GetAllProbability(c *gin.Context) {
-	sta_date := c.Query("start_date")
+	str_community := c.Param("communityId")
+	sta_date := c.Query("date")
 
 	if sta_date == "" {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "start_date is empty"})
 		return
 	}
 
-	url := "https://stay-estimate.kajilab.dev/app/probability/all?date=" + sta_date
+	envPath := "../../.env"
+	//test実行時はenvのディレクトリが変わる
+	if strings.HasSuffix(os.Args[0], ".test") {
+		envPath = "../../../.env"
+	}
+	err := godotenv.Load(
+		envPath,
+	)
+	if err != nil {
+		log.Fatalln("Error loading .env file")
+	}
+
+	url := os.Getenv("PROBABILITY_URL") + "/app/probability/" + str_community + "/all?date=" + sta_date
 	req, _ := http.NewRequest("GET", url, nil)
 	client := new(http.Client)
 	resp, err := client.Do(req)

@@ -30,7 +30,7 @@ func init() {
 		&model.Beacon{},
 		&model.DeletedUser{},
 		&model.Community{},
-		&model.Edited_log{},
+		&model.EditedLog{},
 		&model.Cluster{},
 	)
 
