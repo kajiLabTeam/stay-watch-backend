@@ -97,7 +97,7 @@ type Community struct {
 	Name string
 }
 
-type Edited_log struct {
+type EditedLog struct {
 	gorm.Model
 	User_id   int64
 	Date      time.Time `gorm:"type:date"`
