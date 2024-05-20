@@ -183,3 +183,9 @@ type TagsGetResponse struct {
 	Id   int64  `json:"id"`
 	Name string `json:"name"`
 }
+
+type ProbabilityStayingResponse struct {
+	UserId      int     `json:"userId"`
+	UserName    string  `json:"userName"`
+	Probability float64 `json:"probability"`
+}

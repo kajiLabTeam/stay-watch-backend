@@ -1,0 +1,110 @@
+package controller
+
+import (
+	"encoding/json"
+	"io"
+	"log"
+	"net/http"
+	"os"
+	"strings"
+
+	"github.com/gin-gonic/gin"
+	"github.com/joho/godotenv"
+
+	"Stay_watch/model"
+)
+
+// 特定のユーザが特定の時間以降(または'までに')学校に来る(または'帰る')確率を算出
+func GetProbability(c *gin.Context) {
+	status := c.Param("status") // "reporting" or "leave"
+	before := c.Param("before") // "before" or "after"
+	user_id := c.Query("user_id")
+	str_date := c.Query("date")
+	str_time := c.Query("time")
+
+	if user_id == "" || str_date == "" || str_time == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "date or time is empty"})
+		return
+	}
+
+	envPath := "../../.env"
+	//test実行時はenvのディレクトリが変わる
+	if strings.HasSuffix(os.Args[0], ".test") {
+		envPath = "../../../.env"
+	}
+	err := godotenv.Load(
+		envPath,
+	)
+	if err != nil {
+		log.Fatalln("Error loading .env file")
+	}
+
+	url := os.Getenv("PROBABILITY_URL") + "/app/probability/" + status + "/" + before + "?user_id=" + user_id + "&date=" + str_date + "&time=" + str_time
+	req, _ := http.NewRequest("GET", url, nil)
+	client := new(http.Client)
+	resp, err := client.Do(req)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to access the processing server"})
+		return
+	}
+	defer resp.Body.Close()
+	if resp.StatusCode != 200 {
+		c.JSON(resp.StatusCode, gin.H{"error": "Failed to get probability"})
+		return
+	}
+
+	body, _ := io.ReadAll(resp.Body)
+	var probability model.ProbabilityStayingResponse
+	if err := json.Unmarshal(body, &probability); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to unmarshal probability"})
+		return
+	}
+
+	c.JSON(http.StatusOK, probability)
+}
+
+// 全てのユーザがその日に学校に来る確率を算出
+func GetAllProbability(c *gin.Context) {
+	str_community := c.Param("communityId")
+	sta_date := c.Query("date")
+
+	if sta_date == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "start_date is empty"})
+		return
+	}
+
+	envPath := "../../.env"
+	//test実行時はenvのディレクトリが変わる
+	if strings.HasSuffix(os.Args[0], ".test") {
+		envPath = "../../../.env"
+	}
+	err := godotenv.Load(
+		envPath,
+	)
+	if err != nil {
+		log.Fatalln("Error loading .env file")
+	}
+
+	url := os.Getenv("PROBABILITY_URL") + "/app/probability/" + str_community + "/all?date=" + sta_date
+	req, _ := http.NewRequest("GET", url, nil)
+	client := new(http.Client)
+	resp, err := client.Do(req)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to access the processing server"})
+		return
+	}
+	defer resp.Body.Close()
+	if resp.StatusCode != 200 {
+		c.JSON(resp.StatusCode, gin.H{"error": "Failed to get probability"})
+		return
+	}
+
+	body, _ := io.ReadAll(resp.Body)
+	var probabilities []model.ProbabilityStayingResponse
+	if err := json.Unmarshal(body, &probabilities); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to unmarshal probability"})
+		return
+	}
+
+	c.JSON(http.StatusOK, probabilities)
+}
