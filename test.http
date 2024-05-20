@@ -158,3 +158,8 @@ GET {{baseURL}}/api/v1/tags/1/names
 
 ### コミュニティ（共用も）のタグを取得する
 GET {{baseURL}}/api/v1/tags/2
+
+### 特定のユーザが特定の時間までに研究室に来る帰る確率
+GET {{baseURL}}/api/v1/probability/reporting/before?user_id=2&date=2024-5-16&time=12:00:00
+### あるコミュニティのユーザ全員がその日のうちに研究室に来る確率
+GET {{baseURL}}/api/v1/probability/2/all?date=2024-5-16
