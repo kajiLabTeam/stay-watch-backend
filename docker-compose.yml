@@ -19,6 +19,7 @@ services:
     depends_on:
       vol_mysql:
         condition: service_healthy
+
   vol_mysql:
     container_name: ${MYSQL_CONTAINER_NAME}
     build: ./mysql
@@ -38,6 +39,7 @@ services:
       interval: 10s
       timeout: 20s
       retries: 20
+
   vol_python:
     container_name: vol_python
     build: ./python
@@ -45,12 +47,25 @@ services:
       - ./python/app:/app
     env_file:
       - .env
-    command: 
+    command:
       - "python3"
       - "main.py"
     depends_on:
       vol_mysql:
-        condition: service_healthy      
+        condition: service_healthy
+
+  vol_probability:
+    container_name: vol_probability
+    build:
+      context: .
+      dockerfile: ./probability/dockerfile
+    ports:
+      - "${PROBABILITY_PORT}:8090"
+    expose:
+      - 8090
+    depends_on:
+      - vol_mysql
+
 networks:
   default:
     external:
