@@ -26,7 +26,7 @@ router = APIRouter()
 async def get_probability_reporting_before(reporting:str, before:str, user_id:int = 0, date:str = '2024-1-1', time:str = "24:00:00", db: Session = Depends(get_db)):
     r = True if reporting == "reporting" else False
     b = True if before == "before" else False
-    date_object= datetime.strptime(date, '%Y-%m-%d')
+    date_object= datetime.strptime(date, '%Y-%m-%d') #今日の日付
     seven_days_ago= date_object - timedelta(days=7)
     clusters = cl.get_all_cluster_by_userId_and_date(db, user_id, seven_days_ago, r)
     delta = abs(clusters[0].date - cl.get_oldest_cluster_by_userId(db, user_id, r).date + timedelta(days=1))
