@@ -30,7 +30,7 @@ async def get_probability_reporting_before(reporting:str, before:str, user_id:in
     seven_days_ago= date_object - timedelta(days=7)
     clusters = cl.get_all_cluster_by_userId_and_date(db, user_id, seven_days_ago, r)
     delta = abs(clusters[0].date - cl.get_oldest_cluster_by_userId(db, user_id, r).date + timedelta(days=1))
-    # 差分を日単位に変換
+    # 差分を週単位に変換
     days_difference = math.floor(delta.days/7)
     # ここでクラスタリングの結果を元に確率を計算する(bがTrueなら以前, Falseなら以降)
     pr = nd.probability_from_normal_distribution(clusters, time, days_difference, b)
