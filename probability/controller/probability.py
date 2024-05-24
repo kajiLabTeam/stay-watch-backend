@@ -7,7 +7,7 @@ from fastapi.encoders import jsonable_encoder
 from fastapi.responses import ORJSONResponse
 from sqlalchemy.orm import Session
 from datetime import datetime, timedelta
-from models import cluster as cl, user as us
+from models import cluster as cl, user as us, logs as lg
 from service import normal_distribution as nd
 from lib.mysql import get_db
 
@@ -29,7 +29,7 @@ async def get_probability_reporting_before(reporting:str, before:str, user_id:in
     date_object= datetime.strptime(date, '%Y-%m-%d') #今日の日付
     seven_days_ago= date_object - timedelta(days=7)
     clusters = cl.get_all_cluster_by_userId_and_date(db, user_id, seven_days_ago, r)
-    delta = abs(clusters[0].date - cl.get_oldest_cluster_by_userId(db, user_id, r).date + timedelta(days=1))
+    delta = abs(clusters[0].date - lg.get_oldest_log_by_userId(user_id).date + timedelta(days=1))
     # 差分を週単位に変換
     days_difference = math.floor(delta.days/7)
     # ここでクラスタリングの結果を元に確率を計算する(bがTrueなら以前, Falseなら以降)
