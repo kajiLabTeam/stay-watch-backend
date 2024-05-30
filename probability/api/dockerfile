@@ -8,7 +8,7 @@ RUN apt update && apt install -y \
     curl \
     git
 
-COPY ./probability/ ./
+COPY ./probability/api ./
 
 RUN pip install --upgrade pip && \
     pip install -r requirements.txt
