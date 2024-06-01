@@ -68,6 +68,15 @@ services:
     depends_on:
       - vol_mysql
 
+  vol_probability_clustering:
+    container_name: vol_probability_clustering
+    tty: true
+    build:
+      context: .
+      dockerfile: ./probability/clustering/dockerfile
+    depends_on:
+      - vol_mysql
+
 networks:
   default:
     external:
