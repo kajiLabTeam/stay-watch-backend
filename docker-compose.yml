@@ -54,11 +54,13 @@ services:
       vol_mysql:
         condition: service_healthy
 
-  vol_probability:
-    container_name: vol_probability
+  vol_probability_api:
+    container_name: vol_probability_api
     build:
       context: .
-      dockerfile: ./probability/dockerfile
+      dockerfile: ./probability/api/dockerfile
+    env_file:
+      - ./probability/.env
     ports:
       - "${PROBABILITY_PORT}:8090"
     expose:
