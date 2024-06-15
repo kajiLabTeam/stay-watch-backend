@@ -1,0 +1,2 @@
+*/1 * * * * date >> /usr/clustering/server.log
+*/1 * * * * /usr/local/bin/cron.sh
