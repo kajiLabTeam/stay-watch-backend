@@ -74,6 +74,8 @@ services:
     build:
       context: .
       dockerfile: ./probability/clustering/dockerfile
+    env_file:
+      - ./probability/.env
     depends_on:
       - vol_mysql
 
