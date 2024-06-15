@@ -226,5 +226,5 @@ backup/
 mysql/backup.sql
 mysql/test.sql
 
-
+.venv/
 __pycache__/
