@@ -23,14 +23,22 @@ def formatting_log(df: pd.DataFrame) -> pd.DataFrame:
     result_data = []
     grouped_data = df.groupby(df['start_at'].dt.date)
     for date, group in grouped_data:
-        data = group.loc[group['start_at'].idxmin()]
-        result_data.append({
-            'user_id': df['user_id'],
-            'date': date,
-            'reporting': data['start_at'].strftime('%H:%M:%S.%f')[:-3],
-            'leave': data['start_at'].strftime('%H:%M:%S.%f')[:-3],
-        })
-
+        entry = group.loc[group['start_at'].idxmin()]
+        exit = group.loc[group['start_at'].idxmax()]
+        if entry['start_at'].date() != exit['end_at'].date():
+            result_data.append({
+                'user_id': df['user_id'],
+                'date': date,
+                'entry': entry['start_at'].strftime('%H:%M:%S.%f')[:-3],
+                'exit': None
+            })
+        else:
+            result_data.append({
+                'user_id': df['user_id'],
+                'date': date,
+                'entry': entry['start_at'].strftime('%H:%M:%S.%f')[:-3],
+                'exit': exit['end_at'].strftime('%H:%M:%S.%f')[:-3]
+            })
     # 結果をDataFrameに変換してreturn
     result_df = pd.DataFrame(result_data)
     return result_df
