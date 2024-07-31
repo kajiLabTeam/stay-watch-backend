@@ -5,7 +5,13 @@ from service import clustering, date_operation as do
 from models import log, users, editedlog, cluster
 from lib.mysql import get_db
 
-
+def time_to_seconds(point):
+    try:
+        # 時、分、秒を秒数に変換
+        return sum(x * float(t) for x, t in zip([3600, 60, 1], point.split(":")))
+    except (ValueError, AttributeError):
+        # 無効な入力をスキップ（例: None, 空文字列, 不正フォーマット）
+        return None
 
 def main():
     db = get_db().__next__()
@@ -35,7 +41,11 @@ def main():
             df_exit: list[datetime] = df_day['leaving'].to_list()
             # 時間データを秒単位に変換
             data_seconds_entry: list[int] = [sum(x * int(t) for x, t in zip([3600, 60, 1], point.strftime('%H:%M:%S').split(":"))) for point in df_entry]
-            data_seconds_exit: list[int] = [sum(x * int(t) for x, t in zip([3600, 60, 1], point.strftime('%H:%M:%S').split(":"))) for point in df_exit]
+            data_seconds_exit = np.array([
+                time_to_seconds(point)
+                for point in df_exit
+                if time_to_seconds(point) is not None  # 無効な入力をフィルタリング
+            ])
             # クラスタリングの実行
             # 結果をリストに格納
             result_entry = clustering.xmeans(data_seconds_entry)
