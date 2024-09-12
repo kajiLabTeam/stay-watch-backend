@@ -99,7 +99,7 @@ type Community struct {
 
 type EditedLog struct {
 	gorm.Model
-	User_id   int64
+	UserId    int64
 	Date      time.Time `gorm:"type:date"`
 	Reporting time.Time `gorm:"type:time"`
 	Leave     time.Time `gorm:"type:time"`
@@ -112,5 +112,5 @@ type Cluster struct {
 	Average   float64
 	Sd        float64
 	Count     int64
-	User_id   int64
+	UserId    int64
 }
