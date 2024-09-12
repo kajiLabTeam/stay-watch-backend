@@ -62,7 +62,7 @@ func SetUpServer() *gin.Engine {
 		versionEngine.GET("/signup", controller.SignUp)
 		// 滞在確率
 		versionEngine.GET("/probability/:status/:before", controller.GetProbability)
-		versionEngine.GET("/probability/:communityId/all", controller.GetAllProbability)
+		versionEngine.GET("/probability/all/:communityId", controller.GetAllProbability)
 	}
 
 	return engine
