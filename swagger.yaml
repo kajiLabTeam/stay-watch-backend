@@ -32,6 +32,8 @@ tags:
     description: 建物についての操作
   - name: updateroom
     description: 部屋情報を更新する
+  - name: probability
+    description: とある時間までに在室している・帰宅している確率を取得する
 
 paths:
   /stayers:
@@ -426,3 +428,103 @@ paths:
       responses:
         '200':
           description: OK
+
+  /probability/{status}/{before}:
+    get:
+      tags:
+        - probability
+      summary: とある時刻まで・以降に在室している・帰宅している確率を取得する
+      operationId: controller.Probability
+      parameters:
+        - name: status
+          in: path
+          required: true
+          schema:
+            type: string
+            example: "reporting"
+        - name: before
+          in: path
+          required: true
+          schema:
+            type: string
+            example: "before"
+        - name: user_id
+          in: query
+          required: true
+          schema:
+            type: integer
+            example: 1
+        - name: date
+          in: query
+          required: true
+          schema:
+            type: string
+            example: "2023-03-24"
+        - name: time
+          in: query
+          required: true
+          schema:
+            type: string
+            example: "17:00:00"
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  UserId:
+                    type: integer
+                    example: 5
+                  UserName:
+                    type: string
+                    example: "hoge山hage太郎"
+                  Probability:
+                    type: number
+                    example: 0.76
+        '500':
+          description:
+            Internal Server Error
+
+  /probability/all/{communityId}:
+    get:
+      tags:
+        - probability
+      summary: コミュニティに所属する全てのメンバーのある日付における出勤する確率を取得する
+      operationId: controller.ProbabilityAll
+      parameters:
+        - name: communityId
+          in: path
+          required: true
+          schema:
+            type: integer
+            example: 1
+        - name: date
+          in: query
+          required: true
+          schema:
+            type: string
+            example: "2023-03-24"
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    UserId:
+                      type: integer
+                      example: 5
+                    UserName:
+                      type: string
+                      example: "hoge山hage太郎"
+                    Probability:
+                      type: number
+                      example: 0.76
+        '500':
+          description:
+            Internal Server Error
