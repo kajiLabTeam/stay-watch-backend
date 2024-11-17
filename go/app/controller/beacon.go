@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"encoding/hex"
 	"fmt"
 	"net/http"
 	"strconv"
@@ -10,6 +11,7 @@ import (
 	"Stay_watch/service"
 	"Stay_watch/util"
 
+	"github.com/dchest/siphash"
 	"github.com/gin-gonic/gin"
 )
 
@@ -39,9 +41,56 @@ func getEndUUIDByManufacturer(manufacturer string) string {
 	return resultManufacturer
 }
 
-func convertBeacons(inputBeacons []*model.BeaconSignal) []model.BeaconSignal {
+func getUUIDBySipHash(randomValue string, hashValue string) (string, error) {
+	UserService := service.UserService{}
+	users, err := UserService.GetAllUser()
+	if err != nil {
+		fmt.Println("failed to get users by db: ", err)
+		return "", err
+	}
 
-	//BeaconService := service.BeaconService{}
+	for _, user := range users {
+		// 例：01 02 03 04 05 06 07 08 09 0a 0b 0c 0d 0e 0f 00
+		// 		privateKey := "0102030405060708090a0b0c0d0e0f00"
+		privateKey := user.UUID
+
+		// 文字列をバイトスライスに変換
+		bytes, err := hex.DecodeString(privateKey)
+		if err != nil {
+			fmt.Println("failed to decode hex string: ", err)
+			return "", err
+		}
+
+		// バイトスライスをuint64に変換(8バイトずつ分割して変換)
+		var key1 uint64
+		var key2 uint64
+		for i := 0; i < 8; i++ {
+			key1 |= uint64(bytes[i]) << (8 * i)
+			key2 |= uint64(bytes[8+i]) << (8 * i)
+		}
+
+		// ハッシュ化したいデータ
+		msg := []byte(randomValue)	// ランダム値
+
+		// SipHashを計算
+		hash := siphash.Hash(key1, key2, msg) // ここで第1, 第2引数にカスタム値を指定可能
+
+		// 結果を出力
+		// 結果が一緒になればそのユーザの秘密キーがビーコン固有の秘密キー
+		if(hashValue == strconv.FormatUint(hash, 16)){
+			fmt.Println("randomValue: ", randomValue)
+			fmt.Println("hashValue: ", hashValue)
+			uuid := randomValue + strconv.FormatUint(hash, 16)
+			fmt.Println(uuid)
+			return privateKey, nil
+		}
+	}
+
+	// 見つからなかった場合エラーを返す
+	return "", err
+}
+
+func convertBeacons(inputBeacons []*model.BeaconSignal) []model.BeaconSignal {
 
 	outBeacons := []model.BeaconSignal{}
 	for _, inputBeacon := range inputBeacons {
@@ -52,7 +101,32 @@ func convertBeacons(inputBeacons []*model.BeaconSignal) []model.BeaconSignal {
 		if len(inputBeacon.Uuid) == 38 {
 			tmpUUID := getEndUUIDByManufacturer(inputBeacon.Uuid)
 			uuid = "8ebc21144abd00000000ff01000" + tmpUUID
+		} else {
+			// 自作ビーコンの場合
+			// 自作ビーコンは先頭2bitsが0
+			hexPrefix := uuid[:2]
+			parsedValue, err := strconv.ParseUint(hexPrefix, 16, 8)
+			if err != nil {
+				fmt.Println("Error:", err)
+				continue
+			}
+			fmt.Println("beaconstart2keta: ")
+			fmt.Println(parsedValue)
+			// 自作ビーコンの場合UUIDから秘密キーを取得する処理が必要(例："252b9bea12a9410c5e072029cded8173" -> "0102030405060708090A0B0C0D0E0F00")
+			// 秘密キーはUUIDカラムをそのまま流用（UUIDと桁数一緒のため）
+			if (parsedValue < 63) {
+				randomValue := uuid[:16]
+				hashValue := uuid[16:]
+				fmt.Println(randomValue)
+				fmt.Println(hashValue)
+				uuid, err = getUUIDBySipHash(randomValue, hashValue)
+				if err != nil {
+					fmt.Println("Error:", err)
+					continue
+				}
+			}
 		}
+		
 
 		tmpBeacon := model.BeaconSignal{
 			Uuid: uuid,
