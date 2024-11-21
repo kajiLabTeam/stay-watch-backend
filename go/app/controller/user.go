@@ -63,6 +63,7 @@ func CreateUser(c *gin.Context) {
 		UUID:        "",
 		BeaconId:    int64(beacon.ID),
 		CommunityId: UserCreateRequest.CommunityId,
+		PrivateKey: UserCreateRequest.PrivateKey,
 	}
 
 	// 同じメールアドレスのユーザが既に登録済みだったら409を返す
