@@ -56,16 +56,6 @@ func CreateUser(c *gin.Context) {
 		return
 	}
 
-	user := model.User{
-		Name:        UserCreateRequest.Name,
-		Email:       UserCreateRequest.Email,
-		Role:        UserCreateRequest.Role,
-		UUID:        "",
-		BeaconId:    int64(beacon.ID),
-		CommunityId: UserCreateRequest.CommunityId,
-		PrivateKey: UserCreateRequest.PrivateKey,
-	}
-
 	// 同じメールアドレスのユーザが既に登録済みだったら409を返す
 	isRegisterd, err := UserService.IsEmailAlreadyRegistered(UserCreateRequest.Email)
 	if err != nil {
@@ -76,6 +66,30 @@ func CreateUser(c *gin.Context) {
 		// 同じメールアドレスが既に登録済みの場合
 		c.AbortWithStatusJSON(http.StatusConflict, gin.H{"error": "Arleady Registered Email"})
 		return
+	}
+
+	// 同じPrivateKeyが既に登録済みだったら409を返す
+	if UserCreateRequest.PrivateKey != "" {
+		isRegisterdPrivateKey, err := UserService.IsPrivateKeyAlreadyRegistered(UserCreateRequest.PrivateKey)
+		if err != nil {
+			c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Failed to check private key is arleady registerd"})
+			return
+		}
+		if isRegisterdPrivateKey {
+			// 同じPrivateKeyが既に登録済みの場合
+			c.AbortWithStatusJSON(http.StatusConflict, gin.H{"error": "Arleady Registered Private Key"})
+			return
+		}
+	}
+
+	user := model.User{
+		Name:        UserCreateRequest.Name,
+		Email:       UserCreateRequest.Email,
+		Role:        UserCreateRequest.Role,
+		UUID:        "",
+		BeaconId:    int64(beacon.ID),
+		CommunityId: UserCreateRequest.CommunityId,
+		PrivateKey: UserCreateRequest.PrivateKey,
 	}
 
 	// usersテーブルにユーザ情報を保存
