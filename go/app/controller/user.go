@@ -27,18 +27,35 @@ func createUuid(communityId int64, uuidEditable bool, beaconName string, userId 
 		// iPhoneの場合「8ebc21144abd00000000ff01000 + (userId(16進数))」
 		userIdHex := fmt.Sprintf("%05x", userId)
 		newUuid = "8ebc21144abd00000000ff01000" + userIdHex
-	} else if uuidEditable {
-		// 編集可能（物理）の場合ユーザがフォームで入力した値を用いる
-		//newUuid = "e7d61ea3f8dd49c88f2ff24f" + communityIdHex + requestUuid
-		newUuid = "8ebc21144abd" + "ba0d" + "b7c6" + "ff0f" + communityIdHex + requestUuid
-	} else {
-		// 編集不可（Android）の場合ユーザIDから取得した値を用いる
+	} else if beaconName == "Android" {
+		// Androidの場合ユーザIDから取得した値を用いる
 		// ユーザIDを16進数5桁に変換
 		userIdHex := fmt.Sprintf("%05x", userId)
 		newUuid = "8ebc21144abd" + "ba0d" + "b7c6" + "ff0a" + communityIdHex + userIdHex
+	} else if beaconName == "FCS1301" {
+		newUuid = "8ebc21144abd" + "ba0d" + "b7c6" + "ff0f" + communityIdHex + requestUuid
+	} else {
+		// その他のビーコンの場合リクエストの値をそのまま用いる(StayWatchBeaconもここに含まれる)
+		newUuid = requestUuid
 	}
 
 	return newUuid
+}
+
+func isValidCreateUserRequest(request model.UserCreateRequest) bool {
+	if request.PrivateKey == "" && request.Uuid == "" {
+		// PrivateKeyとUUIDがどちらとも未入力はNG
+		return false
+	}
+	if request.PrivateKey != "" && request.Uuid != "" {
+		// PrivateKeyとUUIDがどちらとも入力はNG
+		return false
+	}
+	if request.PrivateKey != "" && len(request.PrivateKey) != 32 {
+		// privateKeyは32文字固定
+		return false
+	}
+	return true
 }
 
 func CreateUser(c *gin.Context) {
@@ -49,22 +66,9 @@ func CreateUser(c *gin.Context) {
 	BeaconService := service.BeaconService{}
 	TagService := service.TagService{}
 
-	beacon, err := BeaconService.GetBeaconByBeaconName(UserCreateRequest.BeaconName)
-	// もしbeaconTypeが取得できたらerrがnilになる
-	if err != nil {
-		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Failed to get beacon by name"})
-		return
-	}
-
-	// 同じメールアドレスのユーザが既に登録済みだったら409を返す
-	isRegisterd, err := UserService.IsEmailAlreadyRegistered(UserCreateRequest.Email)
-	if err != nil {
-		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Failed to check email is arleady registerd"})
-		return
-	}
-	if isRegisterd {
-		// 同じメールアドレスが既に登録済みの場合
-		c.AbortWithStatusJSON(http.StatusConflict, gin.H{"error": "Arleady Registered Email"})
+	// PrivateKeyとUUIDが正しい値出ない場合BadRequestを返す
+	if !isValidCreateUserRequest(UserCreateRequest) {
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": "Request is not correct"})
 		return
 	}
 
@@ -80,6 +84,25 @@ func CreateUser(c *gin.Context) {
 			c.AbortWithStatusJSON(http.StatusConflict, gin.H{"error": "Arleady Registered Private Key"})
 			return
 		}
+	}
+
+	// 同じメールアドレスのユーザが既に登録済みだったら409を返す
+	isRegisterd, err := UserService.IsEmailAlreadyRegistered(UserCreateRequest.Email)
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Failed to check email is arleady registerd"})
+		return
+	}
+	if isRegisterd {
+		// 同じメールアドレスが既に登録済みの場合
+		c.AbortWithStatusJSON(http.StatusConflict, gin.H{"error": "Arleady Registered Email"})
+		return
+	}
+
+	beacon, err := BeaconService.GetBeaconByBeaconName(UserCreateRequest.BeaconName)
+	// もしbeaconTypeが取得できたらerrがnilになる
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Failed to get beacon by name"})
+		return
 	}
 
 	user := model.User{
