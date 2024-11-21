@@ -687,6 +687,10 @@ func init() {
 				Type:         "iPhone",
 				UuidEditable: false,
 			},
+			{
+				Type: 				"StayWatchBeacon",
+				UuidEditable: false,
+			},
 		}
 		db.Create(&beacons)
 	}
