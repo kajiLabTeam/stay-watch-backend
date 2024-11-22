@@ -18,6 +18,14 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+func stringPointer(s string) *string {
+	return &s
+}
+
+func int64Pointer(i int64) *int64 {
+	return &i
+}
+
 func TestPostStayer(t *testing.T) {
 	response := httptest.NewRecorder()
 	ginContext, _ := gin.CreateTestContext(response)
@@ -314,10 +322,10 @@ func TestPutUser(t *testing.T) {
 	user := model.UserUpdateRequest{
 		ID:          10,
 		Name:        "test",
-		Uuid:        "e7d61ea3f8dd49c88f2ffaefae484c07ab00",
-		Email:       "toge7113+test-put-user@gmail.com",
-		Role:        1,
-		CommunityId: 1,
+		Uuid:        stringPointer("e7d61ea3f8dd49c88f2ffaefae484c07ab00"),
+		Email:       stringPointer("toge7113+test-put-user@gmail.com"),
+		Role:        int64Pointer(1),
+		CommunityId: int64Pointer(1),
 		BeaconName:  "FCS1301",
 		TagIds:      []int64{1, 2, 5},
 	}
