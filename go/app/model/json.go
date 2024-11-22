@@ -125,13 +125,13 @@ type UserCreateRequest struct {
 type UserUpdateRequest struct {
 	ID          int64   `json:"id"`
 	Name        string  `json:"name"`
-	Uuid        string  `json:"uuid"`
-	Email       string  `json:"email"`
-	Role        int64   `json:"role"`
-	CommunityId int64   `json:"communityId"`
+	Uuid        *string  `json:"uuid"`
+	Email       *string  `json:"email"`
+	Role        *int64   `json:"role"`
+	CommunityId *int64   `json:"communityId"`
 	BeaconName  string  `json:"beaconName"`
 	TagIds      []int64 `json:"tagIds"`
-	PrivateKey 	string 	`json:"privateKey"`
+	PrivateKey 	*string 	`json:"privateKey"`
 }
 
 type BeaconRoom struct {

@@ -59,11 +59,11 @@ func isValidCreateUserRequest(request model.UserCreateRequest) bool {
 }
 
 func isValidUpdateUserRequest(request model.UserUpdateRequest) bool {
-	if request.PrivateKey != "" && request.Uuid != "" {
+	if request.PrivateKey != nil && request.Uuid != nil {
 		// PrivateKeyとUUIDがどちらとも入力はNG
 		return false
 	}
-	if request.PrivateKey != "" && len(request.PrivateKey) != 32 {
+	if request.PrivateKey != nil && len(*request.PrivateKey) != 32 {
 		// privateKeyは32文字固定
 		return false
 	}
@@ -290,15 +290,15 @@ func UpdateUser(c *gin.Context) {
 	}
 
 	// 更新前のユーザの情報を取得
-	currentUser, err := UserService.GetUserByUserId(UserUpdateRequest.ID)
+	user, err := UserService.GetUserByUserId(UserUpdateRequest.ID)
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Failed to get user"})
 		return
 	}
 
 	// PrivateKeyに変更がある場合、同じPrivateKeyが既に登録済みだったら409を返す
-	if currentUser.PrivateKey != UserUpdateRequest.PrivateKey && UserUpdateRequest.PrivateKey != "" {
-		isRegisterdPrivateKey, err := UserService.IsPrivateKeyAlreadyRegistered(UserUpdateRequest.PrivateKey)
+	if UserUpdateRequest.PrivateKey != nil && user.PrivateKey != *UserUpdateRequest.PrivateKey {
+		isRegisterdPrivateKey, err := UserService.IsPrivateKeyAlreadyRegistered(*UserUpdateRequest.PrivateKey)
 		if err != nil {
 			c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Failed to check private key is arleady registerd"})
 			return
@@ -311,8 +311,8 @@ func UpdateUser(c *gin.Context) {
 	}
 
 	// メールアドレスに変更がある場合、そのメールアドレスが他のユーザに既に使われているかをチェックする処理をプラスする
-	if currentUser.Email != UserUpdateRequest.Email {
-		isRegisterdEmail, err := UserService.IsEmailAlreadyRegistered(UserUpdateRequest.Email)
+	if UserUpdateRequest.Email != nil && user.Email != *UserUpdateRequest.Email {
+		isRegisterdEmail, err := UserService.IsEmailAlreadyRegistered(*UserUpdateRequest.Email)
 		if err != nil {
 			c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Failed to check email is arleady registerd"})
 			return
@@ -324,17 +324,20 @@ func UpdateUser(c *gin.Context) {
 	}
 
 	// UUIDの作成
-	newUuid := createUuid(UserUpdateRequest.CommunityId, beacon.UuidEditable, UserUpdateRequest.BeaconName, UserUpdateRequest.ID, UserUpdateRequest.Uuid)
-
-	user := model.User{
-		Name:        UserUpdateRequest.Name,
-		Email:       UserUpdateRequest.Email,
-		Role:        UserUpdateRequest.Role,
-		UUID:        newUuid,
-		BeaconId:    int64(beacon.ID),
-		CommunityId: UserUpdateRequest.CommunityId,
-		PrivateKey: UserUpdateRequest.PrivateKey,
+	newUuid := ""
+	if UserUpdateRequest.Uuid != nil && UserUpdateRequest.CommunityId != nil{
+		newUuid = createUuid(*UserUpdateRequest.CommunityId, beacon.UuidEditable, UserUpdateRequest.BeaconName, UserUpdateRequest.ID, *UserUpdateRequest.Uuid)
 	}
+
+	// 値が存在するフィールドのみ更新
+	user.Name = UserUpdateRequest.Name
+	user.BeaconId = int64(beacon.ID)
+	// nilでない場合のみ更新
+	if UserUpdateRequest.Uuid != nil {user.UUID = newUuid}
+	if UserUpdateRequest.Email != nil {user.Email = *UserUpdateRequest.Email}
+	if UserUpdateRequest.Role != nil {user.Role = *UserUpdateRequest.Role}
+	if UserUpdateRequest.CommunityId != nil {user.CommunityId = *UserUpdateRequest.CommunityId}
+	if UserUpdateRequest.PrivateKey != nil {user.PrivateKey = *UserUpdateRequest.PrivateKey}
 
 	// usersテーブルにユーザ情報を保存
 	err = UserService.UpdateUser(&user, UserUpdateRequest.ID)
