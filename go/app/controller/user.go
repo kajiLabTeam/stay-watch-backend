@@ -58,6 +58,18 @@ func isValidCreateUserRequest(request model.UserCreateRequest) bool {
 	return true
 }
 
+func isValidUpdateUserRequest(request model.UserUpdateRequest) bool {
+	if request.PrivateKey != "" && request.Uuid != "" {
+		// PrivateKeyとUUIDがどちらとも入力はNG
+		return false
+	}
+	if request.PrivateKey != "" && len(request.PrivateKey) != 32 {
+		// privateKeyは32文字固定
+		return false
+	}
+	return true
+}
+
 func CreateUser(c *gin.Context) {
 	UserCreateRequest := model.UserCreateRequest{}
 	c.Bind(&UserCreateRequest)
@@ -265,6 +277,12 @@ func UpdateUser(c *gin.Context) {
 	BeaconService := service.BeaconService{}
 	TagService := service.TagService{}
 
+	// PrivateKeyとUUIDが正しい値出ない場合BadRequestを返す
+	if !isValidUpdateUserRequest(UserUpdateRequest) {
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": "Request is not correct"})
+		return
+	}
+
 	beacon, err := BeaconService.GetBeaconByBeaconName(UserUpdateRequest.BeaconName)
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Failed to update user"})
@@ -276,6 +294,20 @@ func UpdateUser(c *gin.Context) {
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Failed to get user"})
 		return
+	}
+
+	// PrivateKeyに変更がある場合、同じPrivateKeyが既に登録済みだったら409を返す
+	if currentUser.PrivateKey != UserUpdateRequest.PrivateKey && UserUpdateRequest.PrivateKey != "" {
+		isRegisterdPrivateKey, err := UserService.IsPrivateKeyAlreadyRegistered(UserUpdateRequest.PrivateKey)
+		if err != nil {
+			c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Failed to check private key is arleady registerd"})
+			return
+		}
+		if isRegisterdPrivateKey {
+			// 同じPrivateKeyが既に登録済みの場合
+			c.AbortWithStatusJSON(http.StatusConflict, gin.H{"error": "Arleady Registered Private Key"})
+			return
+		}
 	}
 
 	// メールアドレスに変更がある場合、そのメールアドレスが他のユーザに既に使われているかをチェックする処理をプラスする
@@ -301,6 +333,7 @@ func UpdateUser(c *gin.Context) {
 		UUID:        newUuid,
 		BeaconId:    int64(beacon.ID),
 		CommunityId: UserUpdateRequest.CommunityId,
+		PrivateKey: UserUpdateRequest.PrivateKey,
 	}
 
 	// usersテーブルにユーザ情報を保存
@@ -311,34 +344,36 @@ func UpdateUser(c *gin.Context) {
 	}
 
 	/* タグマップ関連 */
-	// タグマップIDを取得
-	tagMapIds, err := TagService.GetTagMapIdsByUserId(UserUpdateRequest.ID)
-	if err != nil {
-		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Failed to get tagMap"})
-		return
-	}
-
-	// tag_mapsテーブルの変更前のマップを削除
-	for _, tagMapId := range tagMapIds {
-		err = TagService.DeleteTagMap(tagMapId)
+	// タグマップリクエストが空でなかったらタグマップを更新
+	if UserUpdateRequest.TagIds != nil {
+		tagMapIds, err := TagService.GetTagMapIdsByUserId(UserUpdateRequest.ID)
 		if err != nil {
-			fmt.Printf("Cannot delete tagMap: %v", err)
-			c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Failed to delete tagMap"})
+			c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Failed to get tagMap"})
 			return
 		}
-	}
 
-	// tag_mapsテーブルに新しいタグのマップを保存
-	for _, tagId := range UserUpdateRequest.TagIds {
-		tagMap := model.TagMap{
-			UserID: int64(UserUpdateRequest.ID),
-			TagID:  int64(tagId),
+		// tag_mapsテーブルの変更前のマップを削除
+		for _, tagMapId := range tagMapIds {
+			err = TagService.DeleteTagMap(tagMapId)
+			if err != nil {
+				fmt.Printf("Cannot delete tagMap: %v", err)
+				c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Failed to delete tagMap"})
+				return
+			}
 		}
-		err = TagService.CreateTagMap(&tagMap)
-		if err != nil {
-			fmt.Printf("Cannot register tagMap: %v", err)
-			c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Failed to registered tagMap"})
-			return
+
+		// tag_mapsテーブルに新しいタグのマップを保存
+		for _, tagId := range UserUpdateRequest.TagIds {
+			tagMap := model.TagMap{
+				UserID: int64(UserUpdateRequest.ID),
+				TagID:  int64(tagId),
+			}
+			err = TagService.CreateTagMap(&tagMap)
+			if err != nil {
+				fmt.Printf("Cannot register tagMap: %v", err)
+				c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Failed to registered tagMap"})
+				return
+			}
 		}
 	}
 

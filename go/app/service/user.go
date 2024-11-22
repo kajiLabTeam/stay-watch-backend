@@ -102,7 +102,7 @@ func (UserService) PastUpdateUser(userId int, email string) error {
 }
 
 // ユーザのアップデート
-func (UserService) UpdateUser(updatedUser *model.User, userId int64) error {
+func (UserService) UpdateUser(user *model.User, userId int64) error {
 
 	DbEngine := connect()
 	closer, err := DbEngine.DB()
@@ -110,21 +110,8 @@ func (UserService) UpdateUser(updatedUser *model.User, userId int64) error {
 		return err
 	}
 	defer closer.Close()
-	user := model.User{}
-	result := DbEngine.First(&user, userId)
-	if result.Error != nil {
-		return result.Error
-	}
-	// user = *updatedUser
-	user.UUID = updatedUser.UUID
-	user.Name = updatedUser.Name
-	user.Email = updatedUser.Email
-	user.Role = updatedUser.Role
-	user.BeaconId = updatedUser.BeaconId
-	user.CommunityId = updatedUser.CommunityId
 
-	// result := DbEngine.Model(&model.User{}).Where("id = ?", userId).Update("email", email)
-	result = DbEngine.Save(&user)
+	result := DbEngine.Model(&model.User{}).Where("id = ?", userId).Updates(&user)
 	if result.Error != nil {
 		fmt.Printf("ユーザ更新失敗 %v", result.Error)
 		return result.Error

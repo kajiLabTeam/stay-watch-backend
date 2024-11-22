@@ -131,6 +131,7 @@ type UserUpdateRequest struct {
 	CommunityId int64   `json:"communityId"`
 	BeaconName  string  `json:"beaconName"`
 	TagIds      []int64 `json:"tagIds"`
+	PrivateKey 	string 	`json:"privateKey"`
 }
 
 type BeaconRoom struct {
