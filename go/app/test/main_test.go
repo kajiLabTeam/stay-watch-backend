@@ -289,7 +289,7 @@ func TestCreateUser(t *testing.T) {
 	// 未登録ユーザ
 	unregisteredUser := model.UserCreateRequest{
 		Name:        "tarou",
-		Uuid:        "",
+		Uuid:        "00412",
 		Email:       "toge7113+unregistaserd@gmail.com",
 		Role:        1,
 		CommunityId: 1,
