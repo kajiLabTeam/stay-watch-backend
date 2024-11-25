@@ -15,6 +15,11 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+const (
+	BEACON_ID_STAYWATCHBEACON = 4
+	LENGTH_PRIVATE_KEY = 32
+)
+
 func getEndUUIDByManufacturer(manufacturer string) string {
 	slicedManufacturers := []int{}
 
@@ -41,101 +46,97 @@ func getEndUUIDByManufacturer(manufacturer string) string {
 	return resultManufacturer
 }
 
-func getUUIDBySipHash(randomValue string, hashValue string) (string, error) {
+func getUserIdBySipHash(randomValue string, hashValue string) (int64, error) {
 	UserService := service.UserService{}
-	users, err := UserService.GetAllUser()
+	users, err := UserService.GetUsersByBeaconId(BEACON_ID_STAYWATCHBEACON)
 	if err != nil {
 		fmt.Println("failed to get users by db: ", err)
-		return "", err
+		return 0, err
 	}
 
 	for _, user := range users {
-		// 例：01 02 03 04 05 06 07 08 09 0a 0b 0c 0d 0e 0f 00
-		// 		privateKey := "0102030405060708090a0b0c0d0e0f00"
-		privateKey := user.UUID
+		if len(user.PrivateKey) == LENGTH_PRIVATE_KEY {
+			// 例：01 02 03 04 05 06 07 08 09 0a 0b 0c 0d 0e 0f 00
+			// 		privateKey := "0102030405060708090a0b0c0d0e0f00"
+			privateKey := user.PrivateKey
 
-		// 文字列をバイトスライスに変換
-		bytes, err := hex.DecodeString(privateKey)
-		if err != nil {
-			fmt.Println("failed to decode hex string: ", err)
-			return "", err
-		}
+			// 文字列をバイトスライスに変換
+			bytes, err := hex.DecodeString(privateKey)
+			if err != nil {
+				fmt.Println("failed to decode hex string: ", err)
+				return 0, err
+			}
 
-		// バイトスライスをuint64に変換(8バイトずつ分割して変換)
-		var key1 uint64
-		var key2 uint64
-		for i := 0; i < 8; i++ {
-			key1 |= uint64(bytes[i]) << (8 * i)
-			key2 |= uint64(bytes[8+i]) << (8 * i)
-		}
+			// バイトスライスをuint64に変換(8バイトずつ分割して変換)
+			var key1 uint64
+			var key2 uint64
+			for i := 0; i < 8; i++ {
+				key1 |= uint64(bytes[i]) << (8 * i)
+				key2 |= uint64(bytes[8+i]) << (8 * i)
+			}
 
-		// ハッシュ化したいデータ
-		msg := []byte(randomValue)	// ランダム値
+			// ハッシュ化したいデータ
+			msg := []byte(randomValue)	// ランダム値
 
-		// SipHashを計算
-		hash := siphash.Hash(key1, key2, msg) // ここで第1, 第2引数にカスタム値を指定可能
+			// SipHashを計算
+			hash := siphash.Hash(key1, key2, msg) // ここで第1, 第2引数にカスタム値を指定可能
 
-		// 結果を出力
-		// 結果が一緒になればそのユーザの秘密キーがビーコン固有の秘密キー
-		if(hashValue == strconv.FormatUint(hash, 16)){
-			fmt.Println("randomValue: ", randomValue)
-			fmt.Println("hashValue: ", hashValue)
-			uuid := randomValue + strconv.FormatUint(hash, 16)
-			fmt.Println(uuid)
-			return privateKey, nil
+			// 結果を出力
+			// 結果が一緒になればそのユーザの秘密キーがビーコン固有の秘密キー
+			if(hashValue == strconv.FormatUint(hash, 16)){
+				return int64(user.ID), nil
+			}
 		}
 	}
 
 	// 見つからなかった場合エラーを返す
-	return "", err
+	return 0, err
 }
 
-func convertBeacons(inputBeacons []*model.BeaconSignal) []model.BeaconSignal {
+func convertBeaconsStayers(inputBeacons []*model.BeaconSignal) []model.Stayer {
+	UserService := service.UserService{}
 
-	outBeacons := []model.BeaconSignal{}
+	outStayers := []model.Stayer{}
 	for _, inputBeacon := range inputBeacons {
 
-		uuid := inputBeacon.Uuid
-
+		userId := int64(0)
 		// iPhoneビーコンの場合UUIDを取得する処理が必要(例："4c000180000021000021000021000021000021" -> "8ebc21144abd00000000ff0100000021")
 		if len(inputBeacon.Uuid) == 38 {
 			tmpUUID := getEndUUIDByManufacturer(inputBeacon.Uuid)
-			uuid = "8ebc21144abd00000000ff01000" + tmpUUID
-		} else {
-			// 自作ビーコンの場合
-			// 自作ビーコンは先頭2bitsが0
-			hexPrefix := uuid[:2]
-			parsedValue, err := strconv.ParseUint(hexPrefix, 16, 8)
+			uuid := "8ebc21144abd00000000ff01000" + tmpUUID
+			tmpUserId, err := UserService.GetUserIDByUUID(uuid)
 			if err != nil {
-				fmt.Println("Error:", err)
+				fmt.Println("Cannot get userid by uuid:", err)
 				continue
 			}
-			fmt.Println("beaconstart2keta: ")
-			fmt.Println(parsedValue)
-			// 自作ビーコンの場合UUIDから秘密キーを取得する処理が必要(例："252b9bea12a9410c5e072029cded8173" -> "0102030405060708090A0B0C0D0E0F00")
-			// 秘密キーはUUIDカラムをそのまま流用（UUIDと桁数一緒のため）
-			if (parsedValue < 63) {
-				randomValue := uuid[:16]
-				hashValue := uuid[16:]
-				fmt.Println(randomValue)
-				fmt.Println(hashValue)
-				uuid, err = getUUIDBySipHash(randomValue, hashValue)
+			userId = tmpUserId
+		} else {
+			tmpUserId, err := UserService.GetUserIDByUUID(inputBeacon.Uuid)
+			userId = tmpUserId
+			if err != nil {
+				// もし見つからなかった場合基本的に滞在ウォッチビーコンである
+				randomValue := inputBeacon.Uuid[:16]
+				hashValue := inputBeacon.Uuid[16:]
+				tmpUserId, err := getUserIdBySipHash(randomValue, hashValue)
 				if err != nil {
 					fmt.Println("Error:", err)
 					continue
 				}
+				userId = tmpUserId
 			}
 		}
 		
-
-		tmpBeacon := model.BeaconSignal{
-			Uuid: uuid,
-			Rssi: inputBeacon.Rssi,
+		// 0でない(ユーザが見つかった場合)のみ追加
+		if userId != 0 {
+			tmpStayer := model.Stayer {
+				UserID: userId,
+				Rssi: inputBeacon.Rssi,
+			}
+			outStayers = append(outStayers, tmpStayer)
 		}
-		outBeacons = append(outBeacons, tmpBeacon)
 	}
 
-	return outBeacons
+	return outStayers
 }
 
 // ビーコン情報を受け取る
@@ -149,7 +150,8 @@ func Beacon(c *gin.Context) {
 		return
 	}
 
-	requestBeacons := convertBeacons(beaconRoom.Beacons)
+	// requestBeacons := convertBeacons(beaconRoom.Beacons)
+	requestStayers := convertBeaconsStayers(beaconRoom.Beacons)
 	requestRoomId := beaconRoom.RoomID
 
 	RoomService := service.RoomService{}
@@ -172,14 +174,9 @@ func Beacon(c *gin.Context) {
 		targetUserRssi := -200
 
 		// リクエストからの滞在者リスト(beaconRoom.Beacons)とStayerテーブルの滞在者リストを比較
-		for _, currentStayer := range requestBeacons {
-			pastUUID, err := UserService.GetUserUUIDByUserID(pastStayer.UserID)
-			if err != nil {
-				fmt.Printf("Cannnot get user uuid %v", err)
-				continue
-			}
-			// 1つ前のstayerテーブルにもいた場合
-			if pastUUID == currentStayer.Uuid {
+		for _, currentStayer := range requestStayers {
+			// 現在いる部屋に以前からいた場合
+			if pastStayer.UserID == currentStayer.UserID {
 				targetUserRssi = int(currentStayer.Rssi)
 				isExist = true
 			}
@@ -253,7 +250,7 @@ func Beacon(c *gin.Context) {
 		// 	}
 		// }
 
-		// 以前いた部屋のデータに存在しない場合 {Beacons:[] ,RoomID:1}
+		// 以前いた部屋のデータに現在はいない場合退室処理
 		if !isExist && pastStayer.RoomID == requestRoomId {
 			fmt.Println("以前いた部屋のデータに存在しない場合")
 
@@ -291,15 +288,9 @@ func Beacon(c *gin.Context) {
 
 	}
 
-	for _, currentStayer := range requestBeacons {
+	for _, currentStayer := range requestStayers {
 
-		// APIのリクエストのUUIDからuserIdを取得する
-		currentUserID, err := UserService.GetUserIDByUUID(currentStayer.Uuid)
-		if err != nil {
-			fmt.Println("failed: Cannnot get user id(UUID : " + currentStayer.Uuid + ")")
-			continue
-		}
-
+		currentUserID := currentStayer.UserID
 		currentTime := time.Now()
 		// もし火曜日だったら
 		if currentTime.Weekday() == time.Tuesday {
