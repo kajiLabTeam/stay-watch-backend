@@ -12,6 +12,13 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+const (
+	BEACON_NAME_IPHONE = "iPhone"
+	BEACON_NAME_ANDROID = "Android"
+	BEACON_NAME_FCS1301 = "FCS1301"
+	BEACON_NAME_STAYWATCHBEACON = "StayWatchBeacon"
+)
+
 func Detail(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
 		"message": "Hello, World!",
@@ -23,16 +30,16 @@ func createUuid(communityId int64, uuidEditable bool, beaconName string, userId 
 	communityIdHex := fmt.Sprintf("%03x", communityId)
 	newUuid := ""
 
-	if beaconName == "iPhone" {
+	if beaconName == BEACON_NAME_IPHONE {
 		// iPhoneの場合「8ebc21144abd00000000ff01000 + (userId(16進数))」
 		userIdHex := fmt.Sprintf("%05x", userId)
 		newUuid = "8ebc21144abd00000000ff01000" + userIdHex
-	} else if beaconName == "Android" {
+	} else if beaconName == BEACON_NAME_ANDROID {
 		// Androidの場合ユーザIDから取得した値を用いる
 		// ユーザIDを16進数5桁に変換
 		userIdHex := fmt.Sprintf("%05x", userId)
 		newUuid = "8ebc21144abd" + "ba0d" + "b7c6" + "ff0a" + communityIdHex + userIdHex
-	} else if beaconName == "FCS1301" {
+	} else if beaconName == BEACON_NAME_FCS1301 {
 		newUuid = "8ebc21144abd" + "ba0d" + "b7c6" + "ff0f" + communityIdHex + requestUuid
 	} else {
 		// その他のビーコンの場合リクエストの値をそのまま用いる(StayWatchBeaconもここに含まれる)
@@ -45,14 +52,17 @@ func createUuid(communityId int64, uuidEditable bool, beaconName string, userId 
 func isValidCreateUserRequest(request model.UserCreateRequest) bool {
 	if request.PrivateKey == "" && request.Uuid == "" {
 		// PrivateKeyとUUIDがどちらとも未入力はNG
+		fmt.Println("privateKey and uuid are null")
 		return false
 	}
 	if request.PrivateKey != "" && request.Uuid != "" {
 		// PrivateKeyとUUIDがどちらとも入力はNG
+		fmt.Println("privateKey and uuid are not-null")
 		return false
 	}
 	if request.PrivateKey != "" && len(request.PrivateKey) != 32 {
 		// privateKeyは32文字固定
+		fmt.Println("privateKey is 32 words")
 		return false
 	}
 	return true
@@ -80,6 +90,7 @@ func CreateUser(c *gin.Context) {
 
 	// PrivateKeyとUUIDが正しい値出ない場合BadRequestを返す
 	if !isValidCreateUserRequest(UserCreateRequest) {
+		fmt.Println("privateKey and uuid are not correct")
 		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": "Request is not correct"})
 		return
 	}
@@ -333,11 +344,22 @@ func UpdateUser(c *gin.Context) {
 	user.Name = UserUpdateRequest.Name
 	user.BeaconId = int64(beacon.ID)
 	// nilでない場合のみ更新
-	if UserUpdateRequest.Uuid != nil {user.UUID = newUuid}
 	if UserUpdateRequest.Email != nil {user.Email = *UserUpdateRequest.Email}
 	if UserUpdateRequest.Role != nil {user.Role = *UserUpdateRequest.Role}
 	if UserUpdateRequest.CommunityId != nil {user.CommunityId = *UserUpdateRequest.CommunityId}
-	if UserUpdateRequest.PrivateKey != nil {user.PrivateKey = *UserUpdateRequest.PrivateKey}
+
+	// StayWatchBeaconの場合(PrivateKeyを使う場合)UUIDは""にし、そうでない場合はPrivateKeyを""にする
+	if UserUpdateRequest.BeaconName == BEACON_NAME_STAYWATCHBEACON {
+		user.UUID = ""
+		if UserUpdateRequest.PrivateKey != nil {
+			user.PrivateKey = *UserUpdateRequest.PrivateKey
+		}
+	} else {
+		user.PrivateKey = ""
+		if UserUpdateRequest.Uuid != nil {
+			user.UUID = newUuid
+		}
+	}
 
 	// usersテーブルにユーザ情報を保存
 	err = UserService.UpdateUser(&user, UserUpdateRequest.ID)
