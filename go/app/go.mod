@@ -5,6 +5,7 @@ go 1.16
 require (
 	cloud.google.com/go v0.37.4 // indirect
 	firebase.google.com/go v3.13.0+incompatible
+	github.com/dchest/siphash v1.2.3 // indirect
 	github.com/gin-contrib/cors v1.3.1
 	github.com/gin-gonic/gin v1.8.1
 	github.com/go-playground/validator/v10 v10.11.1 // indirect
