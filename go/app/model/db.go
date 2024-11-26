@@ -17,6 +17,7 @@ type User struct {
 	Role        int64
 	BeaconId    int64
 	CommunityId int64
+	PrivateKey 	string
 }
 
 type DeletedUser struct {
