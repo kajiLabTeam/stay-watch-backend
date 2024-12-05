@@ -50,6 +50,7 @@ func SetUpServer() *gin.Engine {
 		versionEngine.PUT("/users", controller.UpdateUser)
 		versionEngine.DELETE("/users/:userId", controller.DeleteUser)
 		versionEngine.GET("/admin/users/:communityId", controller.AdminUserList)
+		versionEngine.POST("/admin/resources/backup", controller.BackUpDB)
 		versionEngine.GET("/check", controller.Check)
 		versionEngine.POST("/attendance", controller.Attendance)
 		versionEngine.GET("/rooms/:communityID", controller.GetRoomsByCommunityID)
