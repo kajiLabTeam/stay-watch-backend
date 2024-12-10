@@ -225,6 +225,7 @@ credentials/
 backup/
 mysql/backup.sql
 mysql/test.sql
+docker_rsa*
 
 
 __pycache__/
