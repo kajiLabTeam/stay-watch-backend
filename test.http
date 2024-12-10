@@ -19,6 +19,9 @@ GET {{baseURL}}/api/v1/users/2
 ### 管理者画面でのユーザ情報の取得
 GET {{baseURL}}/api/v1/admin/users/2
 
+### DBをCloudStorageへバックアップ
+POST {{baseURL}}/api/v1/admin/resources/backup
+
 ###
 POST {{baseURL}}/api/v1/users HTTP/1.1
 content-type: application/json
