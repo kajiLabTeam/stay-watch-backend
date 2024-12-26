@@ -27,11 +27,11 @@ POST {{baseURL}}/api/v1/users HTTP/1.1
 content-type: application/json
 
 {
-    "name":"tarou",
-    "uuid":"",
-    "email":"ssinya092222@gmail.com",
-    "role":1,
-    "communityId":1,
+    "name":"s.ayaka",
+    "uuid":"12345",
+    "email":"x22043xx310ss@gmail.com",
+    "role":2,
+    "communityId":2,
     "beaconName":"FCS1301",
     "tagIds":[1,5,10]
 }
@@ -89,7 +89,7 @@ content-type: application/json
 {
     "beacons":[
         {
-            "uuid": "4c000180000021000022000121000024000023",
+            "uuid": "e7d61ea3f8dd49c88f2ff2484c07ac02",
             "rssi": -49
         },
         {
