@@ -74,7 +74,7 @@ func (RoomService) UpdateRoom(roomID int, room_name string, buildingID int, poly
 		return err
 	}
 	defer closer.Close()
-	result := DbEngine.Model(&model.Room{}).Where("id = ?", roomID).Updates(model.Room{Name:room_name, Polygon:polygon, BuildingID:int64(buildingID)})	// 今は部屋名と範囲だけ
+	result := DbEngine.Model(&model.Room{}).Where("id = ?", roomID).Updates(model.Room{Name: room_name, Polygon: polygon, BuildingID: int64(buildingID)}) // 今は部屋名と範囲だけ
 	if result.Error != nil {
 		fmt.Printf("ユーザ更新失敗 %v", result.Error)
 		return result.Error
@@ -97,8 +97,6 @@ func (RoomService) GetAllRooms() ([]model.Room, error) {
 
 	return rooms, nil
 }
-
-
 
 //滞在者の一部を取得する
 // func (RoomService) GetStayerByRoomID(roomID int64) ([]model.Stayer, error) {
@@ -316,6 +314,24 @@ func (RoomService) GetGanttLog() ([]model.SimulataneousStayLogGetResponse, error
 
 	return simulataneousStayLogsGetResponse, nil
 
+}
+
+func (RoomService) GetSpecificUserLog(userID int64) ([]model.Log, error) {
+	DbEngine := connect()
+	closer, err := DbEngine.DB()
+	if err != nil {
+		return nil, fmt.Errorf("failed to get DB connection: %w", err)
+	}
+	defer closer.Close()
+
+	//ログデータ初期化
+	logs := make([]model.Log, 0)
+
+	result := DbEngine.Table("log").Where("user_id=?", userID).Find(&logs)
+	if err != nil {
+		return nil, fmt.Errorf("failed to retrieve logs: %w", result.Error)
+	}
+	return logs, nil
 }
 
 // func (RoomService) GetSimultaneousList(userID int64) ([]model.SimulataneousStayLogGetResponse, error) {
@@ -589,7 +605,7 @@ func (RoomService) GetRoomNameByRoomID(roomID int64) (string, error) {
 	defer closer.Close()
 
 	room := model.Room{}
-	result := DbEngine.Take(&room,roomID)
+	result := DbEngine.Take(&room, roomID)
 	if result.Error != nil {
 		fmt.Printf("Cannot get room: %v", result.Error)
 		return "", result.Error
