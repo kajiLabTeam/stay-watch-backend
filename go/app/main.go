@@ -61,6 +61,7 @@ func SetUpServer() *gin.Engine {
 		versionEngine.GET("/communities/:userId", controller.GetCommunityByUserIdHandler)
 		versionEngine.GET("/buildings/editor", controller.GetBuildingsEditor)
 		versionEngine.GET("/signup", controller.SignUp)
+		versionEngine.GET("/logs", controller.GetSpecificUserLog)
 	}
 
 	return engine
