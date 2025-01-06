@@ -320,7 +320,7 @@ func (RoomService) GetSpecificUserLog(userID int64) ([]model.Log, error) {
 	DbEngine := connect()
 	closer, err := DbEngine.DB()
 	if err != nil {
-		return nil, fmt.Errorf("failed to get DB connection: %w", err)
+		return nil, err
 	}
 	defer closer.Close()
 
@@ -328,8 +328,8 @@ func (RoomService) GetSpecificUserLog(userID int64) ([]model.Log, error) {
 	logs := make([]model.Log, 0)
 
 	result := DbEngine.Table("log").Where("user_id=?", userID).Find(&logs)
-	if err != nil {
-		return nil, fmt.Errorf("failed to retrieve logs: %w", result.Error)
+	if result.Error != nil {
+		return nil, result.Error
 	}
 	return logs, nil
 }
