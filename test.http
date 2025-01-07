@@ -163,4 +163,4 @@ GET {{baseURL}}/api/v1/tags/1/names
 GET {{baseURL}}/api/v1/tags/2
 
 ### 特定のユーザの情報を取得する
-GET {{baseURL}}/api/v1/logs?id=1
+GET {{baseURL}}/api/v1/logs/user?id=1

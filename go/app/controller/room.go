@@ -235,7 +235,7 @@ func LogGantt(c *gin.Context) {
 func GetSpecificUserLog(c *gin.Context) {
 
 	RoomService := service.RoomService{}
-	SpecificUserLogs, err := RoomService.GetSpecificUserLog(7)
+	SpecificUserLogs, err := RoomService.GetSpecificUserLog(1)
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Failed to get user log"})
 		return
