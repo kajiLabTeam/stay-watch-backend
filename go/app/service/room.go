@@ -327,7 +327,7 @@ func (RoomService) GetSpecificUserLog(userID int64) ([]model.Log, error) {
 	//ログデータ初期化
 	logs := make([]model.Log, 0)
 
-	result := DbEngine.Table("log").Where("user_id=?", userID).Find(&logs)
+	result := DbEngine.Table("logs").Where("user_id=?", userID).Find(&logs)
 	if result.Error != nil {
 		return nil, result.Error
 	}
