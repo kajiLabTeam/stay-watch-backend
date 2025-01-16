@@ -234,13 +234,44 @@ func LogGantt(c *gin.Context) {
 
 func GetSpecificUserLog(c *gin.Context) {
 
-	userId, _ := strconv.ParseInt(c.Query("id"), 10, 64)
+	userId, err := strconv.ParseInt(c.Query("id"), 10, 64)
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": "Bad Request"})
+		return
+	}
+
 	RoomService := service.RoomService{}
+	UserService := service.UserService{}
+
 	SpecificUserLogs, err := RoomService.GetSpecificUserLog(userId)
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Failed to get user log"})
 		return
 	}
 
-	c.JSON(http.StatusOK, SpecificUserLogs)
+	SpecificUserResponseLog := []model.LogGetResponse{}
+
+	for _, log := range SpecificUserLogs {
+
+		userName, err := UserService.GetUserNameByUserID(log.UserID)
+		if err != nil {
+			c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Failed to get user name"})
+			return
+		}
+		roomName, err := RoomService.GetRoomNameByRoomID(log.RoomID)
+		if err != nil {
+			c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Failed to get room name"})
+			return
+		}
+
+		SpecificUserResponseLog = append(SpecificUserResponseLog, model.LogGetResponse{
+			ID:      int64(log.ID),
+			Name:    userName,
+			Room:    roomName,
+			StartAt: log.StartAt.Format("2006-01-02 15:04:05"),
+			EndAt:   log.EndAt.Format("2006-01-02 15:04:05"),
+		})
+	}
+
+	c.JSON(http.StatusOK, SpecificUserResponseLog)
 }
