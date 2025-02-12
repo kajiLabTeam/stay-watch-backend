@@ -162,5 +162,5 @@ GET {{baseURL}}/api/v1/tags/1/names
 ### コミュニティ（共用も）のタグを取得する
 GET {{baseURL}}/api/v1/tags/2
 
-### 特定のユーザの情報を取得する
-GET {{baseURL}}/api/v1/logs/user?id=1
+### 特定のユーザの情報を取得する（10件目から20件取得）
+GET {{baseURL}}/api/v1/logs?user-id=0&&limit=5&&offset=0
