@@ -619,44 +619,6 @@ func (RoomService) GetRoomNameByRoomID(roomID int64) (string, error) {
 	return room.Name, nil
 }
 
-// 全てのログを取得する
-// func (RoomService) GetAllLog() ([]model.Log, error) {
-// 	DbEngine := connect()
-// 	closer, err := DbEngine.DB()
-// 	if err != nil {
-// 		return nil, err
-// 	}
-// 	defer closer.Close()
-
-// 	logs := make([]model.Log, 0)
-// 	result := DbEngine.Find(&logs)
-// 	if result.Error != nil {
-// 		fmt.Println(result.Error)
-// 		return nil, result.Error
-// 	}
-// 	return logs, nil
-// }
-
-// 最新30件のログを取得する
-// func (RoomService) GetLatestLogs() ([]model.Log, error) {
-// 	DbEngine := connect()
-// 	closer, err := DbEngine.DB()
-// 	if err != nil {
-// 		return nil, err
-// 	}
-// 	defer closer.Close()
-
-// 	logs := make([]model.Log, 0)
-// 	// err := DbEngine.Desc("id").Limit(30).Find(&logs)
-// 	result := DbEngine.Order("id desc").Limit(30).Find(&logs)
-
-// 	if result.Error != nil {
-// 		log.Fatal(result.Error)
-// 		return nil, result.Error
-// 	}
-// 	return logs, nil
-// }
-
 // pageごとに30件のログを取得する
 func (RoomService) GetLogsByPage(page int) ([]model.Log, error) {
 	DbEngine := connect()
