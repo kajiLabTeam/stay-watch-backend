@@ -232,18 +232,28 @@ func LogGantt(c *gin.Context) {
 	c.JSON(http.StatusOK, GanttLogs)
 }
 
-func GetSpecificUserLog(c *gin.Context) {
+func LogRefinementSearch(c *gin.Context) {
+	userID := int64(0)
 
-	userId, err := strconv.ParseInt(c.Query("id"), 10, 64)
+	userID, err := strconv.ParseInt(c.Query("user-id"), 10, 64)
 	if err != nil {
-		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": "Bad Request"})
-		return
+		// c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": "user_id Bad Request"})
+		userID = 0
+	}
+
+	limit, err := strconv.ParseInt(c.Query("limit"), 10, 64)
+	if err != nil || limit == 0 {
+		limit = 30 //デフォルト値
+	}
+	offset, err := strconv.ParseInt(c.Query("offset"), 10, 64)
+	if err != nil {
+		offset = 0 //デフォルト値
 	}
 
 	RoomService := service.RoomService{}
 	UserService := service.UserService{}
 
-	SpecificUserLogs, err := RoomService.GetSpecificUserLog(userId)
+	pageLog, err := RoomService.GetRefinementSearchLogs(userID, limit, offset)
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Failed to get user log"})
 		return
@@ -251,7 +261,7 @@ func GetSpecificUserLog(c *gin.Context) {
 
 	SpecificUserResponseLog := []model.LogGetResponse{}
 
-	for _, log := range SpecificUserLogs {
+	for _, log := range pageLog {
 
 		userName, err := UserService.GetUserNameByUserID(log.UserID)
 		if err != nil {
