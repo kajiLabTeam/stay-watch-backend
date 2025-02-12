@@ -4,7 +4,8 @@ import (
 	"Stay_watch/model"
 	"Stay_watch/util"
 	"fmt"
-	"log"
+
+	// "log"
 	"time"
 )
 
@@ -316,7 +317,7 @@ func (RoomService) GetGanttLog() ([]model.SimulataneousStayLogGetResponse, error
 
 }
 
-func (RoomService) GetSpecificUserLog(userID int64) ([]model.Log, error) {
+func (RoomService) GetRefinementSearchLogs(userID int64, limit int64, offset int64) ([]model.Log, error) {
 	DbEngine := connect()
 	closer, err := DbEngine.DB()
 	if err != nil {
@@ -327,7 +328,12 @@ func (RoomService) GetSpecificUserLog(userID int64) ([]model.Log, error) {
 	//ログデータ初期化
 	logs := make([]model.Log, 0)
 
-	result := DbEngine.Table("logs").Where("user_id=?", userID).Find(&logs)
+	result := DbEngine.Table("logs")
+	if userID != 0 {
+		result.Where("user_id=?", userID)
+	}
+
+	result.Limit(int(limit)).Offset(int(offset)).Find(&logs)
 	if result.Error != nil {
 		return nil, result.Error
 	}
@@ -614,42 +620,42 @@ func (RoomService) GetRoomNameByRoomID(roomID int64) (string, error) {
 }
 
 // 全てのログを取得する
-func (RoomService) GetAllLog() ([]model.Log, error) {
-	DbEngine := connect()
-	closer, err := DbEngine.DB()
-	if err != nil {
-		return nil, err
-	}
-	defer closer.Close()
+// func (RoomService) GetAllLog() ([]model.Log, error) {
+// 	DbEngine := connect()
+// 	closer, err := DbEngine.DB()
+// 	if err != nil {
+// 		return nil, err
+// 	}
+// 	defer closer.Close()
 
-	logs := make([]model.Log, 0)
-	result := DbEngine.Find(&logs)
-	if result.Error != nil {
-		fmt.Println(result.Error)
-		return nil, result.Error
-	}
-	return logs, nil
-}
+// 	logs := make([]model.Log, 0)
+// 	result := DbEngine.Find(&logs)
+// 	if result.Error != nil {
+// 		fmt.Println(result.Error)
+// 		return nil, result.Error
+// 	}
+// 	return logs, nil
+// }
 
 // 最新30件のログを取得する
-func (RoomService) GetLatestLogs() ([]model.Log, error) {
-	DbEngine := connect()
-	closer, err := DbEngine.DB()
-	if err != nil {
-		return nil, err
-	}
-	defer closer.Close()
+// func (RoomService) GetLatestLogs() ([]model.Log, error) {
+// 	DbEngine := connect()
+// 	closer, err := DbEngine.DB()
+// 	if err != nil {
+// 		return nil, err
+// 	}
+// 	defer closer.Close()
 
-	logs := make([]model.Log, 0)
-	// err := DbEngine.Desc("id").Limit(30).Find(&logs)
-	result := DbEngine.Order("id desc").Limit(30).Find(&logs)
+// 	logs := make([]model.Log, 0)
+// 	// err := DbEngine.Desc("id").Limit(30).Find(&logs)
+// 	result := DbEngine.Order("id desc").Limit(30).Find(&logs)
 
-	if result.Error != nil {
-		log.Fatal(result.Error)
-		return nil, result.Error
-	}
-	return logs, nil
-}
+// 	if result.Error != nil {
+// 		log.Fatal(result.Error)
+// 		return nil, result.Error
+// 	}
+// 	return logs, nil
+// }
 
 // pageごとに30件のログを取得する
 func (RoomService) GetLogsByPage(page int) ([]model.Log, error) {
