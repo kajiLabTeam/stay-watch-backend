@@ -333,7 +333,7 @@ func (RoomService) GetRefinementSearchLogs(userID int64, limit int64, offset int
 		result.Where("user_id=?", userID)
 	}
 
-	result.Limit(int(limit)).Offset(int(offset)).Find(&logs)
+	result.Order("id DESC").Limit(int(limit)).Offset(int(offset)).Find(&logs)
 	if result.Error != nil {
 		return nil, result.Error
 	}
