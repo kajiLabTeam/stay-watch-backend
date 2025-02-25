@@ -233,8 +233,6 @@ func LogGantt(c *gin.Context) {
 }
 
 func LogRefinementSearch(c *gin.Context) {
-	userID := int64(0)
-
 	userID, err := strconv.ParseInt(c.Query("user-id"), 10, 64)
 	if err != nil {
 		// c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": "user_id Bad Request"})
