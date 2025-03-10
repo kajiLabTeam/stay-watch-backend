@@ -185,3 +185,11 @@ type TagsGetResponse struct {
 	Id   int64  `json:"id"`
 	Name string `json:"name"`
 }
+
+type PredictionResponse struct {
+	UserID      int64   `json:"userId"`
+	Weekday     int     `json:"weekday"`
+	Time        string  `json:"time"`
+	IsForward   bool    `json:"isForward"`
+	Probability float64 `json:"probability"`
+}
