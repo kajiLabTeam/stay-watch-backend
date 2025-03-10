@@ -11,10 +11,10 @@ import (
 type PredictionService struct{}
 
 // pythonサーバにlogを送信してtimeまでに(or以降に)来訪する確率の予測結果を取得する
-func (PredictionService) PredictVisitProbability(userId int64, weekday int, time string, isForward bool) (float64, error) {
+func (PredictionService) PredictVisitProbability(userID int64, weekday int, time string, isForward bool) (float64, error) {
 	var room RoomService
-	// user_idとweekdayを元にlogを取得
-	logs, err := room.GetEarliestEntryByUserAndWeekday(userId, weekday)
+	// user_IDとweekdayを元にlogを取得
+	logs, err := room.GetEarliestEntryByUserAndWeekday(userID, weekday)
 	if err != nil {
 		return 0, err
 	}
@@ -24,8 +24,8 @@ func (PredictionService) PredictVisitProbability(userId int64, weekday int, time
 		startAt = append(startAt, log.StartAt.Format("15:04:05"))
 	}
 
-	// user_idを持つuserが所属を始めてからの週数を取得
-	weeks, err := room.GetWeeksSinceFirstLog(userId)
+	// user_IDを持つuserが所属を始めてからの週数を取得
+	weeks, err := room.GetWeeksSinceFirstLog(userID)
 	if err != nil {
 		return 0, err
 	}
@@ -64,10 +64,10 @@ func (PredictionService) PredictVisitProbability(userId int64, weekday int, time
 }
 
 // pythonサーバにlogを送信してtimeまでに(or以降に)帰宅する確率の予測結果を取得する
-func (PredictionService) PredictDepartureProbability(userId int64, weekday int, time string, isForward bool) (float64, error) {
+func (PredictionService) PredictDepartureProbability(userID int64, weekday int, time string, isForward bool) (float64, error) {
 	var room RoomService
-	// user_idとweekdayを元にlogを取得
-	logs, err := room.GetLatestExitByUserAndWeekday(userId, weekday)
+	// user_IDとweekdayを元にlogを取得
+	logs, err := room.GetLatestExitByUserAndWeekday(userID, weekday)
 	if err != nil {
 		return 0, err
 	}
@@ -81,8 +81,8 @@ func (PredictionService) PredictDepartureProbability(userId int64, weekday int, 
 		endAt = append(endAt, log.EndAt.Format("15:04:05"))
 	}
 
-	// user_idを持つuserが所属を始めてからの週数を取得
-	weeks, err := room.GetWeeksSinceFirstLog(userId)
+	// user_IDを持つuserが所属を始めてからの週数を取得
+	weeks, err := room.GetWeeksSinceFirstLog(userID)
 	if err != nil {
 		return 0, err
 	}
