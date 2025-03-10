@@ -687,7 +687,7 @@ func (RoomService) GetWeeksSinceFirstLog(userId int64) (int, error) {
 }
 
 // 指定したユーザと曜日のログから日付ごとに最初の入室記録を持つlogを取得する
-func (RoomService) GetEarliestEntryByUserAndWeekday(userId int64, weekday int) ([]model.Log, error) {
+func (RoomService) GetEarliestEntryByUserAndWeekday(userID int64, weekday int) ([]model.Log, error) {
 	DbEngine := connect()
 	closer, err := DbEngine.DB()
 	if err != nil {
@@ -697,7 +697,7 @@ func (RoomService) GetEarliestEntryByUserAndWeekday(userId int64, weekday int) (
 	logs := []model.Log{}
 	// サブクエリを利用して最初の StartAt のレコードを取得
 	subQuery := DbEngine.Model(&model.Log{}).Select("user_id, DATE(start_at) as log_date, MIN(start_at) as first_start_at").
-		Where("user_id = ? AND WEEKDAY(start_at) = ?", userId, weekday).
+		Where("user_id = ? AND WEEKDAY(start_at) = ?", userID, weekday).
 		Group("user_id, log_date")
 	// メインクエリで JOIN
 	result := DbEngine.Model(&model.Log{}).
@@ -710,7 +710,7 @@ func (RoomService) GetEarliestEntryByUserAndWeekday(userId int64, weekday int) (
 }
 
 // 指定したユーザと曜日のログから日付ごとに最後の退室記録を持つlogを取得する
-func (RoomService) GetLatestExitByUserAndWeekday(userId int64, weekday int) ([]model.Log, error) {
+func (RoomService) GetLatestExitByUserAndWeekday(userID int64, weekday int) ([]model.Log, error) {
 	DbEngine := connect()
 	closer, err := DbEngine.DB()
 	if err != nil {
@@ -720,7 +720,7 @@ func (RoomService) GetLatestExitByUserAndWeekday(userId int64, weekday int) ([]m
 	logs := []model.Log{}
 	// サブクエリを利用して最後の EndAt のレコードを取得
 	subQuery := DbEngine.Model(&model.Log{}).Select("user_id, DATE(start_at) as log_date, MAX(end_at) as last_end_at").
-		Where("user_id = ? AND WEEKDAY(start_at)", userId, weekday).
+		Where("user_id = ? AND WEEKDAY(start_at)", userID, weekday).
 		Group("user_id, log_date")
 	// メインクエリで JOIN
 	result := DbEngine.Model(&model.Log{}).
