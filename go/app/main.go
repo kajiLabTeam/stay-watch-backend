@@ -1,9 +1,10 @@
 package main
 
 import (
-	controller "Stay_watch/controller"
 	"log"
 	"time"
+
+	controller "Stay_watch/controller"
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
@@ -11,7 +12,6 @@ import (
 )
 
 func main() {
-
 	log.Println("Start Server")
 	SetUpServer().Run(":8082")
 	// v1.GET("/list/simultaneous/:user_id", controller.SimultaneousStayUserList
