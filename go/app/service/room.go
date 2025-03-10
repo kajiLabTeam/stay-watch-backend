@@ -685,3 +685,49 @@ func (RoomService) GetWeeksSinceFirstLog(userId int64) (int, error) {
 	}
 	return weeks, nil
 }
+
+// 指定したユーザと曜日のログから日付ごとに最初の入室記録を持つlogを取得する
+func (RoomService) GetEarliestEntryByUserAndWeekday(userId int64, weekday int) ([]model.Log, error) {
+	DbEngine := connect()
+	closer, err := DbEngine.DB()
+	if err != nil {
+		return nil, err
+	}
+	defer closer.Close()
+	logs := []model.Log{}
+	// サブクエリを利用して最初の StartAt のレコードを取得
+	subQuery := DbEngine.Model(&model.Log{}).Select("user_id, DATE(start_at) as log_date, MIN(start_at) as first_start_at").
+		Where("user_id = ? AND WEEKDAY(start_at) = ?", userId, weekday).
+		Group("user_id, log_date")
+	// メインクエリで JOIN
+	result := DbEngine.Model(&model.Log{}).
+		Joins("JOIN (?) sub ON logs.user_id = sub.user_id AND DATE(logs.start_at) = sub.log_date AND logs.start_at = sub.first_start_at", subQuery).
+		Find(&logs)
+	if result.Error != nil {
+		return nil, result.Error
+	}
+	return logs, nil
+}
+
+// 指定したユーザと曜日のログから日付ごとに最後の退室記録を持つlogを取得する
+func (RoomService) GetLatestExitByUserAndWeekday(userId int64, weekday int) ([]model.Log, error) {
+	DbEngine := connect()
+	closer, err := DbEngine.DB()
+	if err != nil {
+		return nil, err
+	}
+	defer closer.Close()
+	logs := []model.Log{}
+	// サブクエリを利用して最後の EndAt のレコードを取得
+	subQuery := DbEngine.Model(&model.Log{}).Select("user_id, DATE(start_at) as log_date, MAX(end_at) as last_end_at").
+		Where("user_id = ? AND WEEKDAY(start_at)", userId, weekday).
+		Group("user_id, log_date")
+	// メインクエリで JOIN
+	result := DbEngine.Model(&model.Log{}).
+		Joins("JOIN (?) sub ON logs.user_id = sub.user_id AND DATE(logs.start_at) = sub.log_date AND logs.end_at = sub.last_end_at", subQuery).
+		Find(&logs)
+	if result.Error != nil {
+		return nil, result.Error
+	}
+	return logs, nil
+}
