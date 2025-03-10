@@ -1,18 +1,17 @@
 package service
 
 import (
+	"fmt"
+	"time"
+
 	"Stay_watch/model"
 	"Stay_watch/util"
-	"fmt"
-
 	// "log"
-	"time"
 )
 
 type RoomService struct{}
 
 func (RoomService) CreateLog(Log *model.Log) error {
-
 	DbEngine := connect()
 	closer, err := DbEngine.DB()
 	if err != nil {
@@ -36,7 +35,7 @@ func (RoomService) GetStayer(userID int64) (error, bool) {
 	}
 	defer closer.Close()
 
-	//レコードの数を取得する
+	// レコードの数を取得する
 	var count int64
 	result := DbEngine.Table("stayers").Where("user_id=?", userID).Count(&count)
 	if result.Error != nil {
@@ -99,7 +98,7 @@ func (RoomService) GetAllRooms() ([]model.Room, error) {
 	return rooms, nil
 }
 
-//滞在者の一部を取得する
+// 滞在者の一部を取得する
 // func (RoomService) GetStayerByRoomID(roomID int64) ([]model.Stayer, error) {
 // 	DbEngine := connect()
 // 	closer, err := DbEngine.DB()
@@ -190,7 +189,6 @@ func (RoomService) GetLogByUserAndDate(userID int64, date int64) ([]model.Log, e
 }
 
 func (RoomService) GetLogWithinDate(date int64) ([]model.Log, error) {
-
 	DbEngine := connect()
 	closer, err := DbEngine.DB()
 	if err != nil {
@@ -216,7 +214,6 @@ func (RoomService) GetLogWithinDate(date int64) ([]model.Log, error) {
 }
 
 func (RoomService) GetGanttLog() ([]model.SimulataneousStayLogGetResponse, error) {
-
 	DbEngine := connect()
 	closer, err := DbEngine.DB()
 	if err != nil {
@@ -226,7 +223,7 @@ func (RoomService) GetGanttLog() ([]model.SimulataneousStayLogGetResponse, error
 
 	RoomService := RoomService{}
 	UserService := UserService{}
-	//1週間以内のログを取得
+	// 1週間以内のログを取得
 	logs, err := RoomService.GetLogWithinDate(7)
 	fmt.Println(logs)
 	if err != nil {
@@ -314,7 +311,6 @@ func (RoomService) GetGanttLog() ([]model.SimulataneousStayLogGetResponse, error
 	fmt.Println(simulataneousStayLogsGetResponse)
 
 	return simulataneousStayLogsGetResponse, nil
-
 }
 
 func (RoomService) GetRefinementSearchLogs(userID int64, limit int64, offset int64) ([]model.Log, error) {
@@ -325,7 +321,7 @@ func (RoomService) GetRefinementSearchLogs(userID int64, limit int64, offset int
 	}
 	defer closer.Close()
 
-	//ログデータ初期化
+	// ログデータ初期化
 	logs := make([]model.Log, 0)
 
 	result := DbEngine.Table("logs")
