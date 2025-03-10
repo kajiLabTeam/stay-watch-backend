@@ -665,3 +665,23 @@ func (RoomService) GetLogsFromStartAtAndEntAt(startAt string, endAt string) ([]m
 
 	return logs, nil
 }
+
+// 指定したユーザの最初のログから現在までの週数を取得する
+func (RoomService) GetWeeksSinceFirstLog(userId int64) (int, error) {
+	DbEngine := connect()
+	closer, err := DbEngine.DB()
+	if err != nil {
+		return 0, err
+	}
+	defer closer.Close()
+	var weeks int
+	result := DbEngine.Raw(`
+		SELECT TIMESTAMPDIFF(WEEK, MIN(start_at), NOW())
+		FROM logs
+		WHERE user_id = ?
+	`, userId).Scan(&weeks)
+	if result.Error != nil {
+		return 0, result.Error
+	}
+	return weeks, nil
+}
