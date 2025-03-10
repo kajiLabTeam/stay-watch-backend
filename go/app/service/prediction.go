@@ -6,17 +6,19 @@ import (
 	"net/http"
 	"net/url"
 	"strconv"
+
+	"Stay_watch/model"
 )
 
 type PredictionService struct{}
 
 // pythonサーバにlogを送信してtimeまでに(or以降に)来訪する確率の予測結果を取得する
-func (PredictionService) PredictVisitProbability(userID int64, weekday int, time string, isForward bool) (float64, error) {
+func (PredictionService) PredictVisitProbability(userID int64, weekday int, time string, isForward bool) (model.PredictionResponse, error) {
 	var room RoomService
 	// user_IDとweekdayを元にlogを取得
 	logs, err := room.GetEarliestEntryByUserAndWeekday(userID, weekday)
 	if err != nil {
-		return 0, err
+		return model.PredictionResponse{}, err
 	}
 	// logsからstart_atを"15:04:05"形式に変換してスライスに格納
 	var startAt []string
@@ -27,14 +29,14 @@ func (PredictionService) PredictVisitProbability(userID int64, weekday int, time
 	// user_IDを持つuserが所属を始めてからの週数を取得
 	weeks, err := room.GetWeeksSinceFirstLog(userID)
 	if err != nil {
-		return 0, err
+		return model.PredictionResponse{}, err
 	}
 
 	// pythonサーバにstartAtとweeksを送信してtimeまでに来訪する確率の予測結果を取得
 	baseUrl := "http://localhost:5000/predict"
 	u, err := url.Parse(baseUrl)
 	if err != nil {
-		return 0, err
+		return model.PredictionResponse{}, err
 	}
 	q := u.Query()
 	for _, t := range startAt {
@@ -47,29 +49,36 @@ func (PredictionService) PredictVisitProbability(userID int64, weekday int, time
 	// GETリクエストを送信して予測結果を取得
 	res, err := http.Get(u.String())
 	if err != nil {
-		return 0, err
+		return model.PredictionResponse{}, err
 	}
 	defer res.Body.Close()
 	// 予測結果を取得
 	b, err := io.ReadAll(res.Body)
 	if err != nil {
-		return 0, err
+		return model.PredictionResponse{}, err
 	}
 	probability, err := strconv.ParseFloat(string(b), 64)
 	if err != nil {
-		return 0, err
+		return model.PredictionResponse{}, err
 	}
 	// 予測結果を返す
-	return probability, nil
+	result := model.PredictionResponse{
+		UserID:      userID,
+		Weekday:     weekday,
+		Time:        time,
+		IsForward:   isForward,
+		Probability: probability,
+	}
+	return result, nil
 }
 
 // pythonサーバにlogを送信してtimeまでに(or以降に)帰宅する確率の予測結果を取得する
-func (PredictionService) PredictDepartureProbability(userID int64, weekday int, time string, isForward bool) (float64, error) {
+func (PredictionService) PredictDepartureProbability(userID int64, weekday int, time string, isForward bool) (model.PredictionResponse, error) {
 	var room RoomService
 	// user_IDとweekdayを元にlogを取得
 	logs, err := room.GetLatestExitByUserAndWeekday(userID, weekday)
 	if err != nil {
-		return 0, err
+		return model.PredictionResponse{}, err
 	}
 	// logsからstart_atを"15:04:05"形式に変換してスライスに格納
 	// start_atの日付とend_atの日付が異なる場合はスルーする
@@ -84,14 +93,14 @@ func (PredictionService) PredictDepartureProbability(userID int64, weekday int, 
 	// user_IDを持つuserが所属を始めてからの週数を取得
 	weeks, err := room.GetWeeksSinceFirstLog(userID)
 	if err != nil {
-		return 0, err
+		return model.PredictionResponse{}, err
 	}
 
 	// pythonサーバにstartAtとweeksを送信してtimeまでに来訪する確率の予測結果を取得
 	baseUrl := "http://localhost:5000/predict"
 	u, err := url.Parse(baseUrl)
 	if err != nil {
-		return 0, err
+		return model.PredictionResponse{}, err
 	}
 	q := u.Query()
 	for _, t := range endAt {
@@ -104,18 +113,25 @@ func (PredictionService) PredictDepartureProbability(userID int64, weekday int, 
 	// GETリクエストを送信して予測結果を取得
 	res, err := http.Get(u.String())
 	if err != nil {
-		return 0, err
+		return model.PredictionResponse{}, err
 	}
 	defer res.Body.Close()
 	// 予測結果を取得
 	b, err := io.ReadAll(res.Body)
 	if err != nil {
-		return 0, err
+		return model.PredictionResponse{}, err
 	}
 	probability, err := strconv.ParseFloat(string(b), 64)
 	if err != nil {
-		return 0, err
+		return model.PredictionResponse{}, err
 	}
 	// 予測結果を返す
-	return probability, nil
+	result := model.PredictionResponse{
+		UserID:      userID,
+		Weekday:     weekday,
+		Time:        time,
+		IsForward:   isForward,
+		Probability: probability,
+	}
+	return result, nil
 }
