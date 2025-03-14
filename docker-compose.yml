@@ -54,6 +54,15 @@ services:
       vol_mysql:
         condition: service_healthy
 
+  vol_prediction:
+    container_name: vol_prediction
+    build: ./prediction
+    env_file:
+      - .env
+    depends_on:
+      vol_mysql:
+        condition: service_healthy
+
 networks:
   default:
     external:
