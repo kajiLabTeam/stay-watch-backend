@@ -33,7 +33,7 @@ func (PredictionService) PredictVisitProbability(userID int64, weekday int, time
 	}
 
 	// pythonサーバにstartAtとweeksを送信してtimeまでに来訪する確率の予測結果を取得
-	baseUrl := "http://localhost:5000/predict"
+	baseUrl := "http://vol_prediction:8085/api/v1/prediction/probability/visit"
 	u, err := url.Parse(baseUrl)
 	if err != nil {
 		return model.PredictionResponse{}, err
@@ -97,7 +97,7 @@ func (PredictionService) PredictDepartureProbability(userID int64, weekday int, 
 	}
 
 	// pythonサーバにstartAtとweeksを送信してtimeまでに来訪する確率の予測結果を取得
-	baseUrl := "http://localhost:5000/predict"
+	baseUrl := "http://vol_prediction:8085/api/v1/prediction/probability/departure"
 	u, err := url.Parse(baseUrl)
 	if err != nil {
 		return model.PredictionResponse{}, err
