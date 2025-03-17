@@ -2,8 +2,8 @@ FROM python:3.12.8-slim
 
 WORKDIR /prediction
 
-COPY ./prediction/app ./app
-COPY ./prediction/requirements.txt ./requirements.txt
+COPY ./app ./app
+COPY ./requirements.txt ./requirements.txt
 
 RUN apt-get update && \
     apt-get install -y --no-install-recommends gcc && \
