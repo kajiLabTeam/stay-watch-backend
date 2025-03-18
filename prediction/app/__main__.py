@@ -4,9 +4,7 @@ from fastapi import FastAPI
 
 
 def main():
-    app = FastAPI(
-        prefix="/api/v1/prediction", responses={404: {"description": "Not found"}}
-    )
+    app = FastAPI()
     app.include_router(probability.router)
     uvicorn.run(app, host="0.0.0.0", port=8085)
 
