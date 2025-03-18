@@ -1,16 +1,20 @@
 package service
 
 import (
+	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
 	"net/url"
-	"strconv"
 
 	"Stay_watch/model"
 )
 
 type PredictionService struct{}
+
+type Prediction struct {
+	Probability float64 `json:"probability"`
+}
 
 // pythonサーバにlogを送信してtimeまでに(or以降に)来訪する確率の予測結果を取得する
 func (PredictionService) PredictVisitProbability(userID int64, weekday int, time string, isForward bool) (model.PredictionResponse, error) {
@@ -20,10 +24,10 @@ func (PredictionService) PredictVisitProbability(userID int64, weekday int, time
 	if err != nil {
 		return model.PredictionResponse{}, err
 	}
-	// logsからstart_atを"15:04:05"形式に変換してスライスに格納
+	// logsからstart_atを"15:04"形式に変換してスライスに格納
 	var startAt []string
 	for _, log := range logs {
-		startAt = append(startAt, log.StartAt.Format("15:04:05"))
+		startAt = append(startAt, log.StartAt.Format("15:04"))
 	}
 
 	// user_IDを持つuserが所属を始めてからの週数を取得
@@ -57,8 +61,8 @@ func (PredictionService) PredictVisitProbability(userID int64, weekday int, time
 	if err != nil {
 		return model.PredictionResponse{}, err
 	}
-	probability, err := strconv.ParseFloat(string(b), 64)
-	if err != nil {
+	var p Prediction
+	if err = json.Unmarshal(b, &p); err != nil {
 		return model.PredictionResponse{}, err
 	}
 	// 予測結果を返す
@@ -67,7 +71,7 @@ func (PredictionService) PredictVisitProbability(userID int64, weekday int, time
 		Weekday:     weekday,
 		Time:        time,
 		IsForward:   isForward,
-		Probability: probability,
+		Probability: p.Probability,
 	}
 	return result, nil
 }
@@ -80,14 +84,14 @@ func (PredictionService) PredictDepartureProbability(userID int64, weekday int, 
 	if err != nil {
 		return model.PredictionResponse{}, err
 	}
-	// logsからstart_atを"15:04:05"形式に変換してスライスに格納
+	// logsからstart_atを"15:04"形式に変換してスライスに格納
 	// start_atの日付とend_atの日付が異なる場合はスルーする
 	var endAt []string
 	for _, log := range logs {
 		if log.StartAt.Day() != log.EndAt.Day() {
 			continue
 		}
-		endAt = append(endAt, log.EndAt.Format("15:04:05"))
+		endAt = append(endAt, log.EndAt.Format("15:04"))
 	}
 
 	// user_IDを持つuserが所属を始めてからの週数を取得
@@ -121,8 +125,8 @@ func (PredictionService) PredictDepartureProbability(userID int64, weekday int, 
 	if err != nil {
 		return model.PredictionResponse{}, err
 	}
-	probability, err := strconv.ParseFloat(string(b), 64)
-	if err != nil {
+	var p Prediction
+	if err = json.Unmarshal(b, &p); err != nil {
 		return model.PredictionResponse{}, err
 	}
 	// 予測結果を返す
@@ -131,7 +135,7 @@ func (PredictionService) PredictDepartureProbability(userID int64, weekday int, 
 		Weekday:     weekday,
 		Time:        time,
 		IsForward:   isForward,
-		Probability: probability,
+		Probability: p.Probability,
 	}
 	return result, nil
 }
