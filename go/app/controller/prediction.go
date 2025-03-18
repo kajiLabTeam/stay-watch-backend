@@ -61,7 +61,7 @@ func GetVisitPrediction(c *gin.Context) {
 	}
 
 	// サービスの呼び出し
-	ps := service.PredictionService{}
+	ps := service.ProbabilityService{}
 	predictions, err := ps.GetVisitProbability(userIDs, weekday, t, isForward)
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
@@ -122,7 +122,7 @@ func GetDeparturePrediction(c *gin.Context) {
 	}
 
 	// サービスの呼び出し
-	ps := service.PredictionService{}
+	ps := service.ProbabilityService{}
 	predictions, err := ps.GetDepartureProbability(userIDs, weekday, t, isForward)
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
