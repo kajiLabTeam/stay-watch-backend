@@ -20,7 +20,7 @@ def get_probability(data: list[str], time: str, weeks: int) -> float:
     p: list[float] = []
     for c in cluster:
         # クラスタに所属するデータが1つの場合
-        if len(cluster) == 1:
+        if len(c.data) == 1:
             if time_minutes >= c.data[0]:
                 p.append(1 / weeks)
             else:
@@ -29,16 +29,16 @@ def get_probability(data: list[str], time: str, weeks: int) -> float:
         # 2-1. クラスタの中心をクラスタの平均とする
         loc = c.center
         # 2-2. クラスタの標準偏差を求める
-        scale = np.std(c.data)
+        scale = float(np.std(c.data))
         # scale = 0の場合(クラスタのデータが全て同じ場合)
         if scale == 0:
             if cluster[0] == loc and time_minutes >= loc:
-                p.append(1 * (len(cluster) / weeks))
+                p.append(1 * (len(c.data) / weeks))
             else:
                 p.append(0)
             continue
         # 2-3. 正規分布の確率密度関数を用いて確率を計算
-        p.append(norm.pdf(time_minutes, loc, scale)[0] * (len(cluster) / weeks))
+        p.append(float(norm.cdf(time_minutes, loc, scale)) * (len(c.data) / weeks))
     # 3. 確率を合計して返す
     probability = np.sum(p)
     return probability
