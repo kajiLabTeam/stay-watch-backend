@@ -186,7 +186,7 @@ type TagsGetResponse struct {
 	Name string `json:"name"`
 }
 
-type PredictionResponse struct {
+type ProbabilityResponse struct {
 	UserID      int64   `json:"userId"`
 	Weekday     int     `json:"weekday"`
 	Time        string  `json:"time"`
