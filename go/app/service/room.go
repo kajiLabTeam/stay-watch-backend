@@ -720,7 +720,7 @@ func (RoomService) GetLatestExitByUserAndWeekday(userID int64, weekday int) ([]m
 	logs := []model.Log{}
 	// サブクエリを利用して最後の EndAt のレコードを取得
 	subQuery := DbEngine.Model(&model.Log{}).Select("user_id, DATE(start_at) as log_date, MAX(end_at) as last_end_at").
-		Where("user_id = ? AND WEEKDAY(start_at)", userID, weekday).
+		Where("user_id = ? AND WEEKDAY(start_at) = ?", userID, weekday).
 		Group("user_id, log_date")
 	// メインクエリで JOIN
 	result := DbEngine.Model(&model.Log{}).
