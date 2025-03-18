@@ -6,6 +6,7 @@ import (
 	"io"
 	"net/http"
 	"net/url"
+	"sync"
 
 	"Stay_watch/model"
 )
@@ -14,6 +15,39 @@ type PredictionService struct{}
 
 type Prediction struct {
 	Probability float64 `json:"probability"`
+}
+
+// goroutineを使って予測結果を取得する
+func (PredictionService) GetVisitProbability(userIDs []int64, weekday int, time string, isForward bool) ([]model.PredictionResponse, error) {
+	// 予測結果を格納するチャネル
+	var wg sync.WaitGroup
+	wg.Add(len(userIDs))
+	ch := make(chan model.PredictionResponse, len(userIDs))
+	// ユーザーごとにgoroutineを生成して予測結果を取得
+	for _, userID := range userIDs {
+		go func(userID int64, wg *sync.WaitGroup) {
+			defer wg.Done()
+			var p PredictionService
+			result, err := p.PredictVisitProbability(userID, weekday, time, isForward)
+			if err != nil {
+				ch <- model.PredictionResponse{}
+				return
+			}
+			ch <- result
+		}(userID, &wg)
+	}
+	go func() {
+		wg.Wait()
+		close(ch) // すべての Goroutine が終了したらチャネルを閉じる
+	}()
+	// 予測結果を格納
+	var results []model.PredictionResponse
+	for range userIDs {
+		result := <-ch
+		results = append(results, result)
+	}
+	// 予測結果を返す
+	return results, nil
 }
 
 // pythonサーバにlogを送信してtimeまでに(or以降に)来訪する確率の予測結果を取得する
@@ -74,6 +108,39 @@ func (PredictionService) PredictVisitProbability(userID int64, weekday int, time
 		Probability: p.Probability,
 	}
 	return result, nil
+}
+
+// goroutineを使って予測結果を取得する
+func (PredictionService) GetDepartureProbability(userIDs []int64, weekday int, time string, isForward bool) ([]model.PredictionResponse, error) {
+	// 予測結果を格納するチャネル
+	var wg sync.WaitGroup
+	wg.Add(len(userIDs))
+	ch := make(chan model.PredictionResponse, len(userIDs))
+	// ユーザーごとにgoroutineを生成して予測結果を取得
+	for _, userID := range userIDs {
+		go func(userID int64, wg *sync.WaitGroup) {
+			defer wg.Done()
+			var p PredictionService
+			result, err := p.PredictDepartureProbability(userID, weekday, time, isForward)
+			if err != nil {
+				ch <- model.PredictionResponse{}
+				return
+			}
+			ch <- result
+		}(userID, &wg)
+	}
+	go func() {
+		wg.Wait()
+		close(ch) // すべての Goroutine が終了したらチャネルを閉じる
+	}()
+	// 予測結果を格納
+	var results []model.PredictionResponse
+	for range userIDs {
+		result := <-ch
+		results = append(results, result)
+	}
+	// 予測結果を返す
+	return results, nil
 }
 
 // pythonサーバにlogを送信してtimeまでに(or以降に)帰宅する確率の予測結果を取得する
