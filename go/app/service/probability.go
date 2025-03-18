@@ -13,10 +13,6 @@ import (
 
 type ProbabilityService struct{}
 
-type Prediction struct {
-	Probability float64 `json:"probability"`
-}
-
 // goroutineを使って予測結果を取得する
 func (ProbabilityService) GetVisitProbability(userIDs []int64, weekday int, time string, isForward bool) ([]model.ProbabilityResponse, error) {
 	// 予測結果を格納するチャネル
@@ -95,7 +91,7 @@ func (ProbabilityService) PredictVisitProbability(userID int64, weekday int, tim
 	if err != nil {
 		return model.ProbabilityResponse{}, err
 	}
-	var p Prediction
+	var p model.Prediction
 	if err = json.Unmarshal(b, &p); err != nil {
 		return model.ProbabilityResponse{}, err
 	}
@@ -192,7 +188,7 @@ func (ProbabilityService) PredictDepartureProbability(userID int64, weekday int,
 	if err != nil {
 		return model.ProbabilityResponse{}, err
 	}
-	var p Prediction
+	var p model.Prediction
 	if err = json.Unmarshal(b, &p); err != nil {
 		return model.ProbabilityResponse{}, err
 	}

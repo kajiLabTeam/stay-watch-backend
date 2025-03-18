@@ -193,3 +193,8 @@ type ProbabilityResponse struct {
 	IsForward   bool    `json:"isForward"`
 	Probability float64 `json:"probability"`
 }
+
+type Prediction struct {
+	Probability float64 `json:"probability"`
+	Time        string  `json:"time"`
+}
