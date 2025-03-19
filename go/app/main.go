@@ -61,8 +61,7 @@ func SetUpServer() *gin.Engine {
 		versionEngine.GET("/communities/:userId", controller.GetCommunityByUserIdHandler)
 		versionEngine.GET("/buildings/editor", controller.GetBuildingsEditor)
 		versionEngine.GET("/signup", controller.SignUp)
-		versionEngine.GET("/prediction/visit", controller.GetVisitPrediction)
-		versionEngine.GET("/prediction/departure", controller.GetDeparturePrediction)
+		versionEngine.GET("/prediction/probability/:action", controller.GetProbability)
 	}
 
 	return engine
