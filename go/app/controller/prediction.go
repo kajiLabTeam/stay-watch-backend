@@ -46,7 +46,7 @@ func GetVisitPrediction(c *gin.Context) {
 
 	// パラメータのバリデーション
 	for _, userId := range userIDs {
-		if userId <= 0 {
+		if userId < 0 {
 			c.AbortWithStatusJSON(http.StatusUnprocessableEntity, gin.H{"error": "Invalid query parameter: user-id must be greater than 0."})
 			return
 		}

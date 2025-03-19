@@ -187,13 +187,30 @@ type TagsGetResponse struct {
 }
 
 type ProbabilityResponse struct {
+	Weekday   int                 `json:"weekday"`
+	Time      string              `json:"time"`
+	IsForward bool                `json:"isForward"`
+	Result    []ProbabilityResult `json:"result"`
+}
+
+type ProbabilityResult struct {
 	UserID      int64   `json:"userId"`
-	Weekday     int     `json:"weekday"`
-	Time        string  `json:"time"`
-	IsForward   bool    `json:"isForward"`
 	Probability float64 `json:"probability"`
 }
 
+type PredictionResponse struct {
+	Weekday   int                `json:"weekday"`
+	Time      string             `json:"time"`
+	IsForward bool               `json:"isForward"`
+	Result    []PredictionResult `json:"result"`
+}
+
+type PredictionResult struct {
+	UserID         int64   `json:"userId"`
+	PredictionTime float64 `json:"predictionTime"`
+}
+
+// pythonサーバからの予測結果を格納する構造体
 type Prediction struct {
 	Probability float64 `json:"probability"`
 	Time        string  `json:"time"`
