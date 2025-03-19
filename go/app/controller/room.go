@@ -258,6 +258,7 @@ func LogRefinementSearch(c *gin.Context) {
 	}
 
 	SpecificUserResponseLog := []model.LogGetResponse{}
+	LogsWithCount := []model.LogWithCount{}
 
 	for _, log := range pageLog {
 
@@ -279,7 +280,14 @@ func LogRefinementSearch(c *gin.Context) {
 			StartAt: log.StartAt.Format("2006-01-02 15:04:05"),
 			EndAt:   log.EndAt.Format("2006-01-02 15:04:05"),
 		})
+		LogsWithCount = []model.LogWithCount{
+			{
+				Logs:  SpecificUserResponseLog,
+				Count: len(SpecificUserResponseLog),
+			},
+		}
+
 	}
 
-	c.JSON(http.StatusOK, SpecificUserResponseLog)
+	c.JSON(http.StatusOK, LogsWithCount)
 }
