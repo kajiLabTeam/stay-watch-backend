@@ -313,7 +313,11 @@ func (RoomService) GetLogs(userID int64, limit int64, offset int64) ([]model.Log
 		result.Where("user_id=?", userID)
 	}
 
-	result.Order("id DESC").Limit(int(limit)).Offset(int(offset)).Find(&logs)
+	if limit > 0 {
+		result.Limit(int(limit))
+	}
+
+	result.Order("id DESC").Offset(int(offset)).Find(&logs)
 	if result.Error != nil {
 		return nil, result.Error
 	}
