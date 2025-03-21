@@ -187,8 +187,13 @@ func GetLogs(c *gin.Context) {
 	UserService := service.UserService{}
 
 	pageLog, err := RoomService.GetLogs(userID, limit, offset)
+	allLog, err2 := RoomService.GetLogs(userID, 0, 0)
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Failed to get user log"})
+		return
+	}
+	if err2 != nil {
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Failed to get all log"})
 		return
 	}
 
@@ -217,7 +222,7 @@ func GetLogs(c *gin.Context) {
 	}
 	logsWithCount := model.GetLogResponse{
 		Logs:  specificUserResponseLog,
-		Count: int64(len(specificUserResponseLog)),
+		Count: int64(len(allLog)),
 	}
 
 	c.JSON(http.StatusOK, logsWithCount)
