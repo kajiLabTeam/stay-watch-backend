@@ -297,7 +297,7 @@ func (RoomService) GetGanttLog() ([]model.SimulataneousStayLogGetResponse, error
 
 }
 
-func (RoomService) GetRefinementSearchLogs(userID int64, limit int64, offset int64) ([]model.Log, error) {
+func (RoomService) GetLogs(userID int64, limit int64, offset int64) ([]model.Log, error) {
 	DbEngine := connect()
 	closer, err := DbEngine.DB()
 	if err != nil {
