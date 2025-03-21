@@ -174,7 +174,7 @@ func Log(c *gin.Context) {
 		return
 	}
 
-	logGetResponse := []model.LogGetResponse{}
+	logGetResponse := []model.LogJSON{}
 
 	for _, log := range pageLog {
 
@@ -189,7 +189,7 @@ func Log(c *gin.Context) {
 			return
 		}
 
-		logGetResponse = append(logGetResponse, model.LogGetResponse{
+		logGetResponse = append(logGetResponse, model.LogJSON{
 			ID:      int64(log.ID),
 			Name:    userName,
 			Room:    roomName,
@@ -240,7 +240,7 @@ func LogRefinementSearch(c *gin.Context) {
 	}
 
 	limit, err := strconv.ParseInt(c.Query("limit"), 10, 64)
-	if err != nil || limit == 0 {
+	if err != nil || limit <= 0 {
 		limit = 30 //デフォルト値
 	}
 	offset, err := strconv.ParseInt(c.Query("offset"), 10, 64)
@@ -257,8 +257,7 @@ func LogRefinementSearch(c *gin.Context) {
 		return
 	}
 
-	SpecificUserResponseLog := []model.LogGetResponse{}
-	LogsWithCount := []model.LogWithCount{}
+	specificUserResponseLog := []model.LogJSON{}
 
 	for _, log := range pageLog {
 
@@ -273,21 +272,18 @@ func LogRefinementSearch(c *gin.Context) {
 			return
 		}
 
-		SpecificUserResponseLog = append(SpecificUserResponseLog, model.LogGetResponse{
+		specificUserResponseLog = append(specificUserResponseLog, model.LogJSON{
 			ID:      int64(log.ID),
 			Name:    userName,
 			Room:    roomName,
 			StartAt: log.StartAt.Format("2006-01-02 15:04:05"),
 			EndAt:   log.EndAt.Format("2006-01-02 15:04:05"),
 		})
-		LogsWithCount = []model.LogWithCount{
-			{
-				Logs:  SpecificUserResponseLog,
-				Count: len(SpecificUserResponseLog),
-			},
-		}
-
+	}
+	logsWithCount := model.GetLogResponse{
+		Logs:  specificUserResponseLog,
+		Count: int64(len(specificUserResponseLog)),
 	}
 
-	c.JSON(http.StatusOK, LogsWithCount)
+	c.JSON(http.StatusOK, logsWithCount)
 }
