@@ -167,7 +167,7 @@ func LogGantt(c *gin.Context) {
 	c.JSON(http.StatusOK, GanttLogs)
 }
 
-func LogRefinementSearch(c *gin.Context) {
+func GetLogs(c *gin.Context) {
 	userID, err := strconv.ParseInt(c.Query("user-id"), 10, 64)
 	if err != nil {
 		// c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": "user_id Bad Request"})
@@ -186,7 +186,7 @@ func LogRefinementSearch(c *gin.Context) {
 	RoomService := service.RoomService{}
 	UserService := service.UserService{}
 
-	pageLog, err := RoomService.GetRefinementSearchLogs(userID, limit, offset)
+	pageLog, err := RoomService.GetLogs(userID, limit, offset)
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Failed to get user log"})
 		return
