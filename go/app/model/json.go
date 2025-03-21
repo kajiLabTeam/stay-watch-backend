@@ -13,7 +13,7 @@ type TagGetResponse struct {
 	Name string `json:"name"`
 }
 
-type LogGetResponse struct {
+type LogJSON struct {
 	ID      int64  `json:"id"`
 	StartAt string `json:"startAt"`
 	EndAt   string `json:"endAt"`
@@ -21,9 +21,9 @@ type LogGetResponse struct {
 	Name    string `json:"name"`
 }
 
-type LogWithCount struct {
-	Logs  []LogGetResponse `json:"logs"`
-	Count int              `json:"count"`
+type GetLogResponse struct {
+	Logs  []LogJSON `json:"logs"`
+	Count int64     `json:"count"`
 }
 
 type UserInformationGetResponse struct {

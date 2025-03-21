@@ -329,7 +329,7 @@ func (RoomService) GetRefinementSearchLogs(userID int64, limit int64, offset int
 	logs := make([]model.Log, 0)
 
 	result := DbEngine.Table("logs")
-	if userID != 0 {
+	if userID > 0 {
 		result.Where("user_id=?", userID)
 	}
 
