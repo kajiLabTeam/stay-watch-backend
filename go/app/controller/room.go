@@ -197,7 +197,7 @@ func GetLogs(c *gin.Context) {
 		return
 	}
 
-	specificUserResponseLog := []model.LogJSON{}
+	userLogs := []model.LogJSON{}
 
 	for _, log := range pageLog {
 
@@ -212,7 +212,7 @@ func GetLogs(c *gin.Context) {
 			return
 		}
 
-		specificUserResponseLog = append(specificUserResponseLog, model.LogJSON{
+		userLogs = append(userLogs, model.LogJSON{
 			ID:      int64(log.ID),
 			Name:    userName,
 			Room:    roomName,
@@ -220,10 +220,10 @@ func GetLogs(c *gin.Context) {
 			EndAt:   log.EndAt.Format("2006-01-02 15:04:05"),
 		})
 	}
-	logsWithCount := model.GetLogResponse{
-		Logs:  specificUserResponseLog,
+	responseLog := model.GetLogResponse{
+		Logs:  userLogs,
 		Count: int64(len(allLog)),
 	}
 
-	c.JSON(http.StatusOK, logsWithCount)
+	c.JSON(http.StatusOK, responseLog)
 }
