@@ -354,7 +354,7 @@ func (RoomService) GetRoomNameByRoomID(roomID int64) (string, error) {
 	result := DbEngine.Take(&room, roomID)
 	if result.Error != nil {
 		fmt.Printf("Cannot get room: %v", result.Error)
-		return "", result.Error
+		return "削除済み部屋", nil
 	}
 	return room.Name, nil
 }
