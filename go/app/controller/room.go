@@ -209,7 +209,6 @@ func GetLogs(c *gin.Context) {
 		roomName, err := RoomService.GetRoomNameByRoomID(log.RoomID)
 		if err != nil {
 			c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Failed to get room name"})
-			roomName = "削除済み"
 			return
 		}
 
