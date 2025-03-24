@@ -53,22 +53,6 @@ func (UserService) NewUUID() string {
 
 }
 
-// ユーザ登録処理(削除予定)
-func (UserService) PastRegisterUser(user *model.User) error {
-	DbEngine := connect()
-	closer, err := DbEngine.DB()
-	if err != nil {
-		return err
-	}
-	defer closer.Close()
-	result := DbEngine.Create(user)
-	if result.Error != nil {
-		fmt.Printf("ユーザ登録処理失敗 %v", result.Error)
-		return result.Error
-	}
-	return nil
-}
-
 // ユーザ登録処理new（）
 func (UserService) RegisterUser(user *model.User) (int64, error) {
 	DbEngine := connect()
@@ -83,22 +67,6 @@ func (UserService) RegisterUser(user *model.User) (int64, error) {
 		return -1, result.Error
 	}
 	return int64(user.ID), nil
-}
-
-// ユーザのアップデート（以前の）
-func (UserService) PastUpdateUser(userId int, email string) error {
-	DbEngine := connect()
-	closer, err := DbEngine.DB()
-	if err != nil {
-		return err
-	}
-	defer closer.Close()
-	result := DbEngine.Model(&model.User{}).Where("id = ?", userId).Update("email", email)
-	if result.Error != nil {
-		fmt.Printf("ユーザ更新失敗 %v", result.Error)
-		return result.Error
-	}
-	return nil
 }
 
 // ユーザのアップデート

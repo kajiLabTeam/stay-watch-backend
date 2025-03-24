@@ -13,12 +13,17 @@ type TagGetResponse struct {
 	Name string `json:"name"`
 }
 
-type LogGetResponse struct {
+type LogJSON struct {
 	ID      int64  `json:"id"`
 	StartAt string `json:"startAt"`
 	EndAt   string `json:"endAt"`
 	Room    string `json:"room"`
 	Name    string `json:"name"`
+}
+
+type GetLogResponse struct {
+	Logs  []LogJSON `json:"logs"`
+	Count int64     `json:"count"`
 }
 
 type UserInformationGetResponse struct {
@@ -118,20 +123,20 @@ type UserCreateRequest struct {
 	CommunityId int64   `json:"communityId"`
 	BeaconName  string  `json:"beaconName"`
 	TagIds      []int64 `json:"tagIds"`
-	PrivateKey 	string 	`json:"privateKey"`
+	PrivateKey  string  `json:"privateKey"`
 }
 
 // フロントからバックエンドへ送られてきた更新するユーザ情報
 type UserUpdateRequest struct {
 	ID          int64   `json:"id"`
 	Name        string  `json:"name"`
-	Uuid        *string  `json:"uuid"`
-	Email       *string  `json:"email"`
-	Role        *int64   `json:"role"`
-	CommunityId *int64   `json:"communityId"`
+	Uuid        *string `json:"uuid"`
+	Email       *string `json:"email"`
+	Role        *int64  `json:"role"`
+	CommunityId *int64  `json:"communityId"`
 	BeaconName  string  `json:"beaconName"`
 	TagIds      []int64 `json:"tagIds"`
-	PrivateKey 	*string 	`json:"privateKey"`
+	PrivateKey  *string `json:"privateKey"`
 }
 
 type BeaconRoom struct {

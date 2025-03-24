@@ -4,7 +4,8 @@ import (
 	"Stay_watch/model"
 	"Stay_watch/util"
 	"fmt"
-	"log"
+
+	// "log"
 	"time"
 )
 
@@ -74,7 +75,7 @@ func (RoomService) UpdateRoom(roomID int, room_name string, buildingID int, poly
 		return err
 	}
 	defer closer.Close()
-	result := DbEngine.Model(&model.Room{}).Where("id = ?", roomID).Updates(model.Room{Name:room_name, Polygon:polygon, BuildingID:int64(buildingID)})	// 今は部屋名と範囲だけ
+	result := DbEngine.Model(&model.Room{}).Where("id = ?", roomID).Updates(model.Room{Name: room_name, Polygon: polygon, BuildingID: int64(buildingID)}) // 今は部屋名と範囲だけ
 	if result.Error != nil {
 		fmt.Printf("ユーザ更新失敗 %v", result.Error)
 		return result.Error
@@ -97,24 +98,6 @@ func (RoomService) GetAllRooms() ([]model.Room, error) {
 
 	return rooms, nil
 }
-
-
-
-//滞在者の一部を取得する
-// func (RoomService) GetStayerByRoomID(roomID int64) ([]model.Stayer, error) {
-// 	DbEngine := connect()
-// 	closer, err := DbEngine.DB()
-// 	if err != nil {
-// 		return nil, err
-// 	}
-// 	defer closer.Close()
-// 	stayers := make([]model.Stayer, 0)
-// 	err := DbEngine.Table("stayer").Where("room_id=?", roomID).Find(&stayers)
-// 	if err != nil {
-// 		return nil, fmt.Errorf(" failed: %w", err)
-// 	}
-// 	return stayers, nil
-// }
 
 func (RoomService) CreateStayer(stayer *model.Stayer) error {
 	DbEngine := connect()
@@ -205,10 +188,6 @@ func (RoomService) GetLogWithinDate(date int64) ([]model.Log, error) {
 	result := DbEngine.Order("start_at asc").Where("start_at>=?", currentTime.AddDate(0, 0, -int(date)).Format("2006-01-02 15:04:05")).Find(&logs)
 	if result.Error != nil {
 		return nil, fmt.Errorf(" failed: %w", result.Error)
-	}
-
-	if err != nil {
-		return nil, fmt.Errorf(" failed: %w", err)
 	}
 
 	defer closer.Close()
@@ -318,249 +297,32 @@ func (RoomService) GetGanttLog() ([]model.SimulataneousStayLogGetResponse, error
 
 }
 
-// func (RoomService) GetSimultaneousList(userID int64) ([]model.SimulataneousStayLogGetResponse, error) {
-// 	RoomService := RoomService{}
-// 	logs, err := RoomService.GetLogByUserAndDate(userID, 14)
-// 	if err != nil {
-// 		return nil, fmt.Errorf(" failed: %w", err)
-// 	}
+func (RoomService) GetLogs(userID int64, limit int64, offset int64) ([]model.Log, error) {
+	DbEngine := connect()
+	closer, err := DbEngine.DB()
+	if err != nil {
+		return nil, err
+	}
+	defer closer.Close()
 
-// 	dates := make([]string, 0)
-// 	roomIDs := make([]int64, 0)
-// 	for _, log := range logs {
-// 		dates = append(dates, log.StartAt.Format("2006-01-02"))
-// 		roomIDs = append(roomIDs, log.RoomID)
-// 	}
+	//ログデータ初期化
+	logs := make([]model.Log, 0)
 
-// 	util := util.Util{}
+	result := DbEngine.Table("logs")
+	if userID > 0 {
+		result.Where("user_id=?", userID)
+	}
 
-// 	//滞在した日付
-// 	uniqueDates := util.SliceUniqueString(dates)
-// 	//滞在した部屋
-// 	uniqueRoomIDs := util.SliceUniqueNumber(roomIDs)
+	if limit > 0 {
+		result.Limit(int(limit))
+	}
 
-// 	dateSql := ""
-// 	for index, uniqueDate := range uniqueDates {
-// 		dateSql += "start_at like '" + uniqueDate + "%' or "
-// 		if index == len(uniqueDates)-1 {
-// 			dateSql = dateSql[:len(dateSql)-4]
-// 		}
-// 	}
-
-// 	roomSql := ""
-// 	for index, uniqueRoomID := range uniqueRoomIDs {
-// 		roomSql += "room_id=" + fmt.Sprintf("%d", uniqueRoomID) + " or "
-// 		if index == len(uniqueRoomIDs)-1 {
-// 			roomSql = roomSql[:len(roomSql)-4]
-// 		}
-// 	}
-
-// 	sameDayAndRoomlogs := make([]model.Log, 0)
-// 	err = DbEngine.Table("log").Where(dateSql).And(roomSql).OrderBy("date_format(start_at,'%Y-%m-%d') ,room_id ").Find(&sameDayAndRoomlogs)
-// 	if err != nil {
-// 		return nil, fmt.Errorf(" failed: %w", err)
-// 	}
-
-// 	UserService := UserService{}
-
-// 	simulataneousStayLogsGetResponse := make([]model.SimulataneousStayLogGetResponse, 0)
-// 	roomsGetResponse := make([]model.RoomGetResponse, 0)
-// 	stayTimes := make([]model.StayTime, 0)
-// 	simulataneousStayLogGetResponse := model.SimulataneousStayLogGetResponse{}
-// 	dateCount := 1
-
-// 	for index, sameDayAndRoomlog := range sameDayAndRoomlogs {
-// 		//Ascで昇順にしているため、違うuserIDになるまでループする
-// 		roomGetResponse := model.RoomGetResponse{}
-// 		stayTime := model.StayTime{}
-
-// 		//最後のindexの時
-// 		if index == len(sameDayAndRoomlogs)-1 {
-// 			stayTime.ID = int64(sameDayAndRoomlog.ID)
-// 			userName, err := UserService.GetUserNameByUserID(sameDayAndRoomlog.UserID)
-// 			if err != nil {
-// 				return nil, fmt.Errorf(" failed: %w", err)
-// 			}
-// 			stayTime.UserName = userName
-
-// 			locationTime, err := util.ConvertDatetimeToLocationTime(sameDayAndRoomlog.StartAt.Format("2006-01-02 15:04:05"), "Asia/Tokyo")
-// 			if err != nil {
-// 				return nil, fmt.Errorf(" failed: %w", err)
-// 			}
-// 			unixMilli := util.TimeToUnixMilli(locationTime)
-// 			stayTime.StartAt = unixMilli
-
-// 			locationTime, err = util.ConvertDatetimeToLocationTime(sameDayAndRoomlog.EndAt.Format("2006-01-02 15:04:05"), "Asia/Tokyo")
-
-// 			if err != nil {
-// 				log.Fatal(err.Error())
-// 				return nil, err
-// 			}
-// 			unixMilli = util.TimeToUnixMilli(locationTime)
-// 			stayTime.EndAt = unixMilli
-
-// 			//検索対象者は赤色にする
-// 			if userID == sameDayAndRoomlog.UserID {
-// 				stayTime.Color = "red"
-// 			} else {
-// 				stayTime.Color = "green"
-// 			}
-// 			stayTimes = append(stayTimes, stayTime)
-
-// 			roomGetResponse.ID = sameDayAndRoomlog.RoomID
-// 			roomName, err := RoomService.GetRoomNameByRoomID(sameDayAndRoomlog.RoomID)
-// 			if err != nil {
-// 				return nil, fmt.Errorf("failed: %w", err)
-// 			}
-// 			roomGetResponse.Name = roomName
-// 			roomGetResponse.StayTimes = stayTimes
-// 			roomsGetResponse = append(roomsGetResponse, roomGetResponse)
-// 			stayTimes = nil
-
-// 			//後でuniqueDateのindexに置き換えるかも
-// 			simulataneousStayLogGetResponse.ID = int64(dateCount)
-// 			dateCount++
-// 			simulataneousStayLogGetResponse.Date = sameDayAndRoomlog.StartAt.Format("2006-01-02")
-// 			simulataneousStayLogGetResponse.Rooms = roomsGetResponse
-// 			simulataneousStayLogsGetResponse = append(simulataneousStayLogsGetResponse, simulataneousStayLogGetResponse)
-// 			roomsGetResponse = nil
-// 		} else {
-// 			if sameDayAndRoomlog.StartAt.Format("2006-01-02") == sameDayAndRoomlogs[index+1].StartAt.Format("2006-01-02") {
-// 				if sameDayAndRoomlog.RoomID == sameDayAndRoomlogs[index+1].RoomID {
-// 					stayTime.ID = int64(sameDayAndRoomlog.ID)
-// 					userName, err := UserService.GetUserNameByUserID(sameDayAndRoomlog.UserID)
-// 					if err != nil {
-// 						log.Fatal(err.Error())
-// 						return nil, err
-// 					}
-// 					stayTime.UserName = userName
-
-// 					locationTime, err := util.ConvertDatetimeToLocationTime(sameDayAndRoomlog.StartAt.Format("2006-01-02"), "Asia/Tokyo")
-// 					if err != nil {
-// 						log.Fatal(err.Error())
-// 						return nil, err
-// 					}
-// 					unixMilli := util.TimeToUnixMilli(locationTime)
-// 					stayTime.StartAt = unixMilli
-
-// 					locationTime, err = util.ConvertDatetimeToLocationTime(sameDayAndRoomlog.StartAt.Format("2006-01-02"), "Asia/Tokyo")
-// 					if err != nil {
-// 						log.Fatal(err.Error())
-// 						return nil, err
-// 					}
-// 					unixMilli = util.TimeToUnixMilli(locationTime)
-// 					stayTime.EndAt = unixMilli
-
-// 					//検索対象者は赤色にする
-// 					if userID == sameDayAndRoomlog.UserID {
-// 						stayTime.Color = "red"
-// 					} else {
-// 						stayTime.Color = "green"
-// 					}
-// 					stayTimes = append(stayTimes, stayTime)
-// 				} else {
-// 					stayTime.ID = int64(sameDayAndRoomlog.ID)
-// 					userName, err := UserService.GetUserNameByUserID(sameDayAndRoomlog.UserID)
-// 					if err != nil {
-// 						log.Fatal(err.Error())
-// 						return nil, err
-// 					}
-// 					stayTime.UserName = userName
-
-// 					locationTime, err := util.ConvertDatetimeToLocationTime(sameDayAndRoomlog.StartAt.Format("2006-01-02"), "Asia/Tokyo")
-// 					if err != nil {
-// 						log.Fatal(err.Error())
-// 						return nil, err
-// 					}
-// 					unixMilli := util.TimeToUnixMilli(locationTime)
-// 					stayTime.StartAt = unixMilli
-
-// 					locationTime, err = util.ConvertDatetimeToLocationTime(sameDayAndRoomlog.StartAt.Format("2006-01-02"), "Asia/Tokyo")
-// 					if err != nil {
-// 						log.Fatal(err.Error())
-// 						return nil, err
-// 					}
-// 					unixMilli = util.TimeToUnixMilli(locationTime)
-// 					stayTime.EndAt = unixMilli
-
-// 					//検索対象者は赤色にする
-// 					if userID == sameDayAndRoomlog.UserID {
-// 						stayTime.Color = "red"
-// 					} else {
-// 						stayTime.Color = "green"
-// 					}
-// 					stayTimes = append(stayTimes, stayTime)
-
-// 					roomGetResponse.ID = sameDayAndRoomlog.RoomID
-// 					roomName, err := RoomService.GetRoomNameByRoomID(sameDayAndRoomlog.RoomID)
-// 					if err != nil {
-// 						log.Fatal(err.Error())
-// 						return nil, err
-// 					}
-// 					roomGetResponse.Name = roomName
-// 					roomGetResponse.StayTimes = stayTimes
-// 					roomsGetResponse = append(roomsGetResponse, roomGetResponse)
-// 					stayTimes = nil
-// 				}
-// 			} else {
-// 				stayTime.ID = int64(sameDayAndRoomlog.ID)
-// 				userName, err := UserService.GetUserNameByUserID(sameDayAndRoomlog.UserID)
-// 				if err != nil {
-// 					log.Fatal(err.Error())
-// 					return nil, err
-// 				}
-// 				stayTime.UserName = userName
-
-// 				locationTime, err := util.ConvertDatetimeToLocationTime(sameDayAndRoomlog.StartAt.Format("2006-01-02"), "Asia/Tokyo")
-// 				if err != nil {
-// 					log.Fatal(err.Error())
-// 					return nil, err
-// 				}
-// 				unixMilli := util.TimeToUnixMilli(locationTime)
-// 				stayTime.StartAt = unixMilli
-
-// 				locationTime, err = util.ConvertDatetimeToLocationTime(sameDayAndRoomlog.StartAt.Format("2006-01-02"), "Asia/Tokyo")
-// 				if err != nil {
-// 					log.Fatal(err.Error())
-// 					return nil, err
-// 				}
-// 				unixMilli = util.TimeToUnixMilli(locationTime)
-// 				stayTime.EndAt = unixMilli
-
-// 				//検索対象者は赤色にする
-// 				if userID == sameDayAndRoomlog.UserID {
-// 					stayTime.Color = "red"
-// 				} else {
-// 					stayTime.Color = "green"
-// 				}
-// 				stayTimes = append(stayTimes, stayTime)
-
-// 				roomGetResponse.ID = sameDayAndRoomlog.RoomID
-// 				roomName, err := RoomService.GetRoomNameByRoomID(sameDayAndRoomlog.RoomID)
-// 				if err != nil {
-// 					log.Fatal(err.Error())
-// 					return nil, err
-// 				}
-// 				roomGetResponse.Name = roomName
-// 				roomGetResponse.StayTimes = stayTimes
-// 				roomsGetResponse = append(roomsGetResponse, roomGetResponse)
-// 				stayTimes = nil
-
-// 				//後でuniqueDateのindexに置き換えるかも
-// 				simulataneousStayLogGetResponse.ID = int64(dateCount)
-// 				dateCount++
-// 				simulataneousStayLogGetResponse.Date = sameDayAndRoomlog.StartAt.Format("2006-01-02")
-// 				simulataneousStayLogGetResponse.Rooms = roomsGetResponse
-// 				simulataneousStayLogsGetResponse = append(simulataneousStayLogsGetResponse, simulataneousStayLogGetResponse)
-// 				roomsGetResponse = nil
-// 			}
-// 		}
-// 	}
-
-// 	fmt.Println(simulataneousStayLogsGetResponse)
-
-// 	return simulataneousStayLogsGetResponse, nil
-// }
+	result.Order("id DESC").Offset(int(offset)).Find(&logs)
+	if result.Error != nil {
+		return nil, result.Error
+	}
+	return logs, nil
+}
 
 func (RoomService) GetTimesFromStartAtAndEntAt(startAt string, endAt string) ([]string, error) {
 	times := []string{}
@@ -589,50 +351,12 @@ func (RoomService) GetRoomNameByRoomID(roomID int64) (string, error) {
 	defer closer.Close()
 
 	room := model.Room{}
-	result := DbEngine.Take(&room,roomID)
+	result := DbEngine.Take(&room, roomID)
 	if result.Error != nil {
 		fmt.Printf("Cannot get room: %v", result.Error)
 		return "", result.Error
 	}
 	return room.Name, nil
-}
-
-// 全てのログを取得する
-func (RoomService) GetAllLog() ([]model.Log, error) {
-	DbEngine := connect()
-	closer, err := DbEngine.DB()
-	if err != nil {
-		return nil, err
-	}
-	defer closer.Close()
-
-	logs := make([]model.Log, 0)
-	result := DbEngine.Find(&logs)
-	if result.Error != nil {
-		fmt.Println(result.Error)
-		return nil, result.Error
-	}
-	return logs, nil
-}
-
-// 最新30件のログを取得する
-func (RoomService) GetLatestLogs() ([]model.Log, error) {
-	DbEngine := connect()
-	closer, err := DbEngine.DB()
-	if err != nil {
-		return nil, err
-	}
-	defer closer.Close()
-
-	logs := make([]model.Log, 0)
-	// err := DbEngine.Desc("id").Limit(30).Find(&logs)
-	result := DbEngine.Order("id desc").Limit(30).Find(&logs)
-
-	if result.Error != nil {
-		log.Fatal(result.Error)
-		return nil, result.Error
-	}
-	return logs, nil
 }
 
 // pageごとに30件のログを取得する

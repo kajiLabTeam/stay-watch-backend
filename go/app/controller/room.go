@@ -156,25 +156,48 @@ func Stayer(c *gin.Context) {
 	c.JSON(http.StatusOK, stayerGetResponse)
 }
 
-func Log(c *gin.Context) {
+func LogGantt(c *gin.Context) {
+
+	RoomService := service.RoomService{}
+	GanttLogs, err := RoomService.GetGanttLog()
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Failed to get gantt log"})
+		return
+	}
+	c.JSON(http.StatusOK, GanttLogs)
+}
+
+func GetLogs(c *gin.Context) {
+	userID, err := strconv.ParseInt(c.Query("user-id"), 10, 64)
+	if err != nil {
+		// c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": "user_id Bad Request"})
+		userID = 0
+	}
+
+	limit, err := strconv.ParseInt(c.Query("limit"), 10, 64)
+	if err != nil || limit <= 0 {
+		limit = 30 //デフォルト値
+	}
+	offset, err := strconv.ParseInt(c.Query("offset"), 10, 64)
+	if err != nil {
+		offset = 0 //デフォルト値
+	}
+
 	RoomService := service.RoomService{}
 	UserService := service.UserService{}
 
-	//ページング処理
-	page := c.Query("page")
-	pageInt, err := strconv.Atoi(page)
+	pageLog, err := RoomService.GetLogs(userID, limit, offset)
+	allLog, err2 := RoomService.GetLogs(userID, 0, 0)
 	if err != nil {
-		pageInt = 1
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Failed to get user log"})
+		return
 	}
-
-	//ページごとにLogテーブルからデータを取得する
-	pageLog, err := RoomService.GetLogsByPage(pageInt)
-	if err != nil {
-		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Failed to get logs"})
+	if err2 != nil {
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Failed to get all log"})
 		return
 	}
 
-	logGetResponse := []model.LogGetResponse{}
+	userLogs := []model.LogJSON{}
 
 	for _, log := range pageLog {
 
@@ -189,7 +212,7 @@ func Log(c *gin.Context) {
 			return
 		}
 
-		logGetResponse = append(logGetResponse, model.LogGetResponse{
+		userLogs = append(userLogs, model.LogJSON{
 			ID:      int64(log.ID),
 			Name:    userName,
 			Room:    roomName,
@@ -197,37 +220,10 @@ func Log(c *gin.Context) {
 			EndAt:   log.EndAt.Format("2006-01-02 15:04:05"),
 		})
 	}
-	c.JSON(http.StatusOK, logGetResponse)
-}
-
-// func SimultaneousList(c *gin.Context) {
-// 	userID := c.Param("user_id")
-
-// 	RoomService := service.RoomService{}
-
-// 	//userIDをint64に変換
-// 	userIDInt, err := strconv.ParseInt(userID, 10, 64)
-// 	if err != nil {
-// 		c.String(http.StatusBadRequest, "Bad Request")
-// 		return
-// 	}
-
-// 	SimultaneousList, err := RoomService.GetSimultaneousList(userIDInt)
-// 	if err != nil {
-// 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Failed to "})
-// 		return
-// 	}
-
-// 	c.JSON(http.StatusOK, SimultaneousList)
-// }
-
-func LogGantt(c *gin.Context) {
-
-	RoomService := service.RoomService{}
-	GanttLogs, err := RoomService.GetGanttLog()
-	if err != nil {
-		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Failed to get gantt log"})
-		return
+	responseLog := model.GetLogResponse{
+		Logs:  userLogs,
+		Count: int64(len(allLog)),
 	}
-	c.JSON(http.StatusOK, GanttLogs)
+
+	c.JSON(http.StatusOK, responseLog)
 }

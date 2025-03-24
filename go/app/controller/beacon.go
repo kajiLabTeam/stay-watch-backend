@@ -17,7 +17,7 @@ import (
 
 const (
 	BEACON_ID_STAYWATCHBEACON = 4
-	LENGTH_PRIVATE_KEY = 32
+	LENGTH_PRIVATE_KEY        = 32
 )
 
 func getEndUUIDByManufacturer(manufacturer string) string {
@@ -76,14 +76,14 @@ func getUserIdBySipHash(randomValue string, hashValue string) (int64, error) {
 			}
 
 			// ハッシュ化したいデータ
-			msg := []byte(randomValue)	// ランダム値
+			msg := []byte(randomValue) // ランダム値
 
 			// SipHashを計算
 			hash := siphash.Hash(key1, key2, msg) // ここで第1, 第2引数にカスタム値を指定可能
 
 			// 結果を出力
 			// 結果が一緒になればそのユーザの秘密キーがビーコン固有の秘密キー
-			if(hashValue == fmt.Sprintf("%016x", hash)){
+			if hashValue == strconv.FormatUint(hash, 16) {
 				return int64(user.ID), nil
 			}
 		}
@@ -125,12 +125,12 @@ func convertBeaconsStayers(inputBeacons []*model.BeaconSignal) []model.Stayer {
 				userId = tmpUserId
 			}
 		}
-		
+
 		// 0でない(ユーザが見つかった場合)のみ追加
 		if userId != 0 {
-			tmpStayer := model.Stayer {
+			tmpStayer := model.Stayer{
 				UserID: userId,
-				Rssi: inputBeacon.Rssi,
+				Rssi:   inputBeacon.Rssi,
 			}
 			outStayers = append(outStayers, tmpStayer)
 		}
@@ -353,11 +353,6 @@ func Beacon(c *gin.Context) {
 				return
 			}
 		}
-	}
-
-	if err != nil {
-		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Failed"})
-		return
 	}
 
 	c.JSON(http.StatusCreated, gin.H{

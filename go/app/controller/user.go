@@ -13,9 +13,9 @@ import (
 )
 
 const (
-	BEACON_NAME_IPHONE = "iPhone"
-	BEACON_NAME_ANDROID = "Android"
-	BEACON_NAME_FCS1301 = "FCS1301"
+	BEACON_NAME_IPHONE          = "iPhone"
+	BEACON_NAME_ANDROID         = "Android"
+	BEACON_NAME_FCS1301         = "FCS1301"
 	BEACON_NAME_STAYWATCHBEACON = "StayWatchBeacon"
 )
 
@@ -25,7 +25,7 @@ func Detail(c *gin.Context) {
 	})
 }
 
-func createUuid(communityId int64, uuidEditable bool, beaconName string, userId int64, requestUuid string) string {
+func createUuid(communityId int64, beaconName string, userId int64, requestUuid string) string {
 	// コミュニティIDを16進数3桁に変換
 	communityIdHex := fmt.Sprintf("%03x", communityId)
 	newUuid := ""
@@ -135,7 +135,7 @@ func CreateUser(c *gin.Context) {
 		UUID:        "",
 		BeaconId:    int64(beacon.ID),
 		CommunityId: UserCreateRequest.CommunityId,
-		PrivateKey: UserCreateRequest.PrivateKey,
+		PrivateKey:  UserCreateRequest.PrivateKey,
 	}
 
 	// usersテーブルにユーザ情報を保存
@@ -149,7 +149,7 @@ func CreateUser(c *gin.Context) {
 	// UUIDの作成
 	// コミュニティID取得
 	communityId := UserCreateRequest.CommunityId
-	newUuid := createUuid(communityId, beacon.UuidEditable, UserCreateRequest.BeaconName, registerdUserId, UserCreateRequest.Uuid)
+	newUuid := createUuid(communityId, UserCreateRequest.BeaconName, registerdUserId, UserCreateRequest.Uuid)
 
 	// UUIDを上書き
 	err = UserService.UpdateUuid(newUuid, registerdUserId)
@@ -181,52 +181,6 @@ func CreateUser(c *gin.Context) {
 		"status": "ok",
 	})
 
-}
-
-func PastCreateUser(c *gin.Context) {
-	RegistrationUserForm := model.RegistrationUserForm{}
-	c.Bind(&RegistrationUserForm)
-
-	UserService := service.UserService{}
-	//userIDがないなら新規登録
-	if RegistrationUserForm.ID == 0 {
-		user := model.User{
-			Name:  RegistrationUserForm.Name,
-			Email: RegistrationUserForm.Email,
-			Role:  RegistrationUserForm.Role,
-			UUID:  UserService.NewUUID(),
-		}
-
-		err := UserService.PastRegisterUser(&user)
-		if err != nil {
-			fmt.Printf("Cannnot register user: %v", err)
-			c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Failed to register user"})
-			return
-		}
-	}
-
-	//userIDがあるなら更新
-	if RegistrationUserForm.ID != 0 {
-		//userNameが空なので、userIDからuserNameを取得する
-		err := UserService.PastUpdateUser(
-			int(RegistrationUserForm.ID),
-			RegistrationUserForm.Email,
-		)
-
-		if err != nil {
-			c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Failed to"})
-			return
-		}
-	}
-
-	if !strings.HasSuffix(os.Args[0], ".test") {
-		mailService := service.MailService{}
-		mailService.SendMail("滞在ウォッチユーザ登録の完了のお知らせ", "ユーザ登録が完了したので滞在ウォッチを閲覧することが可能になりました\n一度プロジェクトをリセットしたので再度ログインお願いします。\nアプリドメイン\nhttps://stay-watch-go.kajilab.tk/", RegistrationUserForm.Email)
-	}
-
-	c.JSON(http.StatusCreated, gin.H{
-		"status": "ok",
-	})
 }
 
 func DeleteUser(c *gin.Context) {
@@ -336,17 +290,23 @@ func UpdateUser(c *gin.Context) {
 
 	// UUIDの作成
 	newUuid := ""
-	if UserUpdateRequest.Uuid != nil && UserUpdateRequest.CommunityId != nil{
-		newUuid = createUuid(*UserUpdateRequest.CommunityId, beacon.UuidEditable, UserUpdateRequest.BeaconName, UserUpdateRequest.ID, *UserUpdateRequest.Uuid)
+	if UserUpdateRequest.Uuid != nil && UserUpdateRequest.CommunityId != nil {
+		newUuid = createUuid(*UserUpdateRequest.CommunityId, UserUpdateRequest.BeaconName, UserUpdateRequest.ID, *UserUpdateRequest.Uuid)
 	}
 
 	// 値が存在するフィールドのみ更新
 	user.Name = UserUpdateRequest.Name
 	user.BeaconId = int64(beacon.ID)
 	// nilでない場合のみ更新
-	if UserUpdateRequest.Email != nil {user.Email = *UserUpdateRequest.Email}
-	if UserUpdateRequest.Role != nil {user.Role = *UserUpdateRequest.Role}
-	if UserUpdateRequest.CommunityId != nil {user.CommunityId = *UserUpdateRequest.CommunityId}
+	if UserUpdateRequest.Email != nil {
+		user.Email = *UserUpdateRequest.Email
+	}
+	if UserUpdateRequest.Role != nil {
+		user.Role = *UserUpdateRequest.Role
+	}
+	if UserUpdateRequest.CommunityId != nil {
+		user.CommunityId = *UserUpdateRequest.CommunityId
+	}
 
 	// StayWatchBeaconの場合(PrivateKeyを使う場合)UUIDは""にし、そうでない場合はPrivateKeyを""にする
 	if UserUpdateRequest.BeaconName == BEACON_NAME_STAYWATCHBEACON {
