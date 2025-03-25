@@ -14,7 +14,8 @@ import (
 type ProbabilityService struct{}
 
 // goroutineを使って予測結果を取得する
-func (ProbabilityService) GetVisitProbability(userIDs []int64, weekday int, time string, isForward bool) (model.ProbabilityResponse, error) {
+func (ProbabilityService) GetProbability(action string, userIDs []int64, weekday int, time string, isForward bool) (model.ProbabilityResponse, error) {
+	room := RoomService{}
 	// 予測結果を格納するチャネル
 	var wg sync.WaitGroup
 	wg.Add(len(userIDs))
@@ -22,14 +23,33 @@ func (ProbabilityService) GetVisitProbability(userIDs []int64, weekday int, time
 	// ユーザーごとにgoroutineを生成して予測結果を取得
 	for _, userID := range userIDs {
 		go func(userID int64, wg *sync.WaitGroup) {
-			defer wg.Done()
-			var p ProbabilityService
-			result, err := p.PredictVisitProbability(userID, weekday, time, isForward)
+			weeks, err := room.GetWeeksSinceFirstLog(userID)
 			if err != nil {
 				ch <- model.ProbabilityResult{}
 				return
 			}
-			ch <- result
+			var logs []model.Log
+			switch action {
+			case "visit":
+				logs, err = room.GetEarliestEntryByUserAndWeekday(userID, weekday)
+			case "departure":
+				logs, err = room.GetLatestExitByUserAndWeekday(userID, weekday)
+			default:
+				ch <- model.ProbabilityResult{}
+				return
+			}
+			if err != nil {
+				ch <- model.ProbabilityResult{}
+				return
+			}
+			defer wg.Done()
+			var p ProbabilityService
+			result, err := p.PredictProbability(logs, weeks, time, isForward)
+			if err != nil {
+				ch <- model.ProbabilityResult{}
+				return
+			}
+			ch <- model.ProbabilityResult{UserID: userID, Probability: result}
 		}(userID, &wg)
 	}
 	go func() {
@@ -53,34 +73,22 @@ func (ProbabilityService) GetVisitProbability(userIDs []int64, weekday int, time
 }
 
 // pythonサーバにlogを送信してtimeまでに(or以降に)来訪する確率の予測結果を取得する
-func (ProbabilityService) PredictVisitProbability(userID int64, weekday int, time string, isForward bool) (model.ProbabilityResult, error) {
-	var room RoomService
-	// user_IDとweekdayを元にlogを取得
-	logs, err := room.GetEarliestEntryByUserAndWeekday(userID, weekday)
-	if err != nil {
-		return model.ProbabilityResult{}, err
-	}
+func (ProbabilityService) PredictProbability(logs []model.Log, weeks int, time string, isForward bool) (float64, error) {
 	// logsからstart_atを"15:04"形式に変換してスライスに格納
 	var startAt []string
 	for _, log := range logs {
 		startAt = append(startAt, log.StartAt.Format("15:04"))
 	}
 
-	// user_IDを持つuserが所属を始めてからの週数を取得
-	weeks, err := room.GetWeeksSinceFirstLog(userID)
-	if err != nil {
-		return model.ProbabilityResult{}, err
-	}
-
 	// pythonサーバにstartAtとweeksを送信してtimeまでに来訪する確率の予測結果を取得
-	baseUrl := "http://vol_prediction:8085/api/v1/prediction/probability/visit"
+	baseUrl := "http://vol_prediction:8085/api/v1/prediction/probability"
 	u, err := url.Parse(baseUrl)
 	if err != nil {
-		return model.ProbabilityResult{}, err
+		return 0, err
 	}
 	q := u.Query()
 	for _, t := range startAt {
-		q.Add("start_at", t)
+		q.Add("logs", t)
 	}
 	q.Add("time", time)
 	q.Add("weeks", fmt.Sprintf("%d", weeks))
@@ -89,122 +97,18 @@ func (ProbabilityService) PredictVisitProbability(userID int64, weekday int, tim
 	// GETリクエストを送信して予測結果を取得
 	res, err := http.Get(u.String())
 	if err != nil {
-		return model.ProbabilityResult{}, err
+		return 0, err
 	}
 	defer res.Body.Close()
 	// 予測結果を取得
 	b, err := io.ReadAll(res.Body)
 	if err != nil {
-		return model.ProbabilityResult{}, err
+		return 0, err
 	}
 	var p model.Prediction
 	if err = json.Unmarshal(b, &p); err != nil {
-		return model.ProbabilityResult{}, err
+		return 0, err
 	}
 	// 予測結果を返す
-	result := model.ProbabilityResult{
-		UserID:      userID,
-		Probability: p.Probability,
-	}
-	return result, nil
-}
-
-// goroutineを使って予測結果を取得する
-func (ProbabilityService) GetDepartureProbability(userIDs []int64, weekday int, time string, isForward bool) (model.ProbabilityResponse, error) {
-	// 予測結果を格納するチャネル
-	var wg sync.WaitGroup
-	wg.Add(len(userIDs))
-	ch := make(chan model.ProbabilityResult, len(userIDs))
-	// ユーザーごとにgoroutineを生成して予測結果を取得
-	for _, userID := range userIDs {
-		go func(userID int64, wg *sync.WaitGroup) {
-			defer wg.Done()
-			var p ProbabilityService
-			result, err := p.PredictDepartureProbability(userID, weekday, time, isForward)
-			if err != nil {
-				ch <- model.ProbabilityResult{}
-				return
-			}
-			ch <- result
-		}(userID, &wg)
-	}
-	go func() {
-		wg.Wait()
-		close(ch) // すべての Goroutine が終了したらチャネルを閉じる
-	}()
-	// 予測結果を格納
-	var results []model.ProbabilityResult
-	for range userIDs {
-		result := <-ch
-		results = append(results, result)
-	}
-	// 予測結果を返す
-	responce := model.ProbabilityResponse{
-		Weekday:   weekday,
-		Time:      time,
-		IsForward: isForward,
-		Result:    results,
-	}
-	return responce, nil
-}
-
-// pythonサーバにlogを送信してtimeまでに(or以降に)帰宅する確率の予測結果を取得する
-func (ProbabilityService) PredictDepartureProbability(userID int64, weekday int, time string, isForward bool) (model.ProbabilityResult, error) {
-	var room RoomService
-	// user_IDとweekdayを元にlogを取得
-	logs, err := room.GetLatestExitByUserAndWeekday(userID, weekday)
-	if err != nil {
-		return model.ProbabilityResult{}, err
-	}
-	// logsからstart_atを"15:04"形式に変換してスライスに格納
-	// start_atの日付とend_atの日付が異なる場合はスルーする
-	var endAt []string
-	for _, log := range logs {
-		if log.StartAt.Day() != log.EndAt.Day() {
-			continue
-		}
-		endAt = append(endAt, log.EndAt.Format("15:04"))
-	}
-
-	// user_IDを持つuserが所属を始めてからの週数を取得
-	weeks, err := room.GetWeeksSinceFirstLog(userID)
-	if err != nil {
-		return model.ProbabilityResult{}, err
-	}
-
-	// pythonサーバにstartAtとweeksを送信してtimeまでに来訪する確率の予測結果を取得
-	baseUrl := "http://vol_prediction:8085/api/v1/prediction/probability/departure"
-	u, err := url.Parse(baseUrl)
-	if err != nil {
-		return model.ProbabilityResult{}, err
-	}
-	q := u.Query()
-	for _, t := range endAt {
-		q.Add("end_at", t)
-	}
-	q.Add("time", time)
-	q.Add("weeks", fmt.Sprintf("%d", weeks))
-	q.Add("is_forward", fmt.Sprintf("%t", isForward))
-	u.RawQuery = q.Encode()
-	// GETリクエストを送信して予測結果を取得
-	res, err := http.Get(u.String())
-	if err != nil {
-		return model.ProbabilityResult{}, err
-	}
-	defer res.Body.Close()
-	// 予測結果を取得
-	b, err := io.ReadAll(res.Body)
-	if err != nil {
-		return model.ProbabilityResult{}, err
-	}
-	var p model.Prediction
-	if err = json.Unmarshal(b, &p); err != nil {
-		return model.ProbabilityResult{}, err
-	}
-	// 予測結果を返す
-	result := model.ProbabilityResult{
-		UserID:      userID,
-		Probability: p.Probability,
-	}
-	return result, nil
+	return p.Probability, nil
 }

@@ -46,6 +46,10 @@ func GetProbability(c *gin.Context) {
 	}
 
 	// パラメータのバリデーション
+	if action != "visit" && action != "departure" {
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": "Invalid action parameter: action must be 'visit' or 'departure'."})
+		return
+	}
 	for _, userId := range userIDs {
 		if userId <= 0 {
 			c.AbortWithStatusJSON(http.StatusUnprocessableEntity, gin.H{"error": "Invalid query parameter: user-id must be greater than 0."})
@@ -63,25 +67,13 @@ func GetProbability(c *gin.Context) {
 
 	// サービスの呼び出し
 	ps := service.ProbabilityService{}
-	switch action {
-	case "visit":
-		probabilities, err := ps.GetVisitProbability(userIDs, weekday, t, isForward)
-		if err != nil {
-			c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-			return
-		}
-		c.JSON(http.StatusOK, gin.H{"result": probabilities})
-	case "departure":
-		probabilities, err := ps.GetDepartureProbability(userIDs, weekday, t, isForward)
-		if err != nil {
-			c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-			return
-		}
-		// レスポンスの返却
-		c.JSON(http.StatusOK, gin.H{"result": probabilities})
-	default:
-		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": "Invalid action parameter: action must be 'visit' or 'departure'."})
+	probability, err := ps.GetProbability(action, userIDs, weekday, t, isForward)
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
 	}
+	// レスポンスの返却
+	c.JSON(http.StatusOK, probability)
 }
 
 // 来訪時刻の予測
@@ -91,8 +83,6 @@ func GetPredictionTime(c *gin.Context) {
 	action := c.Param("action")
 	u := c.QueryArray("user-id")
 	w := c.DefaultQuery("weekday", "0")
-	t := c.DefaultQuery("time", "23:59")
-	i := c.DefaultQuery("is-forward", "true")
 
 	// パラメータの型変換
 	if len(u) == 0 {
@@ -113,13 +103,12 @@ func GetPredictionTime(c *gin.Context) {
 		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": "Invalid query parameter: weekday must be an integer."})
 		return
 	}
-	isForward, err := strconv.ParseBool(i)
-	if err != nil {
-		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": "Invalid query parameter: is-forward must be a boolean."})
-		return
-	}
 
 	// パラメータのバリデーション
+	if action != "visit" && action != "departure" {
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": "Invalid action parameter: action must be 'visit' or 'departure'."})
+		return
+	}
 	for _, userId := range userIDs {
 		if userId <= 0 {
 			c.AbortWithStatusJSON(http.StatusUnprocessableEntity, gin.H{"error": "Invalid query parameter: user-id must be greater than 0."})
@@ -130,30 +119,14 @@ func GetPredictionTime(c *gin.Context) {
 		c.AbortWithStatusJSON(http.StatusUnprocessableEntity, gin.H{"error": "Invalid query parameter: weekday must be in 0-6."})
 		return
 	}
-	if _, err := time.Parse("15:04", t); err != nil {
-		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": "Invalid query parameter: time must be in the format HH:MM and must be between 00:00 and 23:59."})
-		return
-	}
 
 	// サービスの呼び出し
 	ps := service.PredictionService{}
-	switch action {
-	case "visit":
-		predictions, err := ps.GetVisitPrediction(userIDs, weekday, t, isForward)
-		if err != nil {
-			c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-			return
-		}
-		c.JSON(http.StatusOK, gin.H{"result": predictions})
-	case "departure":
-		predictions, err := ps.GetDeparturePrediction(userIDs, weekday, t, isForward)
-		if err != nil {
-			c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-			return
-		}
-		// レスポンスの返却
-		c.JSON(http.StatusOK, gin.H{"result": predictions})
-	default:
-		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": "Invalid action parameter: action must be 'visit' or 'departure'."})
+	prediction, err := ps.GetPrediction(action, userIDs, weekday)
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
 	}
+	// レスポンスの返却
+	c.JSON(http.StatusOK, prediction)
 }
