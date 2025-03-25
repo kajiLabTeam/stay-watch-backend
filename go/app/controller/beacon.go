@@ -83,7 +83,7 @@ func getUserIdBySipHash(randomValue string, hashValue string) (int64, error) {
 
 			// 結果を出力
 			// 結果が一緒になればそのユーザの秘密キーがビーコン固有の秘密キー
-			if hashValue == strconv.FormatUint(hash, 16) {
+			if hashValue == fmt.Sprintf("%016x", hash) {
 				return int64(user.ID), nil
 			}
 		}
@@ -141,7 +141,6 @@ func convertBeaconsStayers(inputBeacons []*model.BeaconSignal) []model.Stayer {
 
 // ビーコン情報を受け取る
 func Beacon(c *gin.Context) {
-
 	beaconRoom := model.BeaconRoom{}
 	err := c.Bind(&beaconRoom)
 	if err != nil {
@@ -161,7 +160,6 @@ func Beacon(c *gin.Context) {
 
 	// 事前にStayerテーブルのデータを全て取得する
 	pastAllStayer, err := RoomService.GetAllStayer()
-
 	if err != nil {
 		fmt.Printf("failed: Cannnot get stayer %v", err)
 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Failed to get stayer"})
@@ -361,7 +359,6 @@ func Beacon(c *gin.Context) {
 }
 
 func GetBeacon(c *gin.Context) {
-
 	BeaconService := service.BeaconService{}
 	beacons, err := BeaconService.GetAllBeacon()
 	if err != nil {
@@ -372,7 +369,6 @@ func GetBeacon(c *gin.Context) {
 	beaconGetResponses := []model.BeaconGetResponse{}
 
 	for _, beacon := range beacons {
-
 		beaconGetResponses = append(beaconGetResponses, model.BeaconGetResponse{
 			BeaconId:     int64(beacon.ID),
 			BeaconName:   beacon.Type,
