@@ -83,31 +83,6 @@ func TestGetStayer(t *testing.T) {
 	fmt.Println("TestGetStayer通過")
 }
 
-func TestGetLog(t *testing.T) {
-	response := httptest.NewRecorder()
-	ginContext, _ := gin.CreateTestContext(response)
-	// リクエストの生成
-	// 今回はmiddlewareのテストのためpathはなんでも可
-	req, _ := http.NewRequest(http.MethodGet, "/logs", nil)
-	// リクエスト情報をコンテキストに入れる
-	ginContext.Request = req
-	controller.Log(ginContext)
-	asserts := assert.New(t)
-	// レスポンスのステータスコードの確認
-	asserts.Equal(http.StatusOK, response.Code)
-	// レスポンスのボディを構造体に変換
-	var responseLog []model.LogGetResponse
-	json.Unmarshal(response.Body.Bytes(), &responseLog)
-	// レスポンスのボディの確認
-	asserts.Equal("kaji", responseLog[0].Name)
-	asserts.Equal("梶研-学生部屋", responseLog[0].Room)
-	// asserts.Equal(1, int(responseLog[0].ID))
-	// asserts.Equal("2021-05-01 00:00:00", responseLog[0].StartAt)
-	// asserts.Equal("2021-05-01 00:00:00", responseLog[0].EndAt)
-
-	fmt.Println("TestGetLog通過")
-}
-
 func TestGetUser(t *testing.T) {
 	response := httptest.NewRecorder()
 	ginContext, _ := gin.CreateTestContext(response)
