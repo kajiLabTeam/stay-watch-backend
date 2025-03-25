@@ -317,7 +317,7 @@ func (RoomService) GetLogs(userID int64, limit int64, offset int64) ([]model.Log
 		result.Limit(int(limit))
 	}
 
-	result.Order("id DESC").Offset(int(offset)).Unscoped().Find(&logs)
+	result.Order("id DESC").Offset(int(offset)).Find(&logs)
 	if result.Error != nil {
 		return nil, result.Error
 	}
@@ -351,7 +351,7 @@ func (RoomService) GetRoomNameByRoomID(roomID int64) (string, error) {
 	defer closer.Close()
 
 	room := model.Room{}
-	result := DbEngine.Take(&room, roomID)
+	result := DbEngine.Unscoped().Take(&room, roomID)
 	if result.Error != nil {
 		fmt.Printf("Cannot get room: %v", result.Error)
 		return "削除済み部屋", nil
