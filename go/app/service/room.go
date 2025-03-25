@@ -724,7 +724,7 @@ func (RoomService) GetLatestExitByUserAndWeekday(userID int64, weekday int) ([]m
 		Group("user_id, log_date")
 	// メインクエリで JOIN
 	result := DbEngine.Model(&model.Log{}).
-		Joins("JOIN (?) sub ON logs.user_id = sub.user_id AND DATE(logs.start_at) = sub.log_date AND logs.end_at = sub.last_end_at", subQuery).
+		Joins("JOIN (?) sub ON logs.user_id = sub.user_id AND DATE(logs.end_at) = sub.log_date AND logs.end_at = sub.last_end_at", subQuery).
 		Find(&logs)
 	if result.Error != nil {
 		return nil, result.Error
