@@ -63,13 +63,13 @@ func (ProbabilityService) GetProbability(action string, userIDs []int64, weekday
 		results = append(results, result)
 	}
 	// 予測結果を返す
-	responce := model.ProbabilityResponse{
+	response := model.ProbabilityResponse{
 		Weekday:   weekday,
 		Time:      time,
 		IsForward: isForward,
 		Result:    results,
 	}
-	return responce, nil
+	return response, nil
 }
 
 // pythonサーバにlogを送信してtimeまでに(or以降に)来訪する確率の予測結果を取得する

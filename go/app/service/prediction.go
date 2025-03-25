@@ -66,11 +66,11 @@ func (PredictionService) GetPrediction(action string, userIDs []int64, weekday i
 		results = append(results, result)
 	}
 	// 予測結果を返す
-	responce := model.PredictionResponse{
+	response := model.PredictionResponse{
 		Weekday: weekday,
 		Result:  results,
 	}
-	return responce, nil
+	return response, nil
 }
 
 // pythonサーバにlogを送信して来訪する可能性の高い時刻を取得する
