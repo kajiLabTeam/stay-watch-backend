@@ -204,9 +204,12 @@ func (UserService) GetUserNameByUserID(userID int64) (string, error) {
 	}
 	defer closer.Close()
 	user := model.User{}
-	result := DbEngine.Where("id=?", userID).Take(&user)
+	result := DbEngine.Where("id=?", userID).Limit(1).Find(&user)
 	if result.Error != nil {
 		// 見つからない場合は削除されたユーザであるということになる
+		return "削除済みユーザ", nil
+	}
+	if user.Name == "" {
 		return "削除済みユーザ", nil
 	}
 	return user.Name, nil
