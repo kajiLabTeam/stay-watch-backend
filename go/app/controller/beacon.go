@@ -83,7 +83,7 @@ func getUserIdBySipHash(randomValue string, hashValue string) (int64, error) {
 
 			// 結果を出力
 			// 結果が一緒になればそのユーザの秘密キーがビーコン固有の秘密キー
-			if hashValue == strconv.FormatUint(hash, 16) {
+			if(hashValue == fmt.Sprintf("%016x", hash)){
 				return int64(user.ID), nil
 			}
 		}
