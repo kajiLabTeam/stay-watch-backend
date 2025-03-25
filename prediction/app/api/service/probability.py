@@ -15,6 +15,11 @@ def get_probability(data: list[str], time: str, weeks: int) -> float:
     data_minutes = [time_to_minuts(d) for d in data]
     time_minutes = time_to_minuts(time)
     # 1. dataをxmeansでクラスタリング
+    if len(data_minutes) == 1:
+        if time_minutes >= data_minutes[0]:
+            return 1 / weeks
+        else:
+            return 0
     cluster = clustering(data_minutes)
     # 2. クラスタごとに確率を計算
     p: list[float] = []
