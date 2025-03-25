@@ -232,3 +232,7 @@ __pycache__/
 
 # remove backup files
 *.tar.gz
+
+# remove python virtual environment
+.venv/
+venv/
