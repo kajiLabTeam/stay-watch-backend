@@ -200,8 +200,6 @@ type ProbabilityResult struct {
 
 type PredictionResponse struct {
 	Weekday   int                `json:"weekday"`
-	Time      string             `json:"time"`
-	IsForward bool               `json:"isForward"`
 	Result    []PredictionResult `json:"result"`
 }
 
