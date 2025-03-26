@@ -146,6 +146,7 @@ type BeaconRoom struct {
 
 type BeaconSignal struct {
 	Uuid string `json:"uuid" form:"uuid"`
+	Msd  string `json:"msd"  form:"msd"`
 	Rssi int64  `json:"rssi" form:"rssi"`
 }
 
@@ -204,12 +205,12 @@ type ProbabilityResult struct {
 }
 
 type PredictionResponse struct {
-	Weekday   int                `json:"weekday"`
-	Result    []PredictionResult `json:"result"`
+	Weekday int                `json:"weekday"`
+	Result  []PredictionResult `json:"result"`
 }
 
 type PredictionResult struct {
-	UserID         int64   `json:"userId"`
+	UserID         int64  `json:"userId"`
 	PredictionTime string `json:"predictionTime"`
 }
 

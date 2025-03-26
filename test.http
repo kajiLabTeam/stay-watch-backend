@@ -93,7 +93,8 @@ content-type: application/json
             "rssi": -49
         },
         {
-            "uuid": "8ebc21144abdba0db7c6ff0f0027ac00",
+            "uuid": "",
+            "msd": "ffff2fe318a70be1471fd4ed8976601f0431ed50f404",
             "rssi": -49
         }
     ],
