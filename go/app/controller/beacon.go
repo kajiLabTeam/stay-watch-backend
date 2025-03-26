@@ -103,6 +103,9 @@ func convertBeaconsStayers(inputBeacons []*model.BeaconSignal) []model.Stayer {
 
 		userId := int64(0)
 		if strings.HasPrefix(inputBeacon.Msd, PRIVBEACON_MSD_PREFIX) {
+			if len(inputBeacon.Msd) < 20 {
+				continue
+			}
 			// PrivBeaconの場合
 			hashValue := inputBeacon.Msd[4:20]
 			randomValue := inputBeacon.Msd[20:]
