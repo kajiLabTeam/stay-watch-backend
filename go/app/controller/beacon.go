@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/http"
 	"strconv"
+	"strings"
 	"time"
 
 	"Stay_watch/model"
@@ -18,6 +19,7 @@ import (
 const (
 	BEACON_ID_STAYWATCHBEACON = 4
 	LENGTH_PRIVATE_KEY        = 32
+	PRIVBEACON_MSD_PREFIX     = "ffff"
 )
 
 func getEndUUIDByManufacturer(manufacturer string) string {
@@ -100,8 +102,18 @@ func convertBeaconsStayers(inputBeacons []*model.BeaconSignal) []model.Stayer {
 	for _, inputBeacon := range inputBeacons {
 
 		userId := int64(0)
-		// iPhoneビーコンの場合UUIDを取得する処理が必要(例："4c000180000021000021000021000021000021" -> "8ebc21144abd00000000ff0100000021")
-		if len(inputBeacon.Uuid) == 38 {
+		if strings.HasPrefix(inputBeacon.Msd, PRIVBEACON_MSD_PREFIX) {
+			// PrivBeaconの場合
+			hashValue := inputBeacon.Msd[4:20]
+			randomValue := inputBeacon.Msd[20:]
+			tmpUserId, err := getUserIdBySipHash(randomValue, hashValue)
+			if err != nil {
+				fmt.Println("Error:", err)
+				continue
+			}
+			userId = tmpUserId
+		} else if len(inputBeacon.Uuid) == 38 {
+			// iPhoneビーコンの場合UUIDを取得する処理が必要(例："4c000180000021000021000021000021000021" -> "8ebc21144abd00000000ff0100000021")
 			tmpUUID := getEndUUIDByManufacturer(inputBeacon.Uuid)
 			uuid := "8ebc21144abd00000000ff01000" + tmpUUID
 			tmpUserId, err := UserService.GetUserIDByUUID(uuid)
@@ -114,7 +126,7 @@ func convertBeaconsStayers(inputBeacons []*model.BeaconSignal) []model.Stayer {
 			tmpUserId, err := UserService.GetUserIDByUUID(inputBeacon.Uuid)
 			userId = tmpUserId
 			if err != nil {
-				// もし見つからなかった場合基本的に滞在ウォッチビーコンである
+				// もし見つからなかった場合基本的に旧滞在ウォッチビーコンである
 				randomValue := inputBeacon.Uuid[:16]
 				hashValue := inputBeacon.Uuid[16:]
 				tmpUserId, err := getUserIdBySipHash(randomValue, hashValue)
