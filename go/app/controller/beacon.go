@@ -130,6 +130,9 @@ func convertBeaconsStayers(inputBeacons []*model.BeaconSignal) []model.Stayer {
 			userId = tmpUserId
 			if err != nil {
 				// もし見つからなかった場合基本的に旧滞在ウォッチビーコンである
+				if len(inputBeacon.Uuid) < 17 {
+					continue
+				}
 				randomValue := inputBeacon.Uuid[:16]
 				hashValue := inputBeacon.Uuid[16:]
 				tmpUserId, err := getUserIdBySipHash(randomValue, hashValue)
