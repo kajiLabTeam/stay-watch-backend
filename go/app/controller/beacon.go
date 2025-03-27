@@ -95,6 +95,7 @@ func getUserIdBySipHash(randomValue string, hashValue string) (int64, error) {
 	return 0, err
 }
 
+// ラズパイ受信機から送られてきた電波情報からユーザを特定
 func convertBeaconsStayers(inputBeacons []*model.BeaconSignal) []model.Stayer {
 	UserService := service.UserService{}
 
@@ -102,19 +103,20 @@ func convertBeaconsStayers(inputBeacons []*model.BeaconSignal) []model.Stayer {
 	for _, inputBeacon := range inputBeacons {
 
 		userId := int64(0)
-		if strings.HasPrefix(inputBeacon.Msd, PRIVBEACON_MSD_PREFIX) {
-			if len(inputBeacon.Msd) < 20 {
-				continue
+		// MSDを用いる場合（現在はPrivBeaconのみ）
+		if inputBeacon.Msd != "" {
+			// PrivBeaconはMSDの頭4文字が固定値かつMSDの長さが20文字より大きい
+			if strings.HasPrefix(inputBeacon.Msd, PRIVBEACON_MSD_PREFIX) && len(inputBeacon.Msd) > 20 {
+				// PrivBeaconの場合MSDからランダム値部分とハッシュ値部分を取り出して、DB内のPrivBeaconユーザを総当たりでハッシュ化しユーザ特定する
+				hashValue := inputBeacon.Msd[4:20]
+				randomValue := inputBeacon.Msd[20:]
+				tmpUserId, err := getUserIdBySipHash(randomValue, hashValue)
+				if err != nil {
+					fmt.Println("Error:", err)
+					continue
+				}
+				userId = tmpUserId
 			}
-			// PrivBeaconの場合
-			hashValue := inputBeacon.Msd[4:20]
-			randomValue := inputBeacon.Msd[20:]
-			tmpUserId, err := getUserIdBySipHash(randomValue, hashValue)
-			if err != nil {
-				fmt.Println("Error:", err)
-				continue
-			}
-			userId = tmpUserId
 		} else if len(inputBeacon.Uuid) == 38 {
 			// iPhoneビーコンの場合UUIDを取得する処理が必要(例："4c000180000021000021000021000021000021" -> "8ebc21144abd00000000ff0100000021")
 			tmpUUID := getEndUUIDByManufacturer(inputBeacon.Uuid)
