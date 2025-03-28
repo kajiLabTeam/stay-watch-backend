@@ -48,6 +48,7 @@ func getEndUUIDByManufacturer(manufacturer string) string {
 	return resultManufacturer
 }
 
+// ランダム値とハッシュ値からDBのユーザテーブル内のキーでフルテーブルスキャンする
 func getUserIdBySipHash(randomValue string, hashValue string) (int64, error) {
 	UserService := service.UserService{}
 	users, err := UserService.GetUsersByBeaconId(BEACON_ID_STAYWATCHBEACON)
@@ -95,65 +96,60 @@ func getUserIdBySipHash(randomValue string, hashValue string) (int64, error) {
 	return 0, err
 }
 
+// ラズパイ受信機から送られてきた電波情報からユーザを特定
 func convertBeaconsStayers(inputBeacons []*model.BeaconSignal) []model.Stayer {
 	UserService := service.UserService{}
 
 	outStayers := []model.Stayer{}
 	for _, inputBeacon := range inputBeacons {
-
-		userId := int64(0)
-		if strings.HasPrefix(inputBeacon.Msd, PRIVBEACON_MSD_PREFIX) {
-			if len(inputBeacon.Msd) < 20 {
-				continue
-			}
-			// PrivBeaconの場合
-			hashValue := inputBeacon.Msd[4:20]
-			randomValue := inputBeacon.Msd[20:]
-			tmpUserId, err := getUserIdBySipHash(randomValue, hashValue)
-			if err != nil {
-				fmt.Println("Error:", err)
-				continue
-			}
-			userId = tmpUserId
-		} else if len(inputBeacon.Uuid) == 38 {
-			// iPhoneビーコンの場合UUIDを取得する処理が必要(例："4c000180000021000021000021000021000021" -> "8ebc21144abd00000000ff0100000021")
-			tmpUUID := getEndUUIDByManufacturer(inputBeacon.Uuid)
-			uuid := "8ebc21144abd00000000ff01000" + tmpUUID
-			tmpUserId, err := UserService.GetUserIDByUUID(uuid)
-			if err != nil {
-				fmt.Println("Cannot get userid by uuid:", err)
-				continue
-			}
-			userId = tmpUserId
-		} else {
-			tmpUserId, err := UserService.GetUserIDByUUID(inputBeacon.Uuid)
-			userId = tmpUserId
-			if err != nil {
-				// もし見つからなかった場合基本的に旧滞在ウォッチビーコンである
-				if len(inputBeacon.Uuid) < 17 {
+		// MSDを用いる場合とUUIDを用いる場合で分ける
+		// MSDを用いる場合（現在はPrivBeaconのみ）
+		if inputBeacon.Msd != "" {
+			// PrivBeaconはMSDの頭4文字が固定値かつMSDの長さが20文字より大きい
+			if strings.HasPrefix(inputBeacon.Msd, PRIVBEACON_MSD_PREFIX) && len(inputBeacon.Msd) > 20 {
+				// PrivBeaconの場合MSDからランダム値部分とハッシュ値部分を取り出して、DB内のPrivBeaconユーザを総当たりでハッシュ化しユーザ特定する
+				hashValue := inputBeacon.Msd[4:20]
+				randomValue := inputBeacon.Msd[20:]
+				privBeaconUserId, err := getUserIdBySipHash(randomValue, hashValue)
+				if err == nil {
+					// 見つかったら滞在者リストに追加して次のforへ
+					outStayers = append(outStayers, model.Stayer{
+						UserID: privBeaconUserId,
+						Rssi:   inputBeacon.Rssi,
+					})
 					continue
 				}
-				randomValue := inputBeacon.Uuid[:16]
-				hashValue := inputBeacon.Uuid[16:]
-				tmpUserId, err := getUserIdBySipHash(randomValue, hashValue)
-				if err != nil {
-					fmt.Println("Error:", err)
-					continue
-				}
-				userId = tmpUserId
 			}
 		}
-
-		// 0でない(ユーザが見つかった場合)のみ追加
-		if userId != 0 {
-			tmpStayer := model.Stayer{
-				UserID: userId,
-				Rssi:   inputBeacon.Rssi,
+		// UUIDを用いる場合（iPhoneBeaconやAndroidビーコン、市販ビーコンなど）
+		if inputBeacon.Uuid != "" {
+			// iPhoneビーコンは送られてくるUUID情報を含む値の長さが38文字
+			if len(inputBeacon.Uuid) == 38 {
+				// iPhoneビーコンの場合UUIDを取得する処理が必要(例："4c000180000021000021000021000021000021" -> "8ebc21144abd00000000ff0100000021")
+				tmpUUID := getEndUUIDByManufacturer(inputBeacon.Uuid)
+				uuid := "8ebc21144abd00000000ff01000" + tmpUUID
+				iphoneUserId, err := UserService.GetUserIDByUUID(uuid)
+				if err == nil {
+					// 見つかったら滞在者リストに追加して次のforへ
+					outStayers = append(outStayers, model.Stayer{
+						UserID: iphoneUserId,
+						Rssi:   inputBeacon.Rssi,
+					})
+					continue
+				}
 			}
-			outStayers = append(outStayers, tmpStayer)
+			// Androidビーコンや市販ビーコンの場合は単純にUUIDからユーザを検索
+			commonBeaconUserId, err := UserService.GetUserIDByUUID(inputBeacon.Uuid)
+			if err == nil {
+				// 見つかったら滞在者リストに追加して次のforへ
+				outStayers = append(outStayers, model.Stayer{
+					UserID: commonBeaconUserId,
+					Rssi:   inputBeacon.Rssi,
+				})
+				continue
+			}
 		}
 	}
-
 	return outStayers
 }
 
