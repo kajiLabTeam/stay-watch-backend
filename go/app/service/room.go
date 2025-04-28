@@ -416,7 +416,7 @@ func (RoomService) GetWeeksSinceFirstLog(userId int64) (int, error) {
 	defer closer.Close()
 	var weeks int
 	result := DbEngine.Raw(`
-		SELECT TIMESTAMPDIFF(WEEK, MIN(start_at), NOW())
+		SELECT TIMESTAMPDIFF(WEEK, DATE(MIN(start_at)), CURDATE()) + 1
 		FROM logs
 		WHERE user_id = ?
 	`, userId).Scan(&weeks)
