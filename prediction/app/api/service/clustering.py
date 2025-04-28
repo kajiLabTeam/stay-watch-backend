@@ -9,6 +9,8 @@ def clustering(data: list[int]) -> list[ClusteringResult]:
     bic_values = []
     max_clusters = 4
     for n_clusters in range(1, max_clusters + 1):
+        if n_clusters > len(d):
+            break
         gmm = GaussianMixture(n_components=n_clusters, init_params="k-means++")
         gmm.fit(d.reshape(-1, 1))
         bic_values.append(gmm.bic(d.reshape(-1, 1)))
