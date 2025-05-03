@@ -6,6 +6,5 @@ def time_to_minuts(time: str) -> int:
 
 def minuts_to_time(time: float) -> str:
     """Convert minutes to time string"""
-    rounded = round(time / 30) * 30
-    hours, minuts = divmod(int(rounded), 60)
+    hours, minuts = divmod(int(time), 60)
     return f"{hours:02}:{minuts:02}"
