@@ -19,6 +19,7 @@ services:
     depends_on:
       vol_mysql:
         condition: service_healthy
+    restart: always
 
   vol_mysql:
     container_name: ${MYSQL_CONTAINER_NAME}
@@ -39,6 +40,7 @@ services:
       interval: 10s
       timeout: 20s
       retries: 20
+    restart: always
 
   vol_python:
     container_name: vol_python
@@ -53,6 +55,7 @@ services:
     depends_on:
       vol_mysql:
         condition: service_healthy
+    restart: always
 
   vol_prediction:
     container_name: vol_prediction
@@ -62,6 +65,7 @@ services:
     depends_on:
       vol_mysql:
         condition: service_healthy
+    restart: always
 
 networks:
   default:
