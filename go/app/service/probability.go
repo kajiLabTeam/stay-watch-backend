@@ -25,7 +25,7 @@ func (ProbabilityService) GetProbability(action string, userIDs []int64, weekday
 	for _, userID := range userIDs {
 		go func(userID int64, wg *sync.WaitGroup) {
 			weeks, err := room.GetWeeksSinceFirstLog(userID)
-			wg.Done() // Goroutineが終了したらWaitGroupを減らす
+			defer wg.Done() // Goroutineが終了したらWaitGroupを減らす
 			if err != nil {
 				ch <- model.ProbabilityResult{UserID: userID, Probability: 0}
 				log.Println("Error getting weeks since first log:", err)

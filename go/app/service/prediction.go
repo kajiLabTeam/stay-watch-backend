@@ -26,7 +26,7 @@ func (PredictionService) GetPrediction(action string, userIDs []int64, weekday i
 	for _, userID := range userIDs {
 		go func(userID int64, wg *sync.WaitGroup) {
 			weeks, err := rooms.GetWeeksSinceFirstLog(userID)
-			wg.Done() // Goroutineが終了したらWaitGroupを減らす
+			defer wg.Done() // Goroutineが終了したらWaitGroupを減らす
 			if err != nil {
 				ch <- model.PredictionResult{UserID: userID, PredictionTime: ""}
 				log.Println("Error getting weeks since first log:", err)
