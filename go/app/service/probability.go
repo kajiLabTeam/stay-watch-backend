@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"log"
 	"net/http"
 	"net/url"
 	"sync"
@@ -25,10 +24,8 @@ func (ProbabilityService) GetProbability(action string, userIDs []int64, weekday
 	for _, userID := range userIDs {
 		go func(userID int64, wg *sync.WaitGroup) {
 			weeks, err := room.GetWeeksSinceFirstLog(userID)
-			wg.Done() // Goroutineが終了したらWaitGroupを減らす
 			if err != nil {
-				ch <- model.ProbabilityResult{UserID: userID, Probability: 0}
-				log.Println("Error getting weeks since first log:", err)
+				ch <- model.ProbabilityResult{}
 				return
 			}
 			var logs []model.Log
@@ -38,20 +35,18 @@ func (ProbabilityService) GetProbability(action string, userIDs []int64, weekday
 			case "departure":
 				logs, err = room.GetLatestExitByUserAndWeekday(userID, weekday)
 			default:
-				ch <- model.ProbabilityResult{UserID: userID, Probability: 0}
-				log.Println("Invalid action:", action)
+				ch <- model.ProbabilityResult{}
 				return
 			}
 			if err != nil {
-				ch <- model.ProbabilityResult{UserID: userID, Probability: 0}
-				log.Println("Error getting logs:", err)
+				ch <- model.ProbabilityResult{}
 				return
 			}
+			defer wg.Done()
 			var p ProbabilityService
 			result, err := p.PredictProbability(logs, weeks, time, isForward)
 			if err != nil {
-				ch <- model.ProbabilityResult{UserID: userID, Probability: 0}
-				log.Println("Error getting probability:", err)
+				ch <- model.ProbabilityResult{}
 				return
 			}
 			ch <- model.ProbabilityResult{UserID: userID, Probability: result}
