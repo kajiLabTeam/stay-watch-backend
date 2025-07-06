@@ -38,8 +38,7 @@ func SetUpServer() *gin.Engine {
 		MaxAge:           24 * time.Hour,
 	}))
 	// 独自のリクエストタイマーをミドルウェアとして追加
-	engine.Use(middleware.RequestTimer())
-	engine.Use(middleware.LoginCheck())
+	engine.Use(middleware.AuthCheck())
 
 	versionEngine := engine.Group("api/v1")
 	{
