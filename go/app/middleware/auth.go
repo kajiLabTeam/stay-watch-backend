@@ -1,3 +1,4 @@
+// Package middleware provides middleware handlers for authentication and other HTTP middleware features.
 package middleware
 
 import (
