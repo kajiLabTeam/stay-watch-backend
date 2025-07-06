@@ -37,7 +37,8 @@ func SetUpServer() *gin.Engine {
 		AllowCredentials: true,
 		MaxAge:           24 * time.Hour,
 	}))
-	// 独自のリクエストタイマーをミドルウェアとして追加
+
+	// トークンの検証やAPIキーの検証
 	engine.Use(middleware.AuthCheck())
 
 	versionEngine := engine.Group("api/v1")
