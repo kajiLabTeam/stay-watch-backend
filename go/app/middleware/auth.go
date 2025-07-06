@@ -81,7 +81,7 @@ func checkFirebaseAuth(tokenID string) error {
 }
 
 func checkAPIKey(apiKey string) error {
-	if apiKey != "abcde1" {
+	if apiKey != os.Getenv("STAYWATCH_API_KEY") {
 		err := errors.New("invalid API Key")
 		log.Printf("%v", err)
 		return err
