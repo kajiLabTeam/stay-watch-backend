@@ -9,9 +9,7 @@ import (
 	"os"
 	"strings"
 
-	firebase "firebase.google.com/go"
 	"github.com/gin-gonic/gin"
-	"google.golang.org/api/option"
 )
 
 func AuthCheck() gin.HandlerFunc {
@@ -50,29 +48,10 @@ func AuthCheck() gin.HandlerFunc {
 }
 
 func checkFirebaseAuth(tokenID string) error {
-	// Firebase App 初期化
 	ctx := context.Background()
-	opt := option.WithCredentialsFile("./credentials/firebase.json")
-	if os.Getenv("ENVIRONMENT") == "production" {
-		opt = option.WithCredentialsFile("/app/credentials/firebase.json")
-	}
-
-	conf := &firebase.Config{ProjectID: "stay-watch-a616f"}
-	// OAuth2.0更新トークン対応用
-	app, err := firebase.NewApp(ctx, conf, opt)
-	// OAuth2.0を用いない場合はconfをnilにする
-	if err != nil {
-		log.Printf("Cannot initialize firebase app: %v\n", err)
-		return err
-	}
-	authClient, err := app.Auth(ctx)
-	if err != nil {
-		log.Printf("Cannot initialize firebase auth: %v\n", err)
-		return err
-	}
 
 	// IDトークンの検証(JWTのベリファイ)
-	_, err = authClient.VerifyIDToken(ctx, tokenID)
+	_, err := firebaseAuth.VerifyIDToken(ctx, tokenID)
 	if err != nil {
 		log.Printf("Token verify failed: %v\n", err)
 		return err
