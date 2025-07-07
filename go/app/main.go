@@ -5,6 +5,7 @@ import (
 	"time"
 
 	controller "Stay_watch/controller"
+	"Stay_watch/middleware"
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
@@ -36,6 +37,9 @@ func SetUpServer() *gin.Engine {
 		AllowCredentials: true,
 		MaxAge:           24 * time.Hour,
 	}))
+
+	// トークンの検証やAPIキーの検証
+	engine.Use(middleware.AuthCheck())
 
 	versionEngine := engine.Group("api/v1")
 	{
