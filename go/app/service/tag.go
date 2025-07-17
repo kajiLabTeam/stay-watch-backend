@@ -1,8 +1,11 @@
 package service
 
 import (
-	"Stay_watch/model"
 	"fmt"
+
+	"Stay_watch/model"
+
+	"gorm.io/gorm"
 )
 
 type TagService struct{}
@@ -68,6 +71,42 @@ func (TagService) GetTagsByCommunityId(communityId int64) ([]model.Tag, error) {
 	if result.Error != nil {
 		fmt.Printf("タグ一覧取得失敗 %v", result.Error)
 		return nil, result.Error
+	}
+
+	return tags, nil
+}
+
+func (TagService) GetTagsByTagNames(tagNames []string, communityID int64) ([]model.Tag, error) {
+	DbEngine := connect()
+	closer, err := DbEngine.DB()
+	if err != nil {
+		return nil, err
+	}
+	defer closer.Close()
+	tags := make([]model.Tag, 0)
+	fmt.Println("タグ取得")
+
+	// tagsテーブルから取得
+	for _, tagName := range tagNames {
+		tag := model.Tag{}
+		var result *gorm.DB
+		result = DbEngine.Where("name = ? AND (community_id = ? OR community_id = ?)", tagName, communityID, -1).First(&tag)
+		if result.Error != nil {
+			// tagが見つからない場合新規作成する
+			tag = model.Tag{
+				Name:        tagName,
+				CommunityId: communityID,
+			}
+			fmt.Println("タグ新規作成aaa")
+			fmt.Println(tag)
+			result = DbEngine.Create(&tag)
+			if result.Error != nil {
+				fmt.Println("featal create tag")
+				fmt.Println("タグ新規失敗")
+				return nil, result.Error
+			}
+		}
+		tags = append(tags, tag)
 	}
 
 	return tags, nil

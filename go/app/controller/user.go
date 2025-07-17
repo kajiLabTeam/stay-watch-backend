@@ -1,13 +1,12 @@
 package controller
 
 import (
-	"Stay_watch/model"
-	"Stay_watch/service"
 	"fmt"
 	"net/http"
-	"os"
 	"strconv"
-	"strings"
+
+	"Stay_watch/model"
+	"Stay_watch/service"
 
 	"github.com/gin-gonic/gin"
 )
@@ -158,33 +157,50 @@ func CreateUser(c *gin.Context) {
 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Failed to update uuid"})
 	}
 
-	// tag_mapsテーブルにタグのマップを保存
-	for _, tagId := range UserCreateRequest.TagIds {
-		tag := model.TagMap{
-			UserID: int64(registerdUserId),
-			TagID:  int64(tagId),
-		}
-		err = TagService.CreateTagMap(&tag)
-		if err != nil {
-			fmt.Printf("Cannot register tagMap: %v", err)
-			c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Failed to create tag map"})
-			return
-		}
+	// タグ名からタグを取得
+	tags, err := TagService.GetTagsByTagNames(UserCreateRequest.TagNames, UserCreateRequest.CommunityId)
+	if err != nil {
+		fmt.Printf("Cannot get tags: %v", err)
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Failed to create user"})
 	}
-
-	if !strings.HasSuffix(os.Args[0], ".test") {
-		mailService := service.MailService{}
-		mailService.SendMail("滞在ウォッチユーザ登録の完了のお知らせ", "ユーザ登録が完了したので滞在ウォッチを閲覧することが可能になりました\n一度プロジェクトをリセットしたので再度ログインお願いします。\nアプリドメイン\nhttps://stay-watch-go.kajilab.tk/", UserCreateRequest.Email)
+	// タグマップに登録
+	for _, tag := range tags {
+		err = TagService.CreateTagMap(&model.TagMap{UserID: registerdUserId, TagID: int64(tag.ID)})
+		if err != nil {
+			fmt.Printf("Cannot register tags map: %v", err)
+			c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Failed to register tags map"})
+		}
 	}
 
 	c.JSON(http.StatusCreated, gin.H{
 		"status": "ok",
 	})
 
+	// // tag_mapsテーブルにタグのマップを保存
+	// for _, tagId := range UserCreateRequest.TagIds {
+	// 	tag := model.TagMap{
+	// 		UserID: int64(registerdUserId),
+	// 		TagID:  int64(tagId),
+	// 	}
+	// 	err = TagService.CreateTagMap(&tag)
+	// 	if err != nil {
+	// 		fmt.Printf("Cannot register tagMap: %v", err)
+	// 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Failed to create tag map"})
+	// 		return
+	// 	}
+	// }
+
+	// if !strings.HasSuffix(os.Args[0], ".test") {
+	// 	mailService := service.MailService{}
+	// 	mailService.SendMail("滞在ウォッチユーザ登録の完了のお知らせ", "ユーザ登録が完了したので滞在ウォッチを閲覧することが可能になりました\n一度プロジェクトをリセットしたので再度ログインお願いします。\nアプリドメイン\nhttps://stay-watch-go.kajilab.tk/", UserCreateRequest.Email)
+	// }
+
+	// c.JSON(http.StatusCreated, gin.H{
+	// 	"status": "ok",
+	// })
 }
 
 func DeleteUser(c *gin.Context) {
-
 	userId, err := strconv.ParseInt(c.Param("userId"), 10, 64) // string -> int64
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusBadRequest, "Type is not number")
@@ -231,7 +247,6 @@ func DeleteUser(c *gin.Context) {
 	c.JSON(http.StatusCreated, gin.H{
 		"status": "ok",
 	})
-
 }
 
 func UpdateUser(c *gin.Context) {
@@ -365,11 +380,9 @@ func UpdateUser(c *gin.Context) {
 	c.JSON(http.StatusCreated, gin.H{
 		"status": "ok",
 	})
-
 }
 
 func PastUserList(c *gin.Context) {
-
 	UserService := service.UserService{}
 
 	users, err := UserService.GetAllUser()
@@ -390,7 +403,7 @@ func PastUserList(c *gin.Context) {
 		}
 
 		for _, tagID := range tagsID {
-			//タグIDからタグ名を取得する
+			// タグIDからタグ名を取得する
 			tagName, err := UserService.GetTagName(tagID)
 			if err != nil {
 				c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Failed to get tag name"})
@@ -413,7 +426,6 @@ func PastUserList(c *gin.Context) {
 }
 
 func UserList(c *gin.Context) {
-
 	UserService := service.UserService{}
 	communityId, err := strconv.ParseInt(c.Param("communityId"), 10, 64) // string -> int64
 	if err != nil {
@@ -437,7 +449,7 @@ func UserList(c *gin.Context) {
 		}
 
 		for _, tagID := range tagsID {
-			//タグIDからタグ名を取得する
+			// タグIDからタグ名を取得する
 			tagName, err := UserService.GetTagName(tagID)
 			if err != nil {
 				c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Failed to get tag"})
@@ -484,7 +496,7 @@ func AdminUserList(c *gin.Context) {
 		}
 
 		for _, tagID := range tagsID {
-			//タグIDからタグ名を取得する
+			// タグIDからタグ名を取得する
 			tagName, err := UserService.GetTagName(tagID)
 			if err != nil {
 				c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Failed to get tag"})
@@ -518,7 +530,6 @@ func AdminUserList(c *gin.Context) {
 }
 
 func ExtendedUserList(c *gin.Context) {
-
 	UserService := service.UserService{}
 	users, err := UserService.GetAllUser()
 	if err != nil {
@@ -539,7 +550,7 @@ func ExtendedUserList(c *gin.Context) {
 		}
 
 		for _, tagID := range tagsID {
-			//タグIDからタグ名を取得する
+			// タグIDからタグ名を取得する
 			tagName, err := UserService.GetTagName(tagID)
 			if err != nil {
 				c.String(http.StatusInternalServerError, "Cannot GetTagName")
@@ -597,14 +608,12 @@ func ExtendedUserList(c *gin.Context) {
 // c.JSON(http.StatusOK, userInformationGetResponse)
 
 func Attendance(c *gin.Context) {
-
-	//構造体定義
+	// 構造体定義
 	type Meeting struct {
 		ID int64 `json:"meetingID"`
 	}
 	var meeting Meeting
 	err := c.Bind(&meeting)
-
 	if err != nil {
 		fmt.Println(err)
 		return
@@ -612,7 +621,7 @@ func Attendance(c *gin.Context) {
 
 	fmt.Println(meeting.ID)
 	UserService := service.UserService{}
-	//attendaance_tmpテーブルから全てのデータを取得する
+	// attendaance_tmpテーブルから全てのデータを取得する
 	allAttendancesTmp, err := UserService.GetAllAttendancesTmp()
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Failed to get attendance"})
@@ -679,7 +688,6 @@ func Attendance(c *gin.Context) {
 // }
 
 func Check(c *gin.Context) {
-
 	firebaseUserInfo, err := verifyCheck(c.Request)
 	if err != nil {
 		c.JSON(http.StatusUnauthorized, gin.H{
@@ -704,7 +712,7 @@ func Check(c *gin.Context) {
 		return
 	}
 
-	//メールアドレスが存在しない場合はUserは存在しないのでリクエスト失敗
+	// メールアドレスが存在しない場合はUserは存在しないのでリクエスト失敗
 	if (user == model.User{}) {
 		c.JSON(http.StatusForbidden, gin.H{
 			"status": "権限がありません 管理者にユーザ追加を依頼してください",
@@ -727,7 +735,6 @@ func Check(c *gin.Context) {
 }
 
 func SignUp(c *gin.Context) {
-
 	firebaseUserInfo, err := verifyCheck(c.Request)
 	if err != nil {
 		c.JSON(http.StatusUnauthorized, gin.H{
@@ -745,7 +752,7 @@ func SignUp(c *gin.Context) {
 	}
 	fmt.Println(user)
 
-	//メールアドレスが存在しない場合はUserは存在しないのでリクエスト失敗
+	// メールアドレスが存在しない場合はUserは存在しないのでリクエスト失敗
 	if (user == model.User{}) {
 		c.JSON(http.StatusForbidden, gin.H{
 			"status": "権限がありません 管理者にユーザ追加を依頼してください",
