@@ -320,36 +320,28 @@ func UpdateUser(c *gin.Context) {
 		return
 	}
 
-	/* タグマップ関連 */
+	// タグマップ関連
 	// タグマップリクエストが空でなかったらタグマップを更新
-	if UserUpdateRequest.TagIds != nil {
-		tagMapIds, err := TagService.GetTagMapIdsByUserId(UserUpdateRequest.ID)
+	if UserUpdateRequest.TagNames != nil {
+		// タグ名からタグを取得
+		tags, err := TagService.GetTagsByTagNames(UserUpdateRequest.TagNames, *UserUpdateRequest.CommunityId)
 		if err != nil {
-			c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Failed to get tagMap"})
+			fmt.Printf("Cannot get tags: %v", err)
+			c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Failed to create user"})
+		}
+		// tag_mapsテーブルの変更前のマップを削除
+		err = TagService.DeleteTagMap(UserUpdateRequest.ID)
+		if err != nil {
+			fmt.Printf("Cannot delete tagMap: %v", err)
+			c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Failed to delete tagMap"})
 			return
 		}
-
-		// tag_mapsテーブルの変更前のマップを削除
-		for _, tagMapId := range tagMapIds {
-			err = TagService.DeleteTagMap(tagMapId)
+		// タグマップに登録
+		for _, tag := range tags {
+			err = TagService.CreateTagMap(&model.TagMap{UserID: UserUpdateRequest.ID, TagID: int64(tag.ID)})
 			if err != nil {
-				fmt.Printf("Cannot delete tagMap: %v", err)
-				c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Failed to delete tagMap"})
-				return
-			}
-		}
-
-		// tag_mapsテーブルに新しいタグのマップを保存
-		for _, tagId := range UserUpdateRequest.TagIds {
-			tagMap := model.TagMap{
-				UserID: int64(UserUpdateRequest.ID),
-				TagID:  int64(tagId),
-			}
-			err = TagService.CreateTagMap(&tagMap)
-			if err != nil {
-				fmt.Printf("Cannot register tagMap: %v", err)
-				c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Failed to registered tagMap"})
-				return
+				fmt.Printf("Cannot register tags map: %v", err)
+				c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Failed to register tags map"})
 			}
 		}
 	}
