@@ -3,6 +3,7 @@ package service
 import (
 	"fmt"
 
+	"Stay_watch/constant"
 	"Stay_watch/model"
 
 	"gorm.io/gorm"
@@ -89,7 +90,7 @@ func (TagService) GetTagsByTagNames(tagNames []string, communityID int64) ([]mod
 	for _, tagName := range tagNames {
 		tag := model.Tag{}
 		var result *gorm.DB
-		result = DbEngine.Where("name = ? AND (community_id = ? OR community_id = ?)", tagName, communityID, -1).First(&tag)
+		result = DbEngine.Where("name = ? AND (community_id = ? OR community_id = ?)", tagName, communityID, constant.PublicTagID).First(&tag)
 		if result.Error != nil {
 			// tagが見つからない場合新規作成する
 			tag = model.Tag{
