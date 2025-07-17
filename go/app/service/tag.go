@@ -32,9 +32,9 @@ func (TagService) DeleteTagMap(userId int64) error {
 		return err
 	}
 	defer closer.Close()
-	result := DbEngine.Unscoped().Delete(&model.TagMap{}, userId)
+	result := DbEngine.Where("user_id", userId).Unscoped().Delete(&model.TagMap{})
 	if result.Error != nil {
-		fmt.Printf("ユーザ削除処理失敗 %v", result.Error)
+		fmt.Printf("タグマップ削除処理失敗 %v", result.Error)
 		return result.Error
 	}
 	return nil
