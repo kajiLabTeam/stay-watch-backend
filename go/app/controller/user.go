@@ -175,29 +175,6 @@ func CreateUser(c *gin.Context) {
 	c.JSON(http.StatusCreated, gin.H{
 		"status": "ok",
 	})
-
-	// // tag_mapsテーブルにタグのマップを保存
-	// for _, tagId := range UserCreateRequest.TagIds {
-	// 	tag := model.TagMap{
-	// 		UserID: int64(registerdUserId),
-	// 		TagID:  int64(tagId),
-	// 	}
-	// 	err = TagService.CreateTagMap(&tag)
-	// 	if err != nil {
-	// 		fmt.Printf("Cannot register tagMap: %v", err)
-	// 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Failed to create tag map"})
-	// 		return
-	// 	}
-	// }
-
-	// if !strings.HasSuffix(os.Args[0], ".test") {
-	// 	mailService := service.MailService{}
-	// 	mailService.SendMail("滞在ウォッチユーザ登録の完了のお知らせ", "ユーザ登録が完了したので滞在ウォッチを閲覧することが可能になりました\n一度プロジェクトをリセットしたので再度ログインお願いします。\nアプリドメイン\nhttps://stay-watch-go.kajilab.tk/", UserCreateRequest.Email)
-	// }
-
-	// c.JSON(http.StatusCreated, gin.H{
-	// 	"status": "ok",
-	// })
 }
 
 func DeleteUser(c *gin.Context) {
