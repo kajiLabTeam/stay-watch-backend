@@ -84,7 +84,6 @@ func (TagService) GetTagsByTagNames(tagNames []string, communityID int64) ([]mod
 	}
 	defer closer.Close()
 	tags := make([]model.Tag, 0)
-	fmt.Println("タグ取得")
 
 	// tagsテーブルから取得
 	for _, tagName := range tagNames {
@@ -97,12 +96,9 @@ func (TagService) GetTagsByTagNames(tagNames []string, communityID int64) ([]mod
 				Name:        tagName,
 				CommunityId: communityID,
 			}
-			fmt.Println("タグ新規作成aaa")
-			fmt.Println(tag)
 			result = DbEngine.Create(&tag)
 			if result.Error != nil {
 				fmt.Println("featal create tag")
-				fmt.Println("タグ新規失敗")
 				return nil, result.Error
 			}
 		}
