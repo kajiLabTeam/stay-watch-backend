@@ -324,7 +324,7 @@ func UpdateUser(c *gin.Context) {
 	// タグマップリクエストが空でなかったらタグマップを更新
 	if UserUpdateRequest.TagNames != nil {
 		// タグ名からタグを取得
-		tags, err := TagService.GetTagsByTagNames(UserUpdateRequest.TagNames, *UserUpdateRequest.CommunityId)
+		tags, err := TagService.GetTagsByTagNames(UserUpdateRequest.TagNames, user.CommunityId)
 		if err != nil {
 			fmt.Printf("Cannot get tags: %v", err)
 			c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Failed to create user"})
