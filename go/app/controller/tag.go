@@ -46,36 +46,3 @@ func GetTagsByCommunityIdHandler(c *gin.Context) {
 
 	c.JSON(http.StatusOK, tagsResponse)
 }
-
-func GetTagNamesByCommunityId(c *gin.Context) {
-	communityId, err := strconv.ParseInt(c.Param("communityId"), 10, 64) // string -> int64
-	if err != nil {
-		c.AbortWithStatusJSON(http.StatusBadRequest, "Type is not number")
-	}
-
-	TagService := service.TagService{}
-
-	// DBからどこのコミュニティにも該当するタグネームを持ってくる
-	publicTagNames, err := TagService.GetTagNamesByCommunityId(constant.PublicTagID)
-	if err != nil {
-		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Failed to get public tag name"})
-		return
-	}
-	// DBからコミュニティのタグネームを持ってくる
-	communityTagNames, err := TagService.GetTagNamesByCommunityId(communityId)
-	if err != nil {
-		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Failed to get private tag name"})
-		return
-	}
-	tagNames := append(publicTagNames, communityTagNames...)
-
-	tagNamesResponse := []model.TagsNamesGetResponse{}
-
-	for _, tagName := range tagNames {
-		tagNamesResponse = append(tagNamesResponse, model.TagsNamesGetResponse{
-			Name: tagName,
-		})
-	}
-
-	c.JSON(http.StatusOK, tagNamesResponse)
-}
