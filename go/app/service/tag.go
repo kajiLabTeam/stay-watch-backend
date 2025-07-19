@@ -106,7 +106,7 @@ func (TagService) GetTagsByTagNames(tagNames []string, communityID int64) ([]mod
 			}
 			result = DbEngine.Create(&tag)
 			if result.Error != nil {
-				fmt.Println("featal create tag")
+				fmt.Println("タグ作成失敗")
 				return nil, result.Error
 			}
 		}
