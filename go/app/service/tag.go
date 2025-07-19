@@ -68,7 +68,14 @@ func (TagService) GetTagsByCommunityId(communityId int64) ([]model.Tag, error) {
 	tags := make([]model.Tag, 0)
 
 	// tagsテーブルからcommunity_idカラムがcommunityIdのnameの値をtagNamesに格納
-	result := DbEngine.Where("community_id = ?", communityId).Find(&tags)
+	result := DbEngine.
+		Where("community_id = ?", communityId).
+		Where("EXISTS (?)", // tag_mapsによって1つもユーザにタグづけされていないタグは除外する
+			DbEngine.
+				Table("tag_maps").
+				Select("1").                        // 存在するかしないかを知りたいだけで実際に何を返すかは重要じゃないのでとりあえず1
+				Where("tag_maps.tag_id = tags.id"), // 外側クエリ（tags）の各行に対して、tag_id が一致する行があるかを確認
+		).Find(&tags)
 	if result.Error != nil {
 		fmt.Printf("タグ一覧取得失敗 %v", result.Error)
 		return nil, result.Error
