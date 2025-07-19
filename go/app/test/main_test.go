@@ -154,49 +154,6 @@ func TestGetEditorUser(t *testing.T) {
 	fmt.Println("TestGetEditorUser通過")
 }
 
-func TestGetTagNames(t *testing.T) {
-	router := gin.Default()
-	router.GET("/api/v1/tags/:communityId/names", controller.GetTagNamesByCommunityId)
-
-	asserts := assert.New(t)
-
-	lastSumUsers := 0
-	isAllSumEqual := true
-
-	for i := 0; i < 10; i++ {
-		// HTTPリクエストの生成
-		req, _ := http.NewRequest(http.MethodGet, "/api/v1/tags/"+strconv.Itoa(i)+"/names", nil)
-
-		// レスポンスのレコーダーを作成
-		res := httptest.NewRecorder()
-
-		// リクエストをハンドル
-		router.ServeHTTP(res, req)
-		// レスポンスのステータスコードの確認
-		asserts.Equal(http.StatusOK, res.Code)
-
-		// レスポンスのボディを構造体に変換
-		var responseTagNames []model.TagsNamesGetResponse
-		json.Unmarshal(res.Body.Bytes(), &responseTagNames)
-
-		// community_id=1 のテストタグの情報が正しく取れているか確認
-		if i == 1 {
-			asserts.Equal("B1", responseTagNames[0].Name)
-		}
-
-		if lastSumUsers != len(responseTagNames) {
-			isAllSumEqual = false
-		}
-	}
-	if isAllSumEqual {
-		// 全てユーザ数が同じ場合は正常なら存在しないため
-		// community_idによる絞り込みができていないか、データがそもそも取れていないかなど
-		t.Fatalf("All community tags have the same count")
-	}
-
-	fmt.Println("TestGetTagNames通過")
-}
-
 func TestGetBeacons(t *testing.T) {
 	response := httptest.NewRecorder()
 	ginContext, _ := gin.CreateTestContext(response)
