@@ -116,27 +116,27 @@ type UserEditorResponse struct {
 
 // フロントからバックエンドへ送られてきた新規作成ユーザ情報
 type UserCreateRequest struct {
-	Name        string  `json:"name"`
-	Uuid        string  `json:"uuid"`
-	Email       string  `json:"email"`
-	Role        int64   `json:"role"`
-	CommunityId int64   `json:"communityId"`
-	BeaconName  string  `json:"beaconName"`
-	TagIds      []int64 `json:"tagIds"`
-	PrivateKey  string  `json:"privateKey"`
+	Name        string   `json:"name"`
+	Uuid        string   `json:"uuid"`
+	Email       string   `json:"email"`
+	Role        int64    `json:"role"`
+	CommunityId int64    `json:"communityId"`
+	BeaconName  string   `json:"beaconName"`
+	TagNames    []string `json:"tagNames"`
+	PrivateKey  string   `json:"privateKey"`
 }
 
 // フロントからバックエンドへ送られてきた更新するユーザ情報
 type UserUpdateRequest struct {
-	ID          int64   `json:"id"`
-	Name        string  `json:"name"`
-	Uuid        *string `json:"uuid"`
-	Email       *string `json:"email"`
-	Role        *int64  `json:"role"`
-	CommunityId *int64  `json:"communityId"`
-	BeaconName  string  `json:"beaconName"`
-	TagIds      []int64 `json:"tagIds"`
-	PrivateKey  *string `json:"privateKey"`
+	ID          int64    `json:"id"`
+	Name        string   `json:"name"`
+	Uuid        *string  `json:"uuid"`
+	Email       *string  `json:"email"`
+	Role        *int64   `json:"role"`
+	CommunityId *int64   `json:"communityId"`
+	BeaconName  string   `json:"beaconName"`
+	TagNames    []string `json:"tagNames"`
+	PrivateKey  *string  `json:"privateKey"`
 }
 
 type BeaconRoom struct {
