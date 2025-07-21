@@ -2,17 +2,17 @@
 package main
 
 import (
-	controller "Stay_watch/controller"
-	"Stay_watch/model"
 	"bytes"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
-	"strconv"
-
 	"net/http"
 	"net/http/httptest"
+	"strconv"
 	"testing"
+
+	controller "Stay_watch/controller"
+	"Stay_watch/model"
 
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/assert"
@@ -39,7 +39,7 @@ func TestPostStayer(t *testing.T) {
 		},
 		RoomID: 1,
 	}
-	//jsonに変換
+	// jsonに変換
 	jsonBeaconsRoom, err := json.Marshal(beaconsRoom)
 	if err != nil {
 		t.Fatal(err)
@@ -99,7 +99,7 @@ func TestGetUser(t *testing.T) {
 	var responseUser []model.UserInformationGetResponse
 	json.Unmarshal(response.Body.Bytes(), &responseUser)
 	// レスポンスのボディの確認
-	//fmt.Println(responseUser)
+	// fmt.Println(responseUser)
 	asserts.Equal("kaji", responseUser[0].Name)
 	asserts.Equal("Professor", responseUser[0].Tags[0].Name)
 	asserts.Equal(1, int(responseUser[0].ID))
@@ -109,7 +109,6 @@ func TestGetUser(t *testing.T) {
 
 // 管理者画面でのユーザ取得API
 func TestGetEditorUser(t *testing.T) {
-
 	router := gin.Default()
 	router.GET("/api/v1/admin/users/:communityId", controller.AdminUserList)
 
@@ -155,52 +154,7 @@ func TestGetEditorUser(t *testing.T) {
 	fmt.Println("TestGetEditorUser通過")
 }
 
-func TestGetTagNames(t *testing.T) {
-
-	router := gin.Default()
-	router.GET("/api/v1/tags/:communityId/names", controller.GetTagNamesByCommunityId)
-
-	asserts := assert.New(t)
-
-	lastSumUsers := 0
-	isAllSumEqual := true
-
-	for i := 0; i < 10; i++ {
-		// HTTPリクエストの生成
-		req, _ := http.NewRequest(http.MethodGet, "/api/v1/tags/"+strconv.Itoa(i)+"/names", nil)
-
-		// レスポンスのレコーダーを作成
-		res := httptest.NewRecorder()
-
-		// リクエストをハンドル
-		router.ServeHTTP(res, req)
-		// レスポンスのステータスコードの確認
-		asserts.Equal(http.StatusOK, res.Code)
-
-		// レスポンスのボディを構造体に変換
-		var responseTagNames []model.TagsNamesGetResponse
-		json.Unmarshal(res.Body.Bytes(), &responseTagNames)
-
-		// community_id=1 のテストタグの情報が正しく取れているか確認
-		if i == 1 {
-			asserts.Equal("B1", responseTagNames[0].Name)
-		}
-
-		if lastSumUsers != len(responseTagNames) {
-			isAllSumEqual = false
-		}
-	}
-	if isAllSumEqual {
-		// 全てユーザ数が同じ場合は正常なら存在しないため
-		// community_idによる絞り込みができていないか、データがそもそも取れていないかなど
-		t.Fatalf("All community tags have the same count")
-	}
-
-	fmt.Println("TestGetTagNames通過")
-}
-
 func TestGetBeacons(t *testing.T) {
-
 	response := httptest.NewRecorder()
 	ginContext, _ := gin.CreateTestContext(response)
 
@@ -228,7 +182,6 @@ func TestGetBeacons(t *testing.T) {
 }
 
 func TestGetCommunityByUserId(t *testing.T) {
-
 	router := gin.Default()
 	router.GET("/api/v1/communities/:userId", controller.GetCommunityByUserIdHandler)
 
@@ -257,7 +210,6 @@ func TestGetCommunityByUserId(t *testing.T) {
 // ユーザの新規登録API
 // 未登録の場合
 func TestCreateUser(t *testing.T) {
-
 	response := httptest.NewRecorder()
 	ginContext, _ := gin.CreateTestContext(response)
 
@@ -269,7 +221,7 @@ func TestCreateUser(t *testing.T) {
 		Role:        1,
 		CommunityId: 1,
 		BeaconName:  "FCS1301",
-		TagIds:      []int64{1, 2, 5},
+		TagNames:    []string{"梶研", "HCI"},
 	}
 	jsonUnegisteredUser, err := json.Marshal(unregisteredUser)
 	if err != nil {
@@ -290,7 +242,6 @@ func TestCreateUser(t *testing.T) {
 
 // ユーザの更新API
 func TestPutUser(t *testing.T) {
-
 	response := httptest.NewRecorder()
 	ginContext, _ := gin.CreateTestContext(response)
 
@@ -302,7 +253,7 @@ func TestPutUser(t *testing.T) {
 		Role:        int64Pointer(1),
 		CommunityId: int64Pointer(1),
 		BeaconName:  "FCS1301",
-		TagIds:      []int64{1, 2, 5},
+		TagNames:    []string{"梶研", "HCI"},
 	}
 	jsonUser, err := json.Marshal(user)
 	if err != nil {
@@ -320,7 +271,6 @@ func TestPutUser(t *testing.T) {
 }
 
 func TestDeleteUser(t *testing.T) {
-
 	router := gin.Default()
 	router.DELETE("/api/v1/users/:userId", controller.DeleteUser)
 

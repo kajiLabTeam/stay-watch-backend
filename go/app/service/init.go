@@ -1,10 +1,11 @@
 package service
 
 import (
-	"Stay_watch/model"
 	"fmt"
 	"os"
 	"strings"
+
+	"Stay_watch/model"
 
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/joho/godotenv"
@@ -24,7 +25,7 @@ func init() {
 	var count int64
 	db.Model(&model.User{}).Count(&count)
 	if count == 0 {
-		//複数のユーザーを作成
+		// 複数のユーザーを作成
 		users := []model.User{
 			{
 				Name:        "kaji",
@@ -688,7 +689,7 @@ func init() {
 				UuidEditable: false,
 			},
 			{
-				Type: 				"StayWatchBeacon",
+				Type:         "StayWatchBeacon",
 				UuidEditable: false,
 			},
 		}
@@ -708,18 +709,16 @@ func init() {
 		db.Create(&buildings)
 	}
 	// db.Model(&model.User{}).Count()
-
 }
 
 func connect() *gorm.DB {
-
 	_, envFlag := os.LookupEnv("ENVIRONMENT")
-	//環境変数がセットされていない場合は.envを読み込む（dockerを使用しない開発時)
+	// 環境変数がセットされていない場合は.envを読み込む（dockerを使用しない開発時)
 	if !envFlag {
 		fmt.Println("ENVIRONMENT is not set")
 
 		envPath := "../../.env"
-		//test実行時はenvのディレクトリが変わる
+		// test実行時はenvのディレクトリが変わる
 		if strings.HasSuffix(os.Args[0], ".test") {
 			envPath = "../../../.env"
 		}
@@ -727,7 +726,6 @@ func connect() *gorm.DB {
 		err := godotenv.Load(
 			envPath,
 		)
-
 		if err != nil {
 			fmt.Println("Error loading .env file")
 		}
@@ -735,7 +733,7 @@ func connect() *gorm.DB {
 
 	dsn := "root:root@tcp(localhost:33066)/app?charset=utf8mb4&parseTime=true&loc=Asia%2FTokyo"
 
-	//本番環境の場合はコンテナ名で接続する
+	// 本番環境の場合はコンテナ名で接続する
 	if os.Getenv("ENVIRONMENT") == "production" {
 		dsn = "root:root@tcp(vol_mysql:3306)/app?charset=utf8mb4&parseTime=true&loc=Asia%2FTokyo"
 	}
