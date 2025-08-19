@@ -2,6 +2,7 @@ package controller
 
 import (
 	"encoding/hex"
+	"errors"
 	"fmt"
 	"net/http"
 	"strconv"
@@ -93,7 +94,7 @@ func getUserIdBySipHash(randomValue string, hashValue string) (int64, error) {
 	}
 
 	// 見つからなかった場合エラーを返す
-	return 0, err
+	return 0, errors.New("no matching user found")
 }
 
 // ラズパイ受信機から送られてきた電波情報からユーザを特定
