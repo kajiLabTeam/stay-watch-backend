@@ -440,6 +440,54 @@ func UserList(c *gin.Context) {
 	c.JSON(http.StatusOK, userInformationGetResponse)
 }
 
+func GetUserDetail(c *gin.Context) {
+	// firebaseUserInfo, err := verifyCheck(c.Request)
+	// if err != nil {
+	// 	c.JSON(http.StatusUnauthorized, gin.H{
+	// 		"status": "invalid token",
+	// 	})
+	// 	return
+	// }
+
+	UserService := service.UserService{}
+	user, err := UserService.GetUserByEmail("tarousansansan@gmail.com")
+	if err != nil {
+		fmt.Printf("Cannnot find user: %v", err)
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Failed to get user"})
+		return
+	}
+
+	CommunityService := service.CommunityService{}
+	community, err := CommunityService.GetCommunityById(user.CommunityId)
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Failed to get community"})
+		return
+	}
+
+	// メールアドレスが存在しない場合はUserは存在しないのでリクエスト失敗
+	if (user == model.User{}) {
+		c.JSON(http.StatusForbidden, gin.H{
+			"status": "権限がありません 管理者にユーザ追加を依頼してください",
+		})
+		return
+	}
+
+	userDetail := model.UserDetailGetResponse{
+		ID:   int64(user.ID),
+		Name: user.Name,
+		// Tags:	["a", "d"],
+		Email:         user.Email,
+		UUID:          user.UUID,
+		Role:          user.Role,
+		BeaconId:      user.BeaconId,
+		PrivateKey:    user.PrivateKey,
+		CommunityId:   int64(community.ID),
+		CommunityName: community.Name,
+	}
+
+	c.JSON(http.StatusOK, userDetail)
+}
+
 func AdminUserList(c *gin.Context) {
 	UserService := service.UserService{}
 	BeaconService := service.BeaconService{}
