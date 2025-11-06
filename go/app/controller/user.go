@@ -457,6 +457,22 @@ func GetUserDetail(c *gin.Context) {
 		return
 	}
 
+	tagNames := make([]string, 0)
+	tagIDs, err := UserService.GetUserTagsID(int64(user.ID))
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Failed to get user tags"})
+		return
+	}
+	for _, tagID := range tagIDs {
+		// タグIDからタグ名を取得する
+		tagName, err := UserService.GetTagName(tagID)
+		if err != nil {
+			c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Failed to get tag"})
+			return
+		}
+		tagNames = append(tagNames, tagName)
+	}
+
 	CommunityService := service.CommunityService{}
 	community, err := CommunityService.GetCommunityById(user.CommunityId)
 	if err != nil {
@@ -473,9 +489,9 @@ func GetUserDetail(c *gin.Context) {
 	}
 
 	userDetail := model.UserDetailGetResponse{
-		ID:   int64(user.ID),
-		Name: user.Name,
-		// Tags:	["a", "d"],
+		ID:            int64(user.ID),
+		Name:          user.Name,
+		Tags:          tagNames,
 		Email:         user.Email,
 		UUID:          user.UUID,
 		Role:          user.Role,
