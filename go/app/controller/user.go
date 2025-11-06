@@ -351,49 +351,6 @@ func UpdateUser(c *gin.Context) {
 	})
 }
 
-func PastUserList(c *gin.Context) {
-	UserService := service.UserService{}
-
-	users, err := UserService.GetAllUser()
-	if err != nil {
-		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Failed to get user"})
-		return
-	}
-
-	userInformationGetResponse := []model.UserInformationGetResponse{}
-
-	for _, user := range users {
-
-		tags := make([]model.TagGetResponse, 0)
-		tagsID, err := UserService.GetUserTagsID(int64(user.Model.ID))
-		if err != nil {
-			c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Failed to get user tags"})
-			return
-		}
-
-		for _, tagID := range tagsID {
-			// タグIDからタグ名を取得する
-			tagName, err := UserService.GetTagName(tagID)
-			if err != nil {
-				c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Failed to get tag name"})
-				return
-			}
-			tag := model.TagGetResponse{
-				ID:   tagID,
-				Name: tagName,
-			}
-			tags = append(tags, tag)
-		}
-
-		userInformationGetResponse = append(userInformationGetResponse, model.UserInformationGetResponse{
-			ID:   int64(user.ID),
-			Name: user.Name,
-			Tags: tags,
-		})
-	}
-	c.JSON(http.StatusOK, userInformationGetResponse)
-}
-
 func UserList(c *gin.Context) {
 	UserService := service.UserService{}
 	communityId, err := strconv.ParseInt(c.Param("communityId"), 10, 64) // string -> int64
