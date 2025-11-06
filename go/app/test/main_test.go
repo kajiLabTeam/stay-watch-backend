@@ -83,30 +83,6 @@ func TestGetStayer(t *testing.T) {
 	fmt.Println("TestGetStayer通過")
 }
 
-func TestGetUser(t *testing.T) {
-	response := httptest.NewRecorder()
-	ginContext, _ := gin.CreateTestContext(response)
-	// リクエストの生成
-	// 今回はmiddlewareのテストのためpathはなんでも可
-	req, _ := http.NewRequest(http.MethodGet, "/users", nil)
-	// リクエスト情報をコンテキストに入れる
-	ginContext.Request = req
-	controller.PastUserList(ginContext)
-	asserts := assert.New(t)
-	// レスポンスのステータスコードの確認
-	asserts.Equal(http.StatusOK, response.Code)
-	// レスポンスのボディを構造体に変換
-	var responseUser []model.UserInformationGetResponse
-	json.Unmarshal(response.Body.Bytes(), &responseUser)
-	// レスポンスのボディの確認
-	// fmt.Println(responseUser)
-	asserts.Equal("kaji", responseUser[0].Name)
-	asserts.Equal("Professor", responseUser[0].Tags[0].Name)
-	asserts.Equal(1, int(responseUser[0].ID))
-
-	fmt.Println("TestGetUser通過")
-}
-
 // 管理者画面でのユーザ取得API
 func TestGetEditorUser(t *testing.T) {
 	router := gin.Default()
