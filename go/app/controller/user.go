@@ -441,16 +441,16 @@ func UserList(c *gin.Context) {
 }
 
 func GetUserDetail(c *gin.Context) {
-	// firebaseUserInfo, err := verifyCheck(c.Request)
-	// if err != nil {
-	// 	c.JSON(http.StatusUnauthorized, gin.H{
-	// 		"status": "invalid token",
-	// 	})
-	// 	return
-	// }
+	firebaseUserInfo, err := verifyCheck(c.Request)
+	if err != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{
+			"status": "invalid token",
+		})
+		return
+	}
 
 	UserService := service.UserService{}
-	user, err := UserService.GetUserByEmail("tarousansansan@gmail.com")
+	user, err := UserService.GetUserByEmail(firebaseUserInfo["Email"])
 	if err != nil {
 		fmt.Printf("Cannnot find user: %v", err)
 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Failed to get user"})
