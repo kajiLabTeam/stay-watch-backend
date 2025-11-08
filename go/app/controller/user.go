@@ -188,6 +188,8 @@ func CreateUserKey(c *gin.Context) {
 
 	UserService := service.UserService{}
 	CommunityService := service.CommunityService{}
+
+	// FirebaseAuthで取得したメールアドレスからユーザ情報を取得
 	user, err := UserService.GetUserByEmail(firebaseUserInfo["Email"])
 	if err != nil {
 		fmt.Printf("Cannnot find user: %v", err)
@@ -195,20 +197,7 @@ func CreateUserKey(c *gin.Context) {
 		return
 	}
 
-	// usersテーブルにユーザ情報を保存
-	newPrivateKey, err := UserService.GeneratePrivateKey()
-	if err != nil {
-		fmt.Printf("Cannnot generate key: %v", err)
-		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Failed to generate key"})
-		return
-	}
-	err = UserService.RegisterUserKey(newPrivateKey, int64(user.ID))
-	if err != nil {
-		fmt.Printf("Cannnot register user: %v", err)
-		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Failed to register user"})
-		return
-	}
-
+	// ユーザに紐づけられているタグを全取得
 	tagNames := make([]string, 0)
 	tagIDs, err := UserService.GetUserTagsID(int64(user.ID))
 	if err != nil {
@@ -225,9 +214,25 @@ func CreateUserKey(c *gin.Context) {
 		tagNames = append(tagNames, tagName)
 	}
 
+	// ユーザの所属コミュニティを取得
 	community, err := CommunityService.GetCommunityById(user.CommunityId)
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Failed to get community"})
+		return
+	}
+
+	// userの鍵を生成
+	newPrivateKey, err := UserService.GeneratePrivateKey()
+	if err != nil {
+		fmt.Printf("Cannnot generate key: %v", err)
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Failed to generate key"})
+		return
+	}
+	// userの鍵をDBに保存
+	err = UserService.RegisterUserKey(newPrivateKey, int64(user.ID))
+	if err != nil {
+		fmt.Printf("Cannnot register user: %v", err)
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Failed to register user"})
 		return
 	}
 
