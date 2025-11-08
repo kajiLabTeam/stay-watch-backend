@@ -83,8 +83,8 @@ func (UserService) RegisterUser(user *model.User) (int64, error) {
 	return int64(user.ID), nil
 }
 
-// ユーザの鍵を登録
-func (UserService) RegisterUserKey(key string, userId int64) error {
+// RegisterUserKey はユーザの鍵を登録する
+func (UserService) RegisterUserKey(key string, newBeaconID int64, userId int64) error {
 	DbEngine := connect()
 	closer, err := DbEngine.DB()
 	if err != nil {
@@ -92,7 +92,7 @@ func (UserService) RegisterUserKey(key string, userId int64) error {
 	}
 	defer closer.Close()
 
-	result := DbEngine.Model(&model.User{}).Where("id = ?", userId).Update("private_key", key)
+	result := DbEngine.Model(&model.User{}).Where("id = ?", userId).Updates(model.User{PrivateKey: key, BeaconId: newBeaconID})
 	if result.Error != nil {
 		fmt.Printf("ユーザ更新失敗 %v", result.Error)
 		return result.Error

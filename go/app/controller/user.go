@@ -185,6 +185,12 @@ func CreateUserKey(c *gin.Context) {
 		})
 		return
 	}
+	userKeyPostRequest := model.UserKeyPostRequest{}
+	c.Bind(&userKeyPostRequest)
+	if userKeyPostRequest.BeaconID == 0 {
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": "Not found beaconId"})
+		return
+	}
 
 	UserService := service.UserService{}
 	CommunityService := service.CommunityService{}
@@ -228,8 +234,8 @@ func CreateUserKey(c *gin.Context) {
 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Failed to generate key"})
 		return
 	}
-	// userの鍵をDBに保存
-	err = UserService.RegisterUserKey(newPrivateKey, int64(user.ID))
+	// userの鍵とビーコンIDをDBに保存
+	err = UserService.RegisterUserKey(newPrivateKey, userKeyPostRequest.BeaconID, int64(user.ID))
 	if err != nil {
 		fmt.Printf("Cannnot register user: %v", err)
 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Failed to register user"})
@@ -243,7 +249,7 @@ func CreateUserKey(c *gin.Context) {
 		Email:         user.Email,
 		UUID:          user.UUID,
 		Role:          user.Role,
-		BeaconID:      user.BeaconId,
+		BeaconID:      userKeyPostRequest.BeaconID,
 		PrivateKey:    newPrivateKey,
 		CommunityID:   int64(community.ID),
 		CommunityName: community.Name,
