@@ -50,6 +50,19 @@ type UserRoleCommunityGetResponse struct {
 	CommunityName string `json:"communityName"`
 }
 
+type UserKeyPostResponse struct {
+	ID            int64    `json:"id"`
+	UUID          string   `json:"uuid"`
+	Name          string   `json:"name"`
+	Tags          []string `json:"tags"`
+	Email         string   `json:"email"`
+	Role          int64    `json:"role"`
+	BeaconID      int64    `json:"beaconId"`
+	PrivateKey    string   `json:"privateKey"`
+	CommunityID   int64    `json:"communityId"`
+	CommunityName string   `json:"communityName"`
+}
+
 type UserDetailGetResponse struct {
 	ID            int64    `json:"id"`
 	UUID          string   `json:"uuid"`

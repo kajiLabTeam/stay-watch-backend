@@ -177,6 +177,76 @@ func CreateUser(c *gin.Context) {
 	})
 }
 
+func CreateUserKey(c *gin.Context) {
+	firebaseUserInfo, err := verifyCheck(c.Request)
+	if err != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{
+			"status": "invalid token",
+		})
+		return
+	}
+
+	UserService := service.UserService{}
+	CommunityService := service.CommunityService{}
+	user, err := UserService.GetUserByEmail(firebaseUserInfo["Email"])
+	if err != nil {
+		fmt.Printf("Cannnot find user: %v", err)
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Failed to get user"})
+		return
+	}
+
+	// usersテーブルにユーザ情報を保存
+	newPrivateKey, err := UserService.GeneratePrivateKey()
+	if err != nil {
+		fmt.Printf("Cannnot generate key: %v", err)
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Failed to generate key"})
+		return
+	}
+	err = UserService.RegisterUserKey(newPrivateKey, int64(user.ID))
+	if err != nil {
+		fmt.Printf("Cannnot register user: %v", err)
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Failed to register user"})
+		return
+	}
+
+	tagNames := make([]string, 0)
+	tagIDs, err := UserService.GetUserTagsID(int64(user.ID))
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Failed to get user tags"})
+		return
+	}
+	for _, tagID := range tagIDs {
+		// タグIDからタグ名を取得する
+		tagName, err := UserService.GetTagName(tagID)
+		if err != nil {
+			c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Failed to get tag"})
+			return
+		}
+		tagNames = append(tagNames, tagName)
+	}
+
+	community, err := CommunityService.GetCommunityById(user.CommunityId)
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Failed to get community"})
+		return
+	}
+
+	userDetail := model.UserKeyPostResponse{
+		ID:            int64(user.ID),
+		Name:          user.Name,
+		Tags:          tagNames,
+		Email:         user.Email,
+		UUID:          user.UUID,
+		Role:          user.Role,
+		BeaconID:      user.BeaconId,
+		PrivateKey:    newPrivateKey,
+		CommunityID:   int64(community.ID),
+		CommunityName: community.Name,
+	}
+
+	c.JSON(http.StatusOK, userDetail)
+}
+
 func DeleteUser(c *gin.Context) {
 	userId, err := strconv.ParseInt(c.Param("userId"), 10, 64) // string -> int64
 	if err != nil {
