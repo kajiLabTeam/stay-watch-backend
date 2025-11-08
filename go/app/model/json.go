@@ -139,6 +139,10 @@ type UserCreateRequest struct {
 	PrivateKey  string   `json:"privateKey"`
 }
 
+type UserKeyPostRequest struct {
+	BeaconID int64 `json:"beaconId"`
+}
+
 // フロントからバックエンドへ送られてきた更新するユーザ情報
 type UserUpdateRequest struct {
 	ID          int64    `json:"id"`
