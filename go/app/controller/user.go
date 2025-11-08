@@ -140,7 +140,7 @@ func CreateUser(c *gin.Context) {
 	// usersテーブルにユーザ情報を保存
 	registerdUserId, err := UserService.RegisterUser(&user)
 	if err != nil {
-		fmt.Printf("Cannnot register user: %v", err)
+		fmt.Printf("Cannot register user: %v", err)
 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Failed to register user"})
 		return
 	}
@@ -198,7 +198,7 @@ func CreateUserKey(c *gin.Context) {
 	// FirebaseAuthで取得したメールアドレスからユーザ情報を取得
 	user, err := UserService.GetUserByEmail(firebaseUserInfo["Email"])
 	if err != nil {
-		fmt.Printf("Cannnot find user: %v", err)
+		fmt.Printf("Cannot find user: %v", err)
 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Failed to get user"})
 		return
 	}
@@ -230,15 +230,15 @@ func CreateUserKey(c *gin.Context) {
 	// userの鍵を生成
 	newPrivateKey, err := UserService.GeneratePrivateKey()
 	if err != nil {
-		fmt.Printf("Cannnot generate key: %v", err)
+		fmt.Printf("Cannot generate key: %v", err)
 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Failed to generate key"})
 		return
 	}
 	// userの鍵とビーコンIDをDBに保存
 	err = UserService.RegisterUserKey(newPrivateKey, userKeyPostRequest.BeaconID, int64(user.ID))
 	if err != nil {
-		fmt.Printf("Cannnot register user: %v", err)
-		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Failed to register user"})
+		fmt.Printf("Cannot register user: %v", err)
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Failed to register user key"})
 		return
 	}
 
@@ -706,7 +706,7 @@ func Check(c *gin.Context) {
 	UserService := service.UserService{}
 	user, err := UserService.GetUserByEmail(firebaseUserInfo["Email"])
 	if err != nil {
-		fmt.Printf("Cannnot find user: %v", err)
+		fmt.Printf("Cannot find user: %v", err)
 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Failed to get user"})
 		return
 	}
@@ -753,7 +753,7 @@ func SignUp(c *gin.Context) {
 	UserService := service.UserService{}
 	user, err := UserService.GetUserByEmail(firebaseUserInfo["Email"])
 	if err != nil {
-		fmt.Printf("Cannnot find user: %v", err)
+		fmt.Printf("Cannot find user: %v", err)
 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Failed to get user"})
 		return
 	}
