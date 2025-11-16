@@ -58,7 +58,6 @@ type UserKeyPostResponse struct {
 	Email         string   `json:"email"`
 	Role          int64    `json:"role"`
 	BeaconID      int64    `json:"beaconId"`
-	PrivateKey    string   `json:"privateKey"`
 	CommunityID   int64    `json:"communityId"`
 	CommunityName string   `json:"communityName"`
 }
@@ -140,7 +139,8 @@ type UserCreateRequest struct {
 }
 
 type UserKeyPostRequest struct {
-	BeaconID int64 `json:"beaconId"`
+	BeaconID      *int64  `json:"beaconId"`
+	PrivBeaconKey *string `json:"key"`
 }
 
 // フロントからバックエンドへ送られてきた更新するユーザ情報
