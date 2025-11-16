@@ -68,25 +68,34 @@ func (Util) TimeToUnixMilli(t time.Time) int64 {
 }
 
 func (Util) LoadPrivateKey(path string) (*rsa.PrivateKey, error) {
-	pemData, err := os.ReadFile(path)
+	bytes, err := os.ReadFile(path)
 	if err != nil {
 		return nil, err
 	}
 
-	block, _ := pem.Decode(pemData)
-	if block == nil || block.Type != "PRIVATE KEY" {
-		return nil, fmt.Errorf("invalid PEM block")
+	block, _ := pem.Decode(bytes)
+	if block == nil {
+		return nil, errors.New("invalid private key data")
 	}
 
-	keyInterface, err := x509.ParsePKCS8PrivateKey(block.Bytes)
-	if err != nil {
-		return nil, err
+	switch block.Type {
+	case "RSA PRIVATE KEY": // PKCS#1
+		return x509.ParsePKCS1PrivateKey(block.Bytes)
+
+	case "PRIVATE KEY": // PKCS#8
+		keyInterface, err := x509.ParsePKCS8PrivateKey(block.Bytes)
+		if err != nil {
+			return nil, err
+		}
+		key, ok := keyInterface.(*rsa.PrivateKey)
+		if !ok {
+			return nil, errors.New("not RSA private key")
+		}
+		return key, nil
+
+	default:
+		return nil, fmt.Errorf("unsupported private key type: %s", block.Type)
 	}
-	key, ok := keyInterface.(*rsa.PrivateKey)
-	if !ok {
-		return nil, errors.New("not RSA private key")
-	}
-	return key, nil
 }
 
 // DecryptRSA はRSAによる復号化をします
