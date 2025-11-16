@@ -7,6 +7,7 @@ import (
 
 	"Stay_watch/model"
 	"Stay_watch/service"
+	"Stay_watch/util"
 
 	"github.com/gin-gonic/gin"
 )
@@ -187,14 +188,34 @@ func CreateUserKey(c *gin.Context) {
 	}
 	userKeyPostRequest := model.UserKeyPostRequest{}
 	c.Bind(&userKeyPostRequest)
-	if userKeyPostRequest.BeaconID == 0 {
-		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": "Not found beaconId"})
+
+	// パラメータにPrivBeacon用鍵とビーコンIDが含まれているかをチェック
+	if userKeyPostRequest.BeaconID == nil || userKeyPostRequest.PrivBeaconKey == nil {
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": "Need key and beaconID"})
 		return
 	}
 
 	UserService := service.UserService{}
 	CommunityService := service.CommunityService{}
+	util := util.Util{}
 
+	// == リクエストの暗号化済みのPrivBeacon鍵を復号 ==
+	// RSA秘密鍵を読み込む
+	RSAKey, err := util.LoadPrivateKey("./credentials/privbeacon_rsa_key")
+	if err != nil {
+		fmt.Printf("Cannot load key: %v", err)
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Failed to load key"})
+		return
+	}
+	// PrivBeacon用の鍵が暗号化されて送られてくるためそれをRSA秘密鍵で復号化
+	privBeaconKey, err := util.DecryptRSA(RSAKey, *userKeyPostRequest.PrivBeaconKey)
+	if err != nil {
+		fmt.Printf("Cannot find user: %v", err)
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Failed to decryption request key"})
+		return
+	}
+
+	// == ユーザ取得 ==
 	// FirebaseAuthで取得したメールアドレスからユーザ情報を取得
 	user, err := UserService.GetUserByEmail(firebaseUserInfo["Email"])
 	if err != nil {
@@ -202,7 +223,6 @@ func CreateUserKey(c *gin.Context) {
 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Failed to get user"})
 		return
 	}
-
 	// ユーザに紐づけられているタグを全取得
 	tagNames := make([]string, 0)
 	tagIDs, err := UserService.GetUserTagsID(int64(user.ID))
@@ -219,7 +239,6 @@ func CreateUserKey(c *gin.Context) {
 		}
 		tagNames = append(tagNames, tagName)
 	}
-
 	// ユーザの所属コミュニティを取得
 	community, err := CommunityService.GetCommunityById(user.CommunityId)
 	if err != nil {
@@ -227,21 +246,16 @@ func CreateUserKey(c *gin.Context) {
 		return
 	}
 
-	// userの鍵を生成
-	newPrivateKey, err := UserService.GeneratePrivateKey()
-	if err != nil {
-		fmt.Printf("Cannot generate key: %v", err)
-		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Failed to generate key"})
-		return
-	}
+	// == DBへの鍵保存 ==
 	// userの鍵とビーコンIDをDBに保存
-	err = UserService.RegisterUserKey(newPrivateKey, userKeyPostRequest.BeaconID, int64(user.ID))
+	err = UserService.RegisterUserKey(privBeaconKey, *userKeyPostRequest.BeaconID, int64(user.ID))
 	if err != nil {
 		fmt.Printf("Cannot register user: %v", err)
 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Failed to register user key"})
 		return
 	}
 
+	// == 正常に処理が終わった際のレスポンス ==
 	userDetail := model.UserKeyPostResponse{
 		ID:            int64(user.ID),
 		Name:          user.Name,
@@ -249,12 +263,10 @@ func CreateUserKey(c *gin.Context) {
 		Email:         user.Email,
 		UUID:          user.UUID,
 		Role:          user.Role,
-		BeaconID:      userKeyPostRequest.BeaconID,
-		PrivateKey:    newPrivateKey,
+		BeaconID:      *userKeyPostRequest.BeaconID,
 		CommunityID:   int64(community.ID),
 		CommunityName: community.Name,
 	}
-
 	c.JSON(http.StatusOK, userDetail)
 }
 

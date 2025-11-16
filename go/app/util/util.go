@@ -1,7 +1,16 @@
 package util
 
 import (
+	"crypto/rand"
+	"crypto/rsa"
+	"crypto/sha256"
+	"crypto/x509"
+	"encoding/base64"
+	"encoding/pem"
+	"errors"
+	"fmt"
 	"log"
+	"os"
 	"time"
 )
 
@@ -56,4 +65,39 @@ func (Util) ConvertDatetimeToLocationTime(datetime string, timezone string) (tim
 
 func (Util) TimeToUnixMilli(t time.Time) int64 {
 	return t.UnixNano() / 1000000
+}
+
+func (Util) LoadPrivateKey(path string) (*rsa.PrivateKey, error) {
+	pemData, err := os.ReadFile(path)
+	if err != nil {
+		return nil, err
+	}
+
+	block, _ := pem.Decode(pemData)
+	if block == nil || block.Type != "PRIVATE KEY" {
+		return nil, fmt.Errorf("invalid PEM block")
+	}
+
+	keyInterface, err := x509.ParsePKCS8PrivateKey(block.Bytes)
+	if err != nil {
+		return nil, err
+	}
+	key, ok := keyInterface.(*rsa.PrivateKey)
+	if !ok {
+		return nil, errors.New("not RSA private key")
+	}
+	return key, nil
+}
+
+// DecryptRSA はRSAによる復号化をします
+func (Util) DecryptRSA(priv *rsa.PrivateKey, ciphertext string) (string, error) {
+	decodedCiphertext, err := base64.StdEncoding.DecodeString(ciphertext)
+	if err != nil {
+		return "", err
+	}
+	plaintext, err := rsa.DecryptOAEP(sha256.New(), rand.Reader, priv, decodedCiphertext, nil)
+	if err != nil {
+		return "", err
+	}
+	return string(plaintext), nil
 }
