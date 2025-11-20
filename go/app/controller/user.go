@@ -192,7 +192,7 @@ func CreateUserKey(c *gin.Context) {
 	UserService := service.UserService{}
 	BeaconService := service.BeaconService{}
 	CommunityService := service.CommunityService{}
-	util := util.Util{}
+	u := util.Util{}
 
 	// == パラメータのバリデーション ==
 	// パラメータにPrivBeacon用鍵とビーコンIDが含まれているかをチェック
@@ -210,16 +210,16 @@ func CreateUserKey(c *gin.Context) {
 
 	// == リクエストの暗号化済みのPrivBeacon鍵を復号 ==
 	// RSA秘密鍵を読み込む
-	RSAKey, err := util.LoadPrivateKey("./credentials/privbeacon_rsa_key")
+	RSAKey, err := u.LoadPrivateKey("./credentials/privbeacon_rsa_key")
 	if err != nil {
 		fmt.Printf("Cannot load key: %v", err)
 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Failed to load key"})
 		return
 	}
 	// PrivBeacon用の鍵が暗号化されて送られてくるためそれをRSA秘密鍵で復号化
-	privBeaconKey, err := util.DecryptRSA(RSAKey, *userKeyPostRequest.PrivBeaconKey)
+	privBeaconKey, err := u.DecryptRSA(RSAKey, *userKeyPostRequest.PrivBeaconKey)
 	if err != nil {
-		fmt.Printf("Cannot find user: %v", err)
+		fmt.Printf("Failed to decryption request key: %v", err)
 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Failed to decryption request key"})
 		return
 	}
@@ -233,20 +233,10 @@ func CreateUserKey(c *gin.Context) {
 		return
 	}
 	// ユーザに紐づけられているタグを全取得
-	tagNames := make([]string, 0)
-	tagIDs, err := UserService.GetUserTagsID(int64(user.ID))
+	tagNames, err := UserService.GetUserTagNames(int64(user.ID))
 	if err != nil {
-		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Failed to get user tags"})
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Failed to get tag"})
 		return
-	}
-	for _, tagID := range tagIDs {
-		// タグIDからタグ名を取得する
-		tagName, err := UserService.GetTagName(tagID)
-		if err != nil {
-			c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Failed to get tag"})
-			return
-		}
-		tagNames = append(tagNames, tagName)
 	}
 	// ユーザの所属コミュニティを取得
 	community, err := CommunityService.GetCommunityById(user.CommunityId)
