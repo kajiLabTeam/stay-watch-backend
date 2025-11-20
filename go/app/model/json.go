@@ -50,6 +50,18 @@ type UserRoleCommunityGetResponse struct {
 	CommunityName string `json:"communityName"`
 }
 
+type UserKeyPostResponse struct {
+	ID            int64    `json:"id"`
+	UUID          string   `json:"uuid"`
+	Name          string   `json:"name"`
+	Tags          []string `json:"tags"`
+	Email         string   `json:"email"`
+	Role          int64    `json:"role"`
+	BeaconID      int64    `json:"beaconId"`
+	CommunityID   int64    `json:"communityId"`
+	CommunityName string   `json:"communityName"`
+}
+
 type RoomStayTime struct {
 	Date      string     `json:"date"`
 	TimeRooms []TimeRoom `json:"timeRooms"`
@@ -124,6 +136,11 @@ type UserCreateRequest struct {
 	BeaconName  string   `json:"beaconName"`
 	TagNames    []string `json:"tagNames"`
 	PrivateKey  string   `json:"privateKey"`
+}
+
+type UserKeyPostRequest struct {
+	BeaconID      *int64  `json:"beaconId"`
+	PrivBeaconKey *string `json:"key"`
 }
 
 // フロントからバックエンドへ送られてきた更新するユーザ情報

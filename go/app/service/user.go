@@ -1,9 +1,10 @@
 package service
 
 import (
-	"Stay_watch/model"
 	"fmt"
 	"strconv"
+
+	"Stay_watch/model"
 )
 
 type UserService struct{}
@@ -25,8 +26,7 @@ func (UserService) RegisterSampleUser(user *model.User) error {
 
 // 新しいuuidを生成する
 func (UserService) NewUUID() string {
-
-	//dbから一番最後に登録されたuuidを取得する
+	// dbから一番最後に登録されたuuidを取得する
 	user := model.User{}
 	DbEngine := connect()
 	closer, err := DbEngine.DB()
@@ -43,14 +43,13 @@ func (UserService) NewUUID() string {
 	uuid := user.UUID
 	fowardTarget := uuid[0:28]
 	backTarget := uuid[28:]
-	//10進数に変換
+	// 10進数に変換
 	targetInt, _ := strconv.ParseInt(backTarget, 16, 64)
 	targetInt = targetInt + 1
-	//16新数に変換
+	// 16新数に変換
 	targetHex := strconv.FormatInt(targetInt, 16)
 
 	return fowardTarget + targetHex
-
 }
 
 // ユーザ登録処理new（）
@@ -69,9 +68,31 @@ func (UserService) RegisterUser(user *model.User) (int64, error) {
 	return int64(user.ID), nil
 }
 
+// RegisterUserKey はユーザの鍵を登録する
+func (UserService) RegisterUserKey(key string, newBeaconID int64, userId int64) error {
+	DbEngine := connect()
+	closer, err := DbEngine.DB()
+	if err != nil {
+		return err
+	}
+	defer closer.Close()
+
+	result := DbEngine.Model(&model.User{}).Where("id = ?", userId).Updates(model.User{PrivateKey: key, BeaconId: newBeaconID})
+	if result.Error != nil {
+		fmt.Printf("ユーザ更新失敗 %v", result.Error)
+		return result.Error
+	}
+	user := model.User{}
+	result = DbEngine.First(&user, userId)
+	if result.Error != nil {
+		fmt.Printf("ユーザ取得失敗 %v", result.Error)
+		return result.Error
+	}
+	return nil
+}
+
 // ユーザのアップデート
 func (UserService) UpdateUser(user *model.User, userId int64) error {
-
 	DbEngine := connect()
 	closer, err := DbEngine.DB()
 	if err != nil {
@@ -89,7 +110,6 @@ func (UserService) UpdateUser(user *model.User, userId int64) error {
 
 // Uuidの更新
 func (UserService) UpdateUuid(newUuid string, userId int64) error {
-
 	DbEngine := connect()
 	closer, err := DbEngine.DB()
 	if err != nil {
@@ -165,7 +185,7 @@ func (UserService) GetEditUsersByCommunityId(communityId int64) ([]model.User, e
 	}
 	defer closer.Close()
 	users := make([]model.User, 0)
-	//result := DbEngine.Find(&users)
+	// result := DbEngine.Find(&users)
 	result := DbEngine.Where("community_id = ?", communityId).Find(&users)
 	if result.Error != nil {
 		fmt.Printf("ユーザ取得失敗 %v", result.Error)
@@ -251,6 +271,23 @@ func (UserService) GetTagName(tagID int64) (string, error) {
 	return tag.Name, nil
 }
 
+// GetUserTagNames はユーザIDからそれに紐づいているタグ名をリスト形式で取得します
+func (UserService) GetUserTagNames(userID int64) ([]string, error) {
+	tagNames := make([]string, 0)
+	tagIDs, err := UserService.GetUserTagsID(UserService{}, userID)
+	if err != nil {
+		return nil, err
+	}
+	for _, tagID := range tagIDs {
+		tagName, err := UserService.GetTagName(UserService{}, tagID)
+		if err != nil {
+			return nil, err
+		}
+		tagNames = append(tagNames, tagName)
+	}
+	return tagNames, nil
+}
+
 // attendanceテーブルに登録する
 func (UserService) RegisterAttendance(userID int64, date string, flag bool) error {
 	DbEngine := connect()
@@ -280,7 +317,7 @@ func (UserService) TemporarilySavedAttendance(userID int64, flag int64) error {
 		return err
 	}
 	defer closer.Close()
-	//update
+	// update
 	result := DbEngine.Model(&model.AttendanceTmp{}).Where("user_id=?", userID).Update("flag", flag)
 	if result.Error != nil {
 		fmt.Printf("出席登録失敗 %v", result.Error)
@@ -359,7 +396,6 @@ func (UserService) GetUserIDByEmail(email string) (int64, error) {
 	}
 
 	return int64(user.ID), nil
-
 }
 
 func (UserService) GetEmailByUserId(userId int64) (string, error) {
@@ -414,7 +450,7 @@ func (UserService) IsPrivateKeyAlreadyRegistered(privateKey string) (bool, error
 	return true, nil
 }
 
-//指定されたログリストと同じ時間にいたユーザを取得する
+// 指定されたログリストと同じ時間にいたユーザを取得する
 // func (UserService) GetSameTimeUser(logs []model.Log) ([]model.SimultaneousStayUserGetResponse, error) {
 // 	targetLogs := make([]model.Log, 0)
 // 	fmt.Println(logs)
