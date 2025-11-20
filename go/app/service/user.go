@@ -1,8 +1,6 @@
 package service
 
 import (
-	"crypto/rand"
-	"encoding/hex"
 	"fmt"
 	"strconv"
 
@@ -52,19 +50,6 @@ func (UserService) NewUUID() string {
 	targetHex := strconv.FormatInt(targetInt, 16)
 
 	return fowardTarget + targetHex
-}
-
-// 新しいPrivateKeyを生成する
-func (UserService) GeneratePrivateKey() (string, error) {
-	// 16バイト = 128ビット
-	randomBytes := make([]byte, 16)
-	_, err := rand.Read(randomBytes)
-	if err != nil {
-		return "", err
-	}
-	// 16進数文字列に変換（32文字）
-	randomHex := hex.EncodeToString(randomBytes)
-	return randomHex, nil
 }
 
 // ユーザ登録処理new（）
@@ -284,6 +269,23 @@ func (UserService) GetTagName(tagID int64) (string, error) {
 		return "", result.Error
 	}
 	return tag.Name, nil
+}
+
+// GetUserTagNames はユーザIDからそれに紐づいているタグ名をリスト形式で取得します
+func (UserService) GetUserTagNames(userID int64) ([]string, error) {
+	tagNames := make([]string, 0)
+	tagIDs, err := UserService.GetUserTagsID(UserService{}, userID)
+	if err != nil {
+		return nil, err
+	}
+	for _, tagID := range tagIDs {
+		tagName, err := UserService.GetTagName(UserService{}, tagID)
+		if err != nil {
+			return nil, err
+		}
+		tagNames = append(tagNames, tagName)
+	}
+	return tagNames, nil
 }
 
 // attendanceテーブルに登録する
