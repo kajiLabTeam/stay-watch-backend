@@ -7,6 +7,7 @@ import (
 
 	"Stay_watch/model"
 	"Stay_watch/service"
+	"Stay_watch/util"
 
 	"github.com/gin-gonic/gin"
 )
@@ -140,7 +141,7 @@ func CreateUser(c *gin.Context) {
 	// usersテーブルにユーザ情報を保存
 	registerdUserId, err := UserService.RegisterUser(&user)
 	if err != nil {
-		fmt.Printf("Cannnot register user: %v", err)
+		fmt.Printf("Cannot register user: %v", err)
 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Failed to register user"})
 		return
 	}
@@ -175,6 +176,97 @@ func CreateUser(c *gin.Context) {
 	c.JSON(http.StatusCreated, gin.H{
 		"status": "ok",
 	})
+}
+
+func CreateUserKey(c *gin.Context) {
+	firebaseUserInfo, err := verifyCheck(c.Request)
+	if err != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{
+			"status": "invalid token",
+		})
+		return
+	}
+	userKeyPostRequest := model.UserKeyPostRequest{}
+	c.Bind(&userKeyPostRequest)
+
+	UserService := service.UserService{}
+	BeaconService := service.BeaconService{}
+	CommunityService := service.CommunityService{}
+	u := util.Util{}
+
+	// == パラメータのバリデーション ==
+	// パラメータにPrivBeacon用鍵とビーコンIDが含まれているかをチェック
+	if userKeyPostRequest.BeaconID == nil || userKeyPostRequest.PrivBeaconKey == nil {
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": "Need key and beaconID"})
+		return
+	}
+	// ビーコンIDのビーコンがDBに存在するかチェック
+	_, err = BeaconService.GetBeaconByBeaconId(*userKeyPostRequest.BeaconID)
+	if err != nil {
+		fmt.Printf("Not found beacon: %v", err)
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": "Not exist beaconID"})
+		return
+	}
+
+	// == リクエストの暗号化済みのPrivBeacon鍵を復号 ==
+	// RSA秘密鍵を読み込む
+	RSAKey, err := u.LoadPrivateKey("./credentials/privbeacon_rsa_key")
+	if err != nil {
+		fmt.Printf("Cannot load key: %v", err)
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Failed to load key"})
+		return
+	}
+	// PrivBeacon用の鍵が暗号化されて送られてくるためそれをRSA秘密鍵で復号化
+	privBeaconKey, err := u.DecryptRSA(RSAKey, *userKeyPostRequest.PrivBeaconKey)
+	if err != nil {
+		fmt.Printf("Failed to decryption request key: %v", err)
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Failed to decryption request key"})
+		return
+	}
+
+	// == ユーザ取得 ==
+	// FirebaseAuthで取得したメールアドレスからユーザ情報を取得
+	user, err := UserService.GetUserByEmail(firebaseUserInfo["Email"])
+	if err != nil {
+		fmt.Printf("Cannot find user: %v", err)
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Failed to get user"})
+		return
+	}
+	// ユーザに紐づけられているタグを全取得
+	tagNames, err := UserService.GetUserTagNames(int64(user.ID))
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Failed to get tag"})
+		return
+	}
+	// ユーザの所属コミュニティを取得
+	community, err := CommunityService.GetCommunityById(user.CommunityId)
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Failed to get community"})
+		return
+	}
+
+	// == DBへの鍵保存 ==
+	// userの鍵とビーコンIDをDBに保存
+	err = UserService.RegisterUserKey(privBeaconKey, *userKeyPostRequest.BeaconID, int64(user.ID))
+	if err != nil {
+		fmt.Printf("Cannot register user: %v", err)
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Failed to register user key"})
+		return
+	}
+
+	// == 正常に処理が終わった際のレスポンス ==
+	userDetail := model.UserKeyPostResponse{
+		ID:            int64(user.ID),
+		Name:          user.Name,
+		Tags:          tagNames,
+		Email:         user.Email,
+		UUID:          user.UUID,
+		Role:          user.Role,
+		BeaconID:      *userKeyPostRequest.BeaconID,
+		CommunityID:   int64(community.ID),
+		CommunityName: community.Name,
+	}
+	c.JSON(http.StatusOK, userDetail)
 }
 
 func DeleteUser(c *gin.Context) {
@@ -349,49 +441,6 @@ func UpdateUser(c *gin.Context) {
 	c.JSON(http.StatusCreated, gin.H{
 		"status": "ok",
 	})
-}
-
-func PastUserList(c *gin.Context) {
-	UserService := service.UserService{}
-
-	users, err := UserService.GetAllUser()
-	if err != nil {
-		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Failed to get user"})
-		return
-	}
-
-	userInformationGetResponse := []model.UserInformationGetResponse{}
-
-	for _, user := range users {
-
-		tags := make([]model.TagGetResponse, 0)
-		tagsID, err := UserService.GetUserTagsID(int64(user.Model.ID))
-		if err != nil {
-			c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Failed to get user tags"})
-			return
-		}
-
-		for _, tagID := range tagsID {
-			// タグIDからタグ名を取得する
-			tagName, err := UserService.GetTagName(tagID)
-			if err != nil {
-				c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Failed to get tag name"})
-				return
-			}
-			tag := model.TagGetResponse{
-				ID:   tagID,
-				Name: tagName,
-			}
-			tags = append(tags, tag)
-		}
-
-		userInformationGetResponse = append(userInformationGetResponse, model.UserInformationGetResponse{
-			ID:   int64(user.ID),
-			Name: user.Name,
-			Tags: tags,
-		})
-	}
-	c.JSON(http.StatusOK, userInformationGetResponse)
 }
 
 func UserList(c *gin.Context) {
@@ -668,7 +717,7 @@ func Check(c *gin.Context) {
 	UserService := service.UserService{}
 	user, err := UserService.GetUserByEmail(firebaseUserInfo["Email"])
 	if err != nil {
-		fmt.Printf("Cannnot find user: %v", err)
+		fmt.Printf("Cannot find user: %v", err)
 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Failed to get user"})
 		return
 	}
@@ -715,7 +764,7 @@ func SignUp(c *gin.Context) {
 	UserService := service.UserService{}
 	user, err := UserService.GetUserByEmail(firebaseUserInfo["Email"])
 	if err != nil {
-		fmt.Printf("Cannnot find user: %v", err)
+		fmt.Printf("Cannot find user: %v", err)
 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Failed to get user"})
 		return
 	}
