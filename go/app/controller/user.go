@@ -189,15 +189,24 @@ func CreateUserKey(c *gin.Context) {
 	userKeyPostRequest := model.UserKeyPostRequest{}
 	c.Bind(&userKeyPostRequest)
 
+	UserService := service.UserService{}
+	BeaconService := service.BeaconService{}
+	CommunityService := service.CommunityService{}
+	util := util.Util{}
+
+	// == パラメータのバリデーション ==
 	// パラメータにPrivBeacon用鍵とビーコンIDが含まれているかをチェック
 	if userKeyPostRequest.BeaconID == nil || userKeyPostRequest.PrivBeaconKey == nil {
 		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": "Need key and beaconID"})
 		return
 	}
-
-	UserService := service.UserService{}
-	CommunityService := service.CommunityService{}
-	util := util.Util{}
+	// ビーコンIDのビーコンがDBに存在するかチェック
+	_, err = BeaconService.GetBeaconByBeaconId(*userKeyPostRequest.BeaconID)
+	if err != nil {
+		fmt.Printf("Not found beacon: %v", err)
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": "Not exist beaconID"})
+		return
+	}
 
 	// == リクエストの暗号化済みのPrivBeacon鍵を復号 ==
 	// RSA秘密鍵を読み込む
