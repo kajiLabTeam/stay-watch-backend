@@ -96,6 +96,7 @@ func CreateUser(c *gin.Context) {
 	}
 
 	// 同じPrivateKeyが既に登録済みだったら409を返す
+	// TODO：同じPrivateKeyが登録済みだったらそのユーザから鍵情報を消す
 	if UserCreateRequest.PrivateKey != "" {
 		isRegisterdPrivateKey, err := UserService.IsPrivateKeyAlreadyRegistered(UserCreateRequest.PrivateKey)
 		if err != nil {
@@ -246,6 +247,7 @@ func CreateUserKey(c *gin.Context) {
 	}
 
 	// == DBへの鍵保存 ==
+	// TODO：該当の鍵と既に紐づいているユーザから鍵情報を削除
 	// userの鍵とビーコンIDをDBに保存
 	err = UserService.RegisterUserKey(privBeaconKey, *userKeyPostRequest.BeaconID, int64(user.ID))
 	if err != nil {
@@ -527,10 +529,17 @@ func AdminUserList(c *gin.Context) {
 			tags = append(tags, tag)
 		}
 
-		beacon, err := BeaconService.GetBeaconByBeaconId(user.BeaconId)
-		if err != nil {
-			c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Failed to get beacon"})
-			return
+		// ビーコンタイプ関係
+		beaconType := ""
+		beaconUUIDEditable := false
+		if user.BeaconId != 0 { // NULLの場合0となるため
+			beacon, err := BeaconService.GetBeaconByBeaconId(user.BeaconId)
+			if err != nil {
+				c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Failed to get beacon"})
+				return
+			}
+			beaconType = beacon.Type
+			beaconUUIDEditable = beacon.UuidEditable
 		}
 
 		userEditorResponse = append(userEditorResponse, model.UserEditorResponse{
@@ -539,8 +548,8 @@ func AdminUserList(c *gin.Context) {
 			Uuid:               user.UUID,
 			Email:              user.Email,
 			Role:               user.Role,
-			BeaconUuidEditable: beacon.UuidEditable,
-			BeaconName:         beacon.Type,
+			BeaconUuidEditable: beaconUUIDEditable,
+			BeaconName:         beaconType,
 			Tags:               tags,
 		})
 	}
