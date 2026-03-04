@@ -530,14 +530,11 @@ func AdminUserList(c *gin.Context) {
 		}
 
 		// ビーコンタイプ関係
+		// 該当のビーコンIDのビーコンが見つからない場合，ビーコン未所持とする
 		beaconType := ""
 		beaconUUIDEditable := false
-		if user.BeaconId != 0 { // NULLの場合0となるため
-			beacon, err := BeaconService.GetBeaconByBeaconId(user.BeaconId)
-			if err != nil {
-				c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Failed to get beacon"})
-				return
-			}
+		beacon, err := BeaconService.GetBeaconByBeaconId(user.BeaconId)
+		if err == nil {
 			beaconType = beacon.Type
 			beaconUUIDEditable = beacon.UuidEditable
 		}
