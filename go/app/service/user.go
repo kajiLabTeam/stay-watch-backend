@@ -450,6 +450,27 @@ func (UserService) IsPrivateKeyAlreadyRegistered(privateKey string) (bool, error
 	return true, nil
 }
 
+func (UserService) UnregisterPrivBeacon(privateKey string) error {
+	DBEngine := connect()
+	closer, err := DBEngine.DB()
+	if err != nil {
+		return err
+	}
+	defer closer.Close()
+
+	// userのPrivateKeyのカラムを空文字にする
+	result := DBEngine.Model(&model.User{}).Where("private_key = ?", privateKey).
+		Updates(map[string]interface{}{
+			"private_key": "",
+			"beacon_id":   -1,
+		})
+	// エラーの時はPrivateKeyが見つからなかった時と同じなため
+	if result.Error != nil {
+		return result.Error
+	}
+	return nil
+}
+
 // 指定されたログリストと同じ時間にいたユーザを取得する
 // func (UserService) GetSameTimeUser(logs []model.Log) ([]model.SimultaneousStayUserGetResponse, error) {
 // 	targetLogs := make([]model.Log, 0)

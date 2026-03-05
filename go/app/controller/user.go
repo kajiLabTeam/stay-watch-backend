@@ -85,21 +85,6 @@ func CreateUser(c *gin.Context) {
 		return
 	}
 
-	// 同じPrivateKeyが既に登録済みだったら409を返す
-	// TODO：同じPrivateKeyが登録済みだったらそのユーザから鍵情報を消す
-	if UserCreateRequest.PrivateKey != "" {
-		isRegisterdPrivateKey, err := UserService.IsPrivateKeyAlreadyRegistered(UserCreateRequest.PrivateKey)
-		if err != nil {
-			c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Failed to check private key is arleady registerd"})
-			return
-		}
-		if isRegisterdPrivateKey {
-			// 同じPrivateKeyが既に登録済みの場合
-			c.AbortWithStatusJSON(http.StatusConflict, gin.H{"error": "Arleady Registered Private Key"})
-			return
-		}
-	}
-
 	// 同じメールアドレスのユーザが既に登録済みだったら409を返す
 	isRegisterd, err := UserService.IsEmailAlreadyRegistered(UserCreateRequest.Email)
 	if err != nil {
@@ -124,6 +109,12 @@ func CreateUser(c *gin.Context) {
 			return
 		}
 		beaconID = int64(beaconType.ID)
+	}
+	// PrivateKeyに変更がある場合、そのKeyのユーザを未所持にする
+	err = UserService.UnregisterPrivBeacon(UserCreateRequest.PrivateKey)
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Failed to unregister private key"})
+		return
 	}
 
 	user := model.User{
@@ -351,16 +342,11 @@ func UpdateUser(c *gin.Context) {
 		}
 		user.BeaconId = int64(beaconType.ID)
 
-		// PrivateKeyに変更がある場合、同じPrivateKeyが既に登録済みだったら409を返す
+		// PrivateKeyに変更がある場合、そのKeyのユーザを未所持にする
 		if UserUpdateRequest.PrivateKey != nil && user.PrivateKey != *UserUpdateRequest.PrivateKey {
-			isRegisterdPrivateKey, err := UserService.IsPrivateKeyAlreadyRegistered(*UserUpdateRequest.PrivateKey)
+			err := UserService.UnregisterPrivBeacon(*UserUpdateRequest.PrivateKey)
 			if err != nil {
-				c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Failed to check private key is arleady registerd"})
-				return
-			}
-			if isRegisterdPrivateKey {
-				// 同じPrivateKeyが既に登録済みの場合
-				c.AbortWithStatusJSON(http.StatusConflict, gin.H{"error": "Arleady Registered Private Key"})
+				c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Failed to unregister private key"})
 				return
 			}
 			user.PrivateKey = *UserUpdateRequest.PrivateKey
