@@ -116,14 +116,15 @@ type RegistrationUserForm struct {
 
 // バックエンドからフロントへ返すユーザ情報
 type UserEditorResponse struct {
-	ID                 int64            `json:"id"`
-	Name               string           `json:"name"`
-	Uuid               string           `json:"uuid"`
-	Email              string           `json:"email"`
-	Role               int64            `json:"role"`
-	BeaconUuidEditable bool             `json:"beaconUuidEditable"`
-	BeaconName         string           `json:"beaconName"`
-	Tags               []TagGetResponse `json:"tags"`
+	ID                  int64            `json:"id"`
+	Name                string           `json:"name"`
+	Uuid                string           `json:"uuid"`
+	Email               string           `json:"email"`
+	Role                int64            `json:"role"`
+	BeaconUuidEditable  bool             `json:"beaconUuidEditable"`
+	BeaconName          string           `json:"beaconName"`
+	PrivBeaconKeySuffix string           `json:"privBeaconKeySuffix"`
+	Tags                []TagGetResponse `json:"tags"`
 }
 
 // フロントからバックエンドへ送られてきた新規作成ユーザ情報
