@@ -50,16 +50,6 @@ func createUuid(communityId int64, beaconName string, userId int64, requestUuid 
 }
 
 func isValidCreateUserRequest(request model.UserCreateRequest) bool {
-	if request.PrivateKey == "" && request.Uuid == "" {
-		// PrivateKeyとUUIDがどちらとも未入力はNG
-		fmt.Println("privateKey and uuid are null")
-		return false
-	}
-	if request.PrivateKey != "" && request.Uuid != "" {
-		// PrivateKeyとUUIDがどちらとも入力はNG
-		fmt.Println("privateKey and uuid are not-null")
-		return false
-	}
 	if request.PrivateKey != "" && len(request.PrivateKey) != 32 {
 		// privateKeyは32文字固定
 		fmt.Println("privateKey is 32 words")
@@ -122,11 +112,18 @@ func CreateUser(c *gin.Context) {
 		return
 	}
 
-	beacon, err := BeaconService.GetBeaconByBeaconName(UserCreateRequest.BeaconName)
-	// もしbeaconTypeが取得できたらerrがnilになる
-	if err != nil {
-		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Failed to get beacon by name"})
-		return
+	// ビーコン関連
+	var beaconID int64
+	if UserCreateRequest.BeaconName == "" {
+		// リクエストのビーコン名が""の場合未登録扱い
+		beaconID = -1
+	} else {
+		beaconType, err := BeaconService.GetBeaconByBeaconName(UserCreateRequest.BeaconName)
+		if err != nil {
+			c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": "Failed to get beacon by name"})
+			return
+		}
+		beaconID = int64(beaconType.ID)
 	}
 
 	user := model.User{
@@ -134,7 +131,7 @@ func CreateUser(c *gin.Context) {
 		Email:       UserCreateRequest.Email,
 		Role:        UserCreateRequest.Role,
 		UUID:        "",
-		BeaconId:    int64(beacon.ID),
+		BeaconId:    beaconID,
 		CommunityId: UserCreateRequest.CommunityId,
 		PrivateKey:  UserCreateRequest.PrivateKey,
 	}
