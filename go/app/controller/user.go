@@ -515,6 +515,8 @@ func AdminUserList(c *gin.Context) {
 			return
 		}
 
+		util := util.Util{}
+
 		for _, tagID := range tagsID {
 			// タグIDからタグ名を取得する
 			tagName, err := UserService.GetTagName(tagID)
@@ -540,14 +542,15 @@ func AdminUserList(c *gin.Context) {
 		}
 
 		userEditorResponse = append(userEditorResponse, model.UserEditorResponse{
-			ID:                 int64(user.ID),
-			Name:               user.Name,
-			Uuid:               user.UUID,
-			Email:              user.Email,
-			Role:               user.Role,
-			BeaconUuidEditable: beaconUUIDEditable,
-			BeaconName:         beaconType,
-			Tags:               tags,
+			ID:                  int64(user.ID),
+			Name:                user.Name,
+			Uuid:                user.UUID,
+			Email:               user.Email,
+			Role:                user.Role,
+			BeaconUuidEditable:  beaconUUIDEditable,
+			BeaconName:          beaconType,
+			PrivBeaconKeySuffix: util.LastNChars(user.PrivateKey, int(4)),
+			Tags:                tags,
 		})
 	}
 	c.JSON(http.StatusOK, userEditorResponse)
