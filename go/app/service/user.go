@@ -100,7 +100,7 @@ func (UserService) UpdateUser(user *model.User, userId int64) error {
 	}
 	defer closer.Close()
 
-	result := DbEngine.Model(&model.User{}).Where("id = ?", userId).Updates(&user)
+	result := DbEngine.Model(&model.User{}).Where("id = ?", userId).Updates(&user).Update("private_key", user.PrivateKey) // PrvateKeyだけは空文字でも更新されてほしいため
 	if result.Error != nil {
 		fmt.Printf("ユーザ更新失敗 %v", result.Error)
 		return result.Error

@@ -334,12 +334,6 @@ func UpdateUser(c *gin.Context) {
 		return
 	}
 
-	beacon, err := BeaconService.GetBeaconByBeaconName(UserUpdateRequest.BeaconName)
-	if err != nil {
-		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Failed to update user"})
-		return
-	}
-
 	// 更新前のユーザの情報を取得
 	user, err := UserService.GetUserByUserId(UserUpdateRequest.ID)
 	if err != nil {
@@ -347,17 +341,32 @@ func UpdateUser(c *gin.Context) {
 		return
 	}
 
-	// PrivateKeyに変更がある場合、同じPrivateKeyが既に登録済みだったら409を返す
-	if UserUpdateRequest.PrivateKey != nil && user.PrivateKey != *UserUpdateRequest.PrivateKey {
-		isRegisterdPrivateKey, err := UserService.IsPrivateKeyAlreadyRegistered(*UserUpdateRequest.PrivateKey)
+	// Beaconタイプ関係
+	if UserUpdateRequest.BeaconName == "" {
+		// リクエストのビーコン名が""の場合未登録扱い
+		user.BeaconId = -1
+		user.PrivateKey = ""
+	} else {
+		beaconType, err := BeaconService.GetBeaconByBeaconName(UserUpdateRequest.BeaconName)
 		if err != nil {
-			c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Failed to check private key is arleady registerd"})
+			c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": "Failed to get beacon by name"})
 			return
 		}
-		if isRegisterdPrivateKey {
-			// 同じPrivateKeyが既に登録済みの場合
-			c.AbortWithStatusJSON(http.StatusConflict, gin.H{"error": "Arleady Registered Private Key"})
-			return
+		user.BeaconId = int64(beaconType.ID)
+
+		// PrivateKeyに変更がある場合、同じPrivateKeyが既に登録済みだったら409を返す
+		if UserUpdateRequest.PrivateKey != nil && user.PrivateKey != *UserUpdateRequest.PrivateKey {
+			isRegisterdPrivateKey, err := UserService.IsPrivateKeyAlreadyRegistered(*UserUpdateRequest.PrivateKey)
+			if err != nil {
+				c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Failed to check private key is arleady registerd"})
+				return
+			}
+			if isRegisterdPrivateKey {
+				// 同じPrivateKeyが既に登録済みの場合
+				c.AbortWithStatusJSON(http.StatusConflict, gin.H{"error": "Arleady Registered Private Key"})
+				return
+			}
+			user.PrivateKey = *UserUpdateRequest.PrivateKey
 		}
 	}
 
@@ -374,15 +383,8 @@ func UpdateUser(c *gin.Context) {
 		}
 	}
 
-	// UUIDの作成
-	newUuid := ""
-	if UserUpdateRequest.Uuid != nil && UserUpdateRequest.CommunityId != nil {
-		newUuid = createUuid(*UserUpdateRequest.CommunityId, UserUpdateRequest.BeaconName, UserUpdateRequest.ID, *UserUpdateRequest.Uuid)
-	}
-
 	// 値が存在するフィールドのみ更新
 	user.Name = UserUpdateRequest.Name
-	user.BeaconId = int64(beacon.ID)
 	// nilでない場合のみ更新
 	if UserUpdateRequest.Email != nil {
 		user.Email = *UserUpdateRequest.Email
@@ -394,19 +396,8 @@ func UpdateUser(c *gin.Context) {
 		user.CommunityId = *UserUpdateRequest.CommunityId
 	}
 
-	// StayWatchBeaconの場合(PrivateKeyを使う場合)UUIDは""にし、そうでない場合はPrivateKeyを""にする
-	if UserUpdateRequest.BeaconName == BEACON_NAME_STAYWATCHBEACON {
-		user.UUID = ""
-		if UserUpdateRequest.PrivateKey != nil {
-			user.PrivateKey = *UserUpdateRequest.PrivateKey
-		}
-	} else {
-		user.PrivateKey = ""
-		if UserUpdateRequest.Uuid != nil {
-			user.UUID = newUuid
-		}
-	}
-
+	fmt.Println("ここみて")
+	fmt.Println(user)
 	// usersテーブルにユーザ情報を保存
 	err = UserService.UpdateUser(&user, UserUpdateRequest.ID)
 	if err != nil {
