@@ -235,7 +235,6 @@ func CreateUserKey(c *gin.Context) {
 	}
 
 	// == DBへの鍵保存 ==
-	// TODO：該当の鍵と既に紐づいているユーザから鍵情報を削除
 	// userの鍵とビーコンIDをDBに保存
 	err = UserService.RegisterUserKey(privBeaconKey, *userKeyPostRequest.BeaconID, int64(user.ID))
 	if err != nil {
