@@ -486,18 +486,21 @@ func (UserService) RegisterUserWithPrivBeacon(reqUser model.UserCreateRequest) (
 
 	// リクエストのPrivateKeyのユーザを未所持にする & usersテーブルにユーザ情報を保存
 	err = DBEngine.Transaction(func(tx *gorm.DB) error {
-		// リクエストのPrivateKeyのカラムを空文字にする
-		result := tx.Model(&model.User{}).Where("private_key = ?", reqUser.PrivateKey).
-			Updates(map[string]interface{}{
-				"private_key": "",
-				"beacon_id":   -1,
-			})
-		if result.Error != nil {
-			return result.Error
+		// privateKey==""のとき一括更新されないようにする
+		if reqUser.PrivateKey != "" {
+			// リクエストのPrivateKeyのカラムを空文字にする
+			result := tx.Model(&model.User{}).Where("private_key = ?", reqUser.PrivateKey).
+				Updates(map[string]interface{}{
+					"private_key": "",
+					"beacon_id":   -1,
+				})
+			if result.Error != nil {
+				return result.Error
+			}
 		}
 
 		// 新規ユーザ作成
-		result = tx.Create(&user)
+		result := tx.Create(&user)
 		if result.Error != nil {
 			return result.Error
 		}
@@ -520,19 +523,22 @@ func (UserService) UpdateUserWithPrivBeacon(reqUser model.User) (model.User, err
 
 	// リクエストのPrivateKeyのユーザを未所持にする & usersテーブルにユーザ情報を保存
 	err = DBEngine.Transaction(func(tx *gorm.DB) error {
-		// リクエストのPrivateKeyのカラムを空文字にする
-		result := tx.Model(&model.User{}).Where("private_key = ?", reqUser.PrivateKey).
-			Updates(map[string]interface{}{
-				"private_key": "",
-				"beacon_id":   -1,
-			})
-		if result.Error != nil {
-			fmt.Println(result.Error)
-			return result.Error
+		// privateKey==""のとき一括更新されないようにする
+		if reqUser.PrivateKey != "" {
+			// リクエストのPrivateKeyのカラムを空文字にする
+			result := tx.Model(&model.User{}).Where("private_key = ?", reqUser.PrivateKey).
+				Updates(map[string]interface{}{
+					"private_key": "",
+					"beacon_id":   -1,
+				})
+			if result.Error != nil {
+				fmt.Println(result.Error)
+				return result.Error
+			}
 		}
 
 		// ユーザ更新
-		result = tx.Model(&model.User{}).Where("id = ?", reqUser.ID).Updates(&reqUser).Update("private_key", reqUser.PrivateKey) // PrvateKeyだけは空文字でも更新されてほしいため
+		result := tx.Model(&model.User{}).Where("id = ?", reqUser.ID).Updates(&reqUser).Update("private_key", reqUser.PrivateKey) // PrvateKeyだけは空文字でも更新されてほしいため
 		// result = tx.Create(&reqUser)
 		if result.Error != nil {
 			fmt.Println(result.Error)
@@ -556,6 +562,10 @@ func (UserService) UnregisterPrivBeacon(privateKey string) error {
 	}
 	defer closer.Close()
 
+	// privateKey==""のとき一括更新されないようにする
+	if privateKey == "" {
+		return nil
+	}
 	// userのPrivateKeyのカラムを空文字にする
 	result := DBEngine.Model(&model.User{}).Where("private_key = ?", privateKey).
 		Updates(map[string]interface{}{
