@@ -284,6 +284,19 @@ func UpdateUser(c *gin.Context) {
 		return
 	}
 
+	// メールアドレスに変更がある場合、そのメールアドレスが他のユーザに既に使われているかをチェックする処理をプラスする
+	if UserUpdateRequest.Email != nil && user.Email != *UserUpdateRequest.Email {
+		isRegisterdEmail, err := UserService.IsEmailAlreadyRegistered(*UserUpdateRequest.Email)
+		if err != nil {
+			c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Failed to check email is arleady registerd"})
+			return
+		} else if isRegisterdEmail {
+			// 同じメールアドレスが既に登録済みの場合
+			c.AbortWithStatusJSON(http.StatusConflict, gin.H{"error": "Arleady Registered Email"})
+			return
+		}
+	}
+
 	// Beaconタイプ関係
 	if UserUpdateRequest.BeaconName == "" {
 		// リクエストのビーコン名が""の場合未登録扱い
@@ -296,29 +309,7 @@ func UpdateUser(c *gin.Context) {
 			return
 		}
 		user.BeaconId = int64(beaconType.ID)
-
-		// PrivateKeyに変更がある場合、そのKeyのユーザを未所持にする
-		if UserUpdateRequest.PrivateKey != nil && user.PrivateKey != *UserUpdateRequest.PrivateKey {
-			err := UserService.UnregisterPrivBeacon(*UserUpdateRequest.PrivateKey)
-			if err != nil {
-				c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Failed to unregister private key"})
-				return
-			}
-			user.PrivateKey = *UserUpdateRequest.PrivateKey
-		}
-	}
-
-	// メールアドレスに変更がある場合、そのメールアドレスが他のユーザに既に使われているかをチェックする処理をプラスする
-	if UserUpdateRequest.Email != nil && user.Email != *UserUpdateRequest.Email {
-		isRegisterdEmail, err := UserService.IsEmailAlreadyRegistered(*UserUpdateRequest.Email)
-		if err != nil {
-			c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Failed to check email is arleady registerd"})
-			return
-		} else if isRegisterdEmail {
-			// 同じメールアドレスが既に登録済みの場合
-			c.AbortWithStatusJSON(http.StatusConflict, gin.H{"error": "Arleady Registered Email"})
-			return
-		}
+		user.PrivateKey = *UserUpdateRequest.PrivateKey
 	}
 
 	// 値が存在するフィールドのみ更新
@@ -334,12 +325,10 @@ func UpdateUser(c *gin.Context) {
 		user.CommunityId = *UserUpdateRequest.CommunityId
 	}
 
-	fmt.Println("ここみて")
-	fmt.Println(user)
 	// usersテーブルにユーザ情報を保存
-	err = UserService.UpdateUser(&user, UserUpdateRequest.ID)
+	_, err = UserService.UpdateUserWithPrivBeacon(user)
 	if err != nil {
-		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Failed to update user"})
+		c.AbortWithStatusJSON(http.StatusConflict, gin.H{"error": "Failed to update user"})
 		return
 	}
 
