@@ -510,6 +510,44 @@ func (UserService) RegisterUserWithPrivBeacon(reqUser model.UserCreateRequest) (
 	return user, nil
 }
 
+func (UserService) UpdateUserWithPrivBeacon(reqUser model.User) (model.User, error) {
+	DBEngine := connect()
+	closer, err := DBEngine.DB()
+	if err != nil {
+		return model.User{}, err
+	}
+	defer closer.Close()
+
+	// リクエストのPrivateKeyのユーザを未所持にする & usersテーブルにユーザ情報を保存
+	err = DBEngine.Transaction(func(tx *gorm.DB) error {
+		// リクエストのPrivateKeyのカラムを空文字にする
+		result := tx.Model(&model.User{}).Where("private_key = ?", reqUser.PrivateKey).
+			Updates(map[string]interface{}{
+				"private_key": "",
+				"beacon_id":   -1,
+			})
+		if result.Error != nil {
+			fmt.Println(result.Error)
+			return result.Error
+		}
+
+		// ユーザ更新
+		result = tx.Model(&model.User{}).Where("id = ?", reqUser.ID).Updates(&reqUser).Update("private_key", reqUser.PrivateKey) // PrvateKeyだけは空文字でも更新されてほしいため
+		// result = tx.Create(&reqUser)
+		if result.Error != nil {
+			fmt.Println(result.Error)
+			return result.Error
+		}
+
+		return nil
+	})
+	if err != nil {
+		fmt.Println(err)
+		return model.User{}, err
+	}
+	return reqUser, nil
+}
+
 func (UserService) UnregisterPrivBeacon(privateKey string) error {
 	DBEngine := connect()
 	closer, err := DBEngine.DB()
