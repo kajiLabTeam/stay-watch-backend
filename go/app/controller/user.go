@@ -458,6 +458,10 @@ func AdminUserList(c *gin.Context) {
 			beaconType = beacon.Type
 			beaconUUIDEditable = beacon.UuidEditable
 		}
+		privBeconKeySuffix := ""
+		if len(user.PrivateKey) > 4 {
+			privBeconKeySuffix = util.LastNChars(user.PrivateKey, int(4))
+		}
 
 		userEditorResponse = append(userEditorResponse, model.UserEditorResponse{
 			ID:                  int64(user.ID),
@@ -467,7 +471,7 @@ func AdminUserList(c *gin.Context) {
 			Role:                user.Role,
 			BeaconUuidEditable:  beaconUUIDEditable,
 			BeaconName:          beaconType,
-			PrivBeaconKeySuffix: util.LastNChars(user.PrivateKey, int(4)),
+			PrivBeaconKeySuffix: privBeconKeySuffix,
 			Tags:                tags,
 		})
 	}
