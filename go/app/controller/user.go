@@ -75,7 +75,6 @@ func CreateUser(c *gin.Context) {
 	c.Bind(&UserCreateRequest)
 
 	UserService := service.UserService{}
-	BeaconService := service.BeaconService{}
 	TagService := service.TagService{}
 
 	// PrivateKeyとUUIDが正しい値出ない場合BadRequestを返す
@@ -97,54 +96,12 @@ func CreateUser(c *gin.Context) {
 		return
 	}
 
-	// ビーコン関連
-	var beaconID int64
-	if UserCreateRequest.BeaconName == "" {
-		// リクエストのビーコン名が""の場合未登録扱い
-		beaconID = -1
-	} else {
-		beaconType, err := BeaconService.GetBeaconByBeaconName(UserCreateRequest.BeaconName)
-		if err != nil {
-			c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": "Failed to get beacon by name"})
-			return
-		}
-		beaconID = int64(beaconType.ID)
-	}
-	// PrivateKeyに変更がある場合、そのKeyのユーザを未所持にする
-	err = UserService.UnregisterPrivBeacon(UserCreateRequest.PrivateKey)
-	if err != nil {
-		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Failed to unregister private key"})
-		return
-	}
-
-	user := model.User{
-		Name:        UserCreateRequest.Name,
-		Email:       UserCreateRequest.Email,
-		Role:        UserCreateRequest.Role,
-		UUID:        "",
-		BeaconId:    beaconID,
-		CommunityId: UserCreateRequest.CommunityId,
-		PrivateKey:  UserCreateRequest.PrivateKey,
-	}
-
-	// usersテーブルにユーザ情報を保存
-	registerdUserId, err := UserService.RegisterUser(&user)
+	// ユーザ登録
+	registerdUser, err := UserService.RegisterUserWithPrivBeacon(UserCreateRequest)
 	if err != nil {
 		fmt.Printf("Cannot register user: %v", err)
 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Failed to register user"})
 		return
-	}
-
-	// UUIDの作成
-	// コミュニティID取得
-	communityId := UserCreateRequest.CommunityId
-	newUuid := createUuid(communityId, UserCreateRequest.BeaconName, registerdUserId, UserCreateRequest.Uuid)
-
-	// UUIDを上書き
-	err = UserService.UpdateUuid(newUuid, registerdUserId)
-	if err != nil {
-		fmt.Printf("Cannot update uuid: %v", err)
-		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Failed to update uuid"})
 	}
 
 	// タグ名からタグを取得
@@ -155,7 +112,7 @@ func CreateUser(c *gin.Context) {
 	}
 	// タグマップに登録
 	for _, tag := range tags {
-		err = TagService.CreateTagMap(&model.TagMap{UserID: registerdUserId, TagID: int64(tag.ID)})
+		err = TagService.CreateTagMap(&model.TagMap{UserID: int64(registerdUser.ID), TagID: int64(tag.ID)})
 		if err != nil {
 			fmt.Printf("Cannot register tags map: %v", err)
 			c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Failed to register tags map"})
@@ -312,7 +269,6 @@ func UpdateUser(c *gin.Context) {
 	c.Bind(&UserUpdateRequest)
 
 	UserService := service.UserService{}
-	BeaconService := service.BeaconService{}
 	TagService := service.TagService{}
 
 	// PrivateKeyとUUIDが正しい値出ない場合BadRequestを返す
@@ -334,7 +290,7 @@ func UpdateUser(c *gin.Context) {
 		user.BeaconId = -1
 		user.PrivateKey = ""
 	} else {
-		beaconType, err := BeaconService.GetBeaconByBeaconName(UserUpdateRequest.BeaconName)
+		beaconType, err := service.GetBeaconByBeaconName(UserUpdateRequest.BeaconName)
 		if err != nil {
 			c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": "Failed to get beacon by name"})
 			return
