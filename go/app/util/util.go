@@ -113,6 +113,9 @@ func (Util) DecryptRSA(priv *rsa.PrivateKey, ciphertext string) (string, error) 
 
 // LastNChars はstring型の末尾N文字を返す
 func (Util) LastNChars(s string, n int) string {
+	if n <= 0 {
+		return ""
+	}
 	if len(s) <= n {
 		return s
 	}
