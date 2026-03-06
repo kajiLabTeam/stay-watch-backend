@@ -5,6 +5,8 @@ import (
 	"strconv"
 
 	"Stay_watch/model"
+
+	"gorm.io/gorm"
 )
 
 type UserService struct{}
@@ -448,6 +450,64 @@ func (UserService) IsPrivateKeyAlreadyRegistered(privateKey string) (bool, error
 		return false, nil
 	}
 	return true, nil
+}
+
+func (UserService) RegisterUserWithPrivBeacon(reqUser model.UserCreateRequest) (model.User, error) {
+	DBEngine := connect()
+	closer, err := DBEngine.DB()
+	if err != nil {
+		return model.User{}, err
+	}
+	defer closer.Close()
+
+	// ビーコン関連
+	user := model.User{}
+	var beaconID int64
+	if reqUser.BeaconName == "" {
+		// リクエストのビーコン名が""の場合未所持扱い．ビーコン未所持のユーザはビーコンIDを-1とする
+		beaconID = -1
+	} else {
+		beaconType, err := GetBeaconByBeaconName(reqUser.BeaconName)
+		if err != nil {
+			return user, err
+		}
+		beaconID = int64(beaconType.ID)
+	}
+
+	user = model.User{
+		Name:        reqUser.Name,
+		Email:       reqUser.Email,
+		Role:        reqUser.Role,
+		UUID:        "",
+		BeaconId:    beaconID,
+		CommunityId: reqUser.CommunityId,
+		PrivateKey:  reqUser.PrivateKey,
+	}
+
+	// リクエストのPrivateKeyのユーザを未所持にする & usersテーブルにユーザ情報を保存
+	err = DBEngine.Transaction(func(tx *gorm.DB) error {
+		// リクエストのPrivateKeyのカラムを空文字にする
+		result := tx.Model(&model.User{}).Where("private_key = ?", reqUser.PrivateKey).
+			Updates(map[string]interface{}{
+				"private_key": "",
+				"beacon_id":   -1,
+			})
+		if result.Error != nil {
+			return result.Error
+		}
+
+		// 新規ユーザ作成
+		result = tx.Create(&user)
+		if result.Error != nil {
+			return result.Error
+		}
+
+		return nil
+	})
+	if err != nil {
+		return user, err
+	}
+	return user, nil
 }
 
 func (UserService) UnregisterPrivBeacon(privateKey string) error {
