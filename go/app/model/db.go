@@ -17,7 +17,7 @@ type User struct {
 	Role        int64
 	BeaconId    int64
 	CommunityId int64
-	PrivateKey  string `gorm:"primarykey"`
+	PrivateKey  string `gorm:"uniqueIndex"`
 }
 
 type DeletedUser struct {
