@@ -309,7 +309,9 @@ func UpdateUser(c *gin.Context) {
 			return
 		}
 		user.BeaconId = int64(beaconType.ID)
-		user.PrivateKey = *UserUpdateRequest.PrivateKey
+		if UserUpdateRequest.PrivateKey != nil {
+			user.PrivateKey = *UserUpdateRequest.PrivateKey
+		}
 	}
 
 	// 値が存在するフィールドのみ更新
