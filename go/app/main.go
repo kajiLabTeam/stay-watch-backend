@@ -6,7 +6,6 @@ import (
 
 	controller "Stay_watch/controller"
 	"Stay_watch/middleware"
-	"Stay_watch/service"
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
@@ -15,7 +14,6 @@ import (
 
 func main() {
 	log.Println("Start Server")
-	service.InitDatabase()
 	SetUpServer().Run(":8082")
 	// v1.GET("/list/simultaneous/:user_id", controller.SimultaneousStayUserList
 }
