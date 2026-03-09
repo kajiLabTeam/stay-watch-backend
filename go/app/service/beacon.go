@@ -1,8 +1,9 @@
 package service
 
 import (
-	"Stay_watch/model"
 	"fmt"
+
+	"Stay_watch/model"
 )
 
 type BeaconService struct{}
@@ -42,7 +43,7 @@ func (BeaconService) GetBeaconByBeaconId(beaconId int64) (model.Beacon, error) {
 	return beacon, nil
 }
 
-func (BeaconService) GetBeaconByBeaconName(beaconName string) (model.Beacon, error) {
+func GetBeaconByBeaconName(beaconName string) (model.Beacon, error) {
 	DbEngine := connect()
 	close, err := DbEngine.DB()
 	if err != nil {
@@ -62,7 +63,6 @@ func (BeaconService) GetBeaconByBeaconName(beaconName string) (model.Beacon, err
 func (BeaconService) GetBeaconIdByBeaconName(beaconName string) (int64, error) {
 	DbEngine := connect()
 	close, err := DbEngine.DB()
-
 	if err != nil {
 		return 0, err
 	}
