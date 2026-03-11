@@ -1,2 +1,2 @@
 /usr/sbin/sshd
-mysqld
+exec docker-entrypoint.sh mysqld
