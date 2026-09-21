@@ -37,7 +37,7 @@ def get_probability(data: list[str], time: str, weeks: int) -> float:
         scale = float(np.std(c.data))
         # scale = 0の場合(クラスタのデータが全て同じ場合)
         if scale == 0:
-            if cluster[0] == loc and time_minutes >= loc:
+            if time_minutes >= loc:
                 p.append(1 * (len(c.data) / weeks))
             else:
                 p.append(0)
