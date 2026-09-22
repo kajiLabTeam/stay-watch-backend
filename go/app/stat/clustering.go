@@ -124,14 +124,32 @@ func fitGMM(data []float64, k int) ([]gaussianComponent, float64) {
 			components[c].weight = sumR / float64(n)
 		}
 
-		if math.Abs(logLikelihood-prevLogLikelihood) < emTolerance {
-			prevLogLikelihood = logLikelihood
+		converged := math.Abs(logLikelihood-prevLogLikelihood) < emTolerance
+		prevLogLikelihood = logLikelihood
+		if converged {
 			break
 		}
-		prevLogLikelihood = logLikelihood
 	}
 
-	return components, prevLogLikelihood
+	// Recompute the log-likelihood against the final, post-M-step
+	// components so it matches what BIC actually scores.
+	return components, logLikelihoodOf(data, components)
+}
+
+// logLikelihoodOf computes the total log-likelihood of data under the
+// given mixture components.
+func logLikelihoodOf(data []float64, components []gaussianComponent) float64 {
+	logLikelihood := 0.0
+	for _, x := range data {
+		total := 0.0
+		for _, comp := range components {
+			total += comp.weight * normalPDF(x, comp.mean, math.Sqrt(comp.variance))
+		}
+		if total > 0 {
+			logLikelihood += math.Log(total)
+		}
+	}
+	return logLikelihood
 }
 
 // initComponents deterministically initializes k components by sorting
