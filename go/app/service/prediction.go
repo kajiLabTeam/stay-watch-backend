@@ -1,16 +1,12 @@
 package service
 
 import (
-	"encoding/json"
-	"fmt"
-	"io"
 	"log"
-	"net/http"
-	"net/url"
 	"sync"
 	"time"
 
 	"Stay_watch/model"
+	"Stay_watch/stat"
 )
 
 type PredictionService struct{}
@@ -84,39 +80,13 @@ func (PredictionService) GetPrediction(action string, userIDs []int64, weekday i
 	return response, nil
 }
 
-// pythonサーバにlogを送信して来訪する可能性の高い時刻を取得する
+// logから来訪する可能性の高い時刻を取得する
 func (PredictionService) PredictTime(logs []time.Time, weeks int) (string, error) {
 	// logからstart_atを”15:04”形式に変換してスライスに格納
 	var startAt []string
 	for _, log := range logs {
 		startAt = append(startAt, log.Format("15:04"))
 	}
-	// pythonサーバに送信して予測結果を取得
-	baseUrl := "http://vol_prediction:8085/api/v1/prediction/time"
-	u, err := url.Parse(baseUrl)
-	if err != nil {
-		return "", err
-	}
-	q := u.Query()
-	for _, t := range startAt {
-		q.Add("logs", t)
-	}
-	q.Add("weeks", fmt.Sprintf("%d", weeks))
-	u.RawQuery = q.Encode()
-	// 予測結果を取得
-	res, err := http.Get(u.String())
-	if err != nil {
-		return "", err
-	}
-	defer res.Body.Close()
-	b, err := io.ReadAll(res.Body)
-	if err != nil {
-		return "", err
-	}
-	var p model.Prediction
-	if err = json.Unmarshal(b, &p); err != nil {
-		return "", err
-	}
-	// 予測結果を返す
-	return p.Time, nil
+
+	return stat.GetPredictionTime(startAt, weeks)
 }
