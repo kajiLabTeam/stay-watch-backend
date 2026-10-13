@@ -1,6 +1,9 @@
 package stat
 
-import "math"
+import (
+	"fmt"
+	"math"
+)
 
 // GetProbability estimates the probability of an action occurring by
 // targetTime, given historical log times ("HH:MM") and the number of
@@ -8,6 +11,9 @@ import "math"
 // to represent the probability of the action occurring at or after
 // targetTime instead of by targetTime.
 func GetProbability(data []string, targetTime string, weeks int, isForward bool) (float64, error) {
+	if weeks <= 0 {
+		return 0, fmt.Errorf("weeks must be positive: %d", weeks)
+	}
 	dataMinutes := make([]float64, len(data))
 	for i, d := range data {
 		m, err := TimeToMinutes(d)

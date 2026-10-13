@@ -230,7 +230,7 @@ func assignClusters(data []float64, components []gaussianComponent) []ClusterRes
 // 1-D Gaussian mixture: BIC = -2*logLikelihood + numParams*log(n).
 // numParams = k means + k variances + (k-1) independent weights.
 func bic(logLikelihood float64, k, n int) float64 {
-	numParams := 2*k - 1
+	numParams := 3*k - 1
 	return -2*logLikelihood + float64(numParams)*math.Log(float64(n))
 }
 

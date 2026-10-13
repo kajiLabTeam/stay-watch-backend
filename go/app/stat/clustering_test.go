@@ -90,3 +90,12 @@ func TestNormalCDF(t *testing.T) {
 		t.Errorf("NormalCDF(0,0,1) = %v, want 0.5", got)
 	}
 }
+
+func TestBIC(t *testing.T) {
+	// k=2, n=10: numParams = 2 means + 2 variances + 1 weight = 5.
+	got := bic(-20, 2, 10)
+	want := 40 + 5*math.Log(10)
+	if math.Abs(got-want) > 1e-9 {
+		t.Errorf("bic = %v, want %v", got, want)
+	}
+}

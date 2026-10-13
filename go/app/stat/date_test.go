@@ -44,6 +44,8 @@ func TestMinutesToTime(t *testing.T) {
 		{30, "00:30"},
 		{90, "01:30"},
 		{1439, "23:59"},
+		{1440, "00:00"},
+		{1470, "00:30"},
 	}
 	for _, c := range cases {
 		got := MinutesToTime(c.in)

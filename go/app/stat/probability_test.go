@@ -71,3 +71,11 @@ func TestGetProbabilityInvalidTime(t *testing.T) {
 		t.Error("expected error for invalid log time")
 	}
 }
+
+func TestGetProbabilityNonPositiveWeeks(t *testing.T) {
+	for _, weeks := range []int{0, -1} {
+		if _, err := GetProbability([]string{"09:00"}, "10:00", weeks, true); err == nil {
+			t.Errorf("expected error for weeks=%d", weeks)
+		}
+	}
+}

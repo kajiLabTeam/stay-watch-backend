@@ -28,8 +28,10 @@ func TimeToMinutes(t string) (int, error) {
 }
 
 // MinutesToTime converts minutes since midnight to a "HH:MM" time string.
+// Values outside a single day are wrapped, so 1440 (e.g. "23:59" rounded
+// up by TimeToMinutes) becomes "00:00".
 func MinutesToTime(m float64) string {
-	total := int(m)
+	total := ((int(m) % 1440) + 1440) % 1440
 	hours, minutes := total/60, total%60
 	return fmt.Sprintf("%02d:%02d", hours, minutes)
 }
