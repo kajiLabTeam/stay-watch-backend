@@ -525,7 +525,7 @@ func (UserService) UpdateUserWithPrivBeacon(reqUser model.User) (model.User, err
 	err = DBEngine.Transaction(func(tx *gorm.DB) error {
 		// privateKey==""のとき一括更新されないようにする
 		if reqUser.PrivateKey != "" {
-			// リクエストのPrivateKeyのカラムを空文字にする
+			// 元の持ち主のPrivateKeyカラムを空文字にする
 			result := tx.Model(&model.User{}).Where("private_key = ?", reqUser.PrivateKey).
 				Updates(map[string]interface{}{
 					"private_key": "",
@@ -537,9 +537,18 @@ func (UserService) UpdateUserWithPrivBeacon(reqUser model.User) (model.User, err
 			}
 		}
 
-		// ユーザ更新
-		result := tx.Model(&model.User{}).Where("id = ?", reqUser.ID).Updates(&reqUser).Update("private_key", reqUser.PrivateKey) // PrvateKeyだけは空文字でも更新されてほしいため
-		// result = tx.Create(&reqUser)
+		// 次の持ち主のユーザ更新
+		result := tx.Model(&model.User{}).
+			Where("id = ?", reqUser.ID).
+			Updates(map[string]interface{}{
+				"uuid":         reqUser.UUID,
+				"name":         reqUser.Name,
+				"email":        reqUser.Email,
+				"role":         reqUser.Role,
+				"private_key":  reqUser.PrivateKey,
+				"beacon_id":    reqUser.BeaconId,
+				"community_id": reqUser.CommunityId,
+			})
 		if result.Error != nil {
 			fmt.Println(result.Error)
 			return result.Error

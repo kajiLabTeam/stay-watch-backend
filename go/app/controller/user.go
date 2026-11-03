@@ -315,7 +315,6 @@ func UpdateUser(c *gin.Context) {
 	}
 
 	// 値が存在するフィールドのみ更新
-	user.Name = UserUpdateRequest.Name
 	// nilでない場合のみ更新
 	if UserUpdateRequest.Email != nil {
 		user.Email = *UserUpdateRequest.Email
@@ -325,6 +324,9 @@ func UpdateUser(c *gin.Context) {
 	}
 	if UserUpdateRequest.CommunityId != nil {
 		user.CommunityId = *UserUpdateRequest.CommunityId
+	}
+	if UserUpdateRequest.Name != "" {
+		user.Name = UserUpdateRequest.Name
 	}
 
 	// usersテーブルにユーザ情報を保存
