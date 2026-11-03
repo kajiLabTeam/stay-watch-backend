@@ -7,18 +7,40 @@
 // が起きるため、ここではヒステリシスと猶予時間を入れて判定する。
 package presence
 
-import "time"
+import (
+	"os"
+	"strconv"
+	"time"
+)
 
 const (
-	// RoomSwitchRssiMargin 別の部屋へ移ったと判定するのに必要なRSSI差[dB]。
+	// DefaultRoomSwitchRssiMargin 別の部屋へ移ったと判定するのに必要なRSSI差[dB]。
 	// 別部屋のRSSIが「今いる部屋の直近RSSI + この値」以上のときだけ移動とみなす。
-	RoomSwitchRssiMargin = 5
+	DefaultRoomSwitchRssiMargin = 5
 
-	// AbsenceGrace 今いる部屋の受信機から見えなくなってから
+	// DefaultAbsenceGrace 今いる部屋の受信機から見えなくなってから
 	// 退室（または他部屋への移動）を認めるまでの猶予時間。
 	// 受信機のPOST周期(5分)の2回分を目安にしている。
-	AbsenceGrace = 10 * time.Minute
+	DefaultAbsenceGrace = 10 * time.Minute
 )
+
+// RoomSwitchRssiMargin 判定に使うRSSI差[dB]。環境変数 PRESENCE_SWITCH_MARGIN_DB で上書きできる。
+// .env はserviceパッケージのinitで読み込まれるため、パッケージinitではなく判定時に読む。
+func RoomSwitchRssiMargin() int64 {
+	if v, err := strconv.ParseInt(os.Getenv("PRESENCE_SWITCH_MARGIN_DB"), 10, 64); err == nil {
+		return v
+	}
+	return DefaultRoomSwitchRssiMargin
+}
+
+// AbsenceGrace 判定に使う退室猶予。環境変数 PRESENCE_ABSENCE_GRACE_SEC[秒] で上書きできる。
+// ローカル検証で猶予を短くする用途を想定。
+func AbsenceGrace() time.Duration {
+	if v, err := strconv.Atoi(os.Getenv("PRESENCE_ABSENCE_GRACE_SEC")); err == nil && v > 0 {
+		return time.Duration(v) * time.Second
+	}
+	return DefaultAbsenceGrace
+}
 
 // Action はStayerテーブルの既存レコードに対して取る処理。
 type Action int
@@ -60,7 +82,7 @@ type Observation struct {
 
 // Decide は既存の在室状態と今回の観測から取るべき処理を返す。
 func Decide(cur Current, obs Observation, now time.Time) Action {
-	stale := now.Sub(cur.LastSeen) > AbsenceGrace
+	stale := now.Sub(cur.LastSeen) > AbsenceGrace()
 
 	if obs.RoomID == cur.RoomID {
 		if obs.Seen {
@@ -79,7 +101,7 @@ func Decide(cur Current, obs Observation, now time.Time) Action {
 		return Keep
 	}
 	// 今の部屋で最近見えていない、または別部屋の方が明確に強い場合のみ移動
-	if stale || obs.Rssi >= cur.Rssi+RoomSwitchRssiMargin {
+	if stale || obs.Rssi >= cur.Rssi+RoomSwitchRssiMargin() {
 		return Exit
 	}
 	return Keep

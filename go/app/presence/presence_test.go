@@ -75,3 +75,18 @@ func TestNoFlappingBetweenAdjacentRooms(t *testing.T) {
 		t.Fatalf("room = %d, want %d", cur.RoomID, roomA)
 	}
 }
+
+func TestEnvOverride(t *testing.T) {
+	t.Setenv("PRESENCE_SWITCH_MARGIN_DB", "3")
+	t.Setenv("PRESENCE_ABSENCE_GRACE_SEC", "30")
+	if got := RoomSwitchRssiMargin(); got != 3 {
+		t.Errorf("margin = %d, want 3", got)
+	}
+	if got := AbsenceGrace(); got != 30*time.Second {
+		t.Errorf("grace = %v, want 30s", got)
+	}
+	now := time.Now()
+	if got := Decide(Current{1, -70, now.Add(-31 * time.Second)}, Observation{1, false, 0}, now); got != Exit {
+		t.Errorf("Decide() = %v, want Exit", got)
+	}
+}
