@@ -5,11 +5,28 @@ import (
 	"math"
 )
 
+const (
+	// Beta(priorAlpha, priorBeta) prior on the per-weekday visit rate.
+	priorAlpha = 1.0
+	priorBeta  = 1.0
+)
+
+// visitRate returns the posterior-mean visit rate given n observed
+// visits over weeks weeks, under a Beta(priorAlpha, priorBeta) prior.
+func visitRate(n, weeks int) float64 {
+	return (float64(n) + priorAlpha) / (float64(weeks) + priorAlpha + priorBeta)
+}
+
 // GetProbability estimates the probability of an action occurring by
-// targetTime, given historical log times ("HH:MM") and the number of
-// weeks of observation. When isForward is false, the result is inverted
-// to represent the probability of the action occurring at or after
-// targetTime instead of by targetTime.
+// targetTime, given historical log times ("HH:MM", at most one per day)
+// and the number of weeks of observation. The result is
+//
+//	P(by targetTime) = visitRate(n, weeks) * P(by targetTime | visits that day)
+//
+// where the conditional term is a CDF in [0, 1] estimated from the
+// clustered log times. When isForward is false, the result is the
+// probability of the action occurring at or after targetTime instead,
+// i.e. visitRate * (1 - CDF).
 func GetProbability(data []string, targetTime string, weeks int, isForward bool) (float64, error) {
 	if weeks <= 0 {
 		return 0, fmt.Errorf("weeks must be positive: %d", weeks)
@@ -27,10 +44,11 @@ func GetProbability(data []string, targetTime string, weeks int, isForward bool)
 		return 0, err
 	}
 
-	var p float64
-	if len(dataMinutes) == 1 {
+	n := len(dataMinutes)
+	var cdf float64
+	if n == 1 {
 		if float64(targetMinutes) >= dataMinutes[0] {
-			p = 1 / float64(weeks)
+			cdf = 1
 		}
 	} else {
 		clusters, err := Clustering(dataMinutes)
@@ -38,26 +56,29 @@ func GetProbability(data []string, targetTime string, weeks int, isForward bool)
 			return 0, err
 		}
 		for _, c := range clusters {
+			share := float64(len(c.Data)) / float64(n)
 			switch {
 			case len(c.Data) == 1:
 				if float64(targetMinutes) >= c.Data[0] {
-					p += 1 / float64(weeks)
+					cdf += share
 				}
 			default:
 				scale := stddev(c.Data)
 				if scale == 0 {
 					if float64(targetMinutes) >= c.Center {
-						p += float64(len(c.Data)) / float64(weeks)
+						cdf += share
 					}
 				} else {
-					p += NormalCDF(float64(targetMinutes), c.Center, scale) * float64(len(c.Data)) / float64(weeks)
+					cdf += NormalCDF(float64(targetMinutes), c.Center, scale) * share
 				}
 			}
 		}
 	}
 
+	rate := visitRate(n, weeks)
+	p := rate * cdf
 	if !isForward {
-		p = float64(len(data))/float64(weeks) - p
+		p = rate - p
 	}
 	return p, nil
 }
