@@ -8,7 +8,11 @@ import (
 )
 
 // TimeToMinutes converts a "HH:MM" time string to minutes since midnight,
-// rounded to the nearest 30-minute mark.
+// rounded to the nearest 30-minute mark. Hours must be in 0..23 and
+// minutes in 0..59.
+//
+// Known limitation: times are treated as points on a line, not a circle,
+// so data spanning midnight (e.g. 23:50 and 00:10) is treated as far apart.
 func TimeToMinutes(t string) (int, error) {
 	parts := strings.Split(t, ":")
 	if len(parts) != 2 {
@@ -21,6 +25,9 @@ func TimeToMinutes(t string) (int, error) {
 	m, err := strconv.Atoi(parts[1])
 	if err != nil {
 		return 0, fmt.Errorf("invalid time format: %s", t)
+	}
+	if h < 0 || h > 23 || m < 0 || m > 59 {
+		return 0, fmt.Errorf("time out of range: %s", t)
 	}
 	total := h*60 + m
 	rounded := math.Round(float64(total)/30) * 30

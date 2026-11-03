@@ -3,7 +3,7 @@ package stat
 import "testing"
 
 func TestGetPredictionTimeSingleLog(t *testing.T) {
-	got, err := GetPredictionTime([]string{"09:00"}, 4)
+	got, err := GetPredictionTime([]string{"09:00"})
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
@@ -13,7 +13,7 @@ func TestGetPredictionTimeSingleLog(t *testing.T) {
 }
 
 func TestGetPredictionTimeSingleCluster(t *testing.T) {
-	got, err := GetPredictionTime([]string{"09:00", "09:00", "09:05"}, 3)
+	got, err := GetPredictionTime([]string{"09:00", "09:00", "09:05"})
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
@@ -25,7 +25,7 @@ func TestGetPredictionTimeSingleCluster(t *testing.T) {
 func TestGetPredictionTimeMultiCluster(t *testing.T) {
 	// Equal-sized clusters at 08:00 and 18:00 -> weighted average is 13:00.
 	data := []string{"08:00", "08:00", "08:00", "18:00", "18:00", "18:00"}
-	got, err := GetPredictionTime(data, 6)
+	got, err := GetPredictionTime(data)
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
@@ -35,7 +35,7 @@ func TestGetPredictionTimeMultiCluster(t *testing.T) {
 }
 
 func TestGetPredictionTimeInvalid(t *testing.T) {
-	if _, err := GetPredictionTime([]string{"bad"}, 4); err == nil {
+	if _, err := GetPredictionTime([]string{"bad"}); err == nil {
 		t.Error("expected error for invalid log time")
 	}
 }

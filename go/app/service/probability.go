@@ -44,7 +44,7 @@ func (ProbabilityService) GetProbability(action string, userIDs []int64, weekday
 				return
 			}
 			var p ProbabilityService
-			result, err := p.PredictProbability(logs, weeks, time, isForward)
+			result, err := p.PredictProbability(logs, weeks, time, isForward, action == "departure")
 			if err != nil {
 				ch <- model.ProbabilityResult{UserID: userID, Probability: 0}
 				log.Println("Error getting probability:", err)
@@ -74,12 +74,17 @@ func (ProbabilityService) GetProbability(action string, userIDs []int64, weekday
 }
 
 // logsからtimeまでに(or以降に)来訪する確率の予測結果を取得する
-func (ProbabilityService) PredictProbability(logs []model.Log, weeks int, time string, isForward bool) (float64, error) {
-	// logsからstart_atを"15:04"形式に変換してスライスに格納
-	var startAt []string
+// useEndAtがtrueのときはend_at(退室時刻)、falseのときはstart_at(入室時刻)を使う
+func (ProbabilityService) PredictProbability(logs []model.Log, weeks int, time string, isForward bool, useEndAt bool) (float64, error) {
+	// logsから時刻を"15:04"形式に変換してスライスに格納
+	var times []string
 	for _, log := range logs {
-		startAt = append(startAt, log.StartAt.Format("15:04"))
+		t := log.StartAt
+		if useEndAt {
+			t = log.EndAt
+		}
+		times = append(times, t.Format("15:04"))
 	}
 
-	return stat.GetProbability(startAt, time, weeks, isForward)
+	return stat.GetProbability(times, time, weeks, isForward)
 }

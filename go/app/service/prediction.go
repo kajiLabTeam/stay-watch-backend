@@ -21,13 +21,7 @@ func (PredictionService) GetPrediction(action string, userIDs []int64, weekday i
 	// ユーザーごとにgoroutineを生成して予測結果を取得
 	for _, userID := range userIDs {
 		go func(userID int64, wg *sync.WaitGroup) {
-			weeks, err := rooms.GetWeeksSinceFirstLog(userID)
 			defer wg.Done() // Goroutineが終了したらWaitGroupを減らす
-			if err != nil {
-				ch <- model.PredictionResult{UserID: userID, PredictionTime: ""}
-				log.Println("Error getting weeks since first log:", err)
-				return
-			}
 			// var logs []model.Log
 			var times []time.Time
 			switch action {
@@ -57,7 +51,7 @@ func (PredictionService) GetPrediction(action string, userIDs []int64, weekday i
 				return
 			}
 			var p PredictionService
-			result, err := p.PredictTime(times, weeks)
+			result, err := p.PredictTime(times)
 			if err != nil {
 				ch <- model.PredictionResult{UserID: userID, PredictionTime: ""}
 				log.Println("Error predicting time:", err)
@@ -81,12 +75,12 @@ func (PredictionService) GetPrediction(action string, userIDs []int64, weekday i
 }
 
 // logから来訪する可能性の高い時刻を取得する
-func (PredictionService) PredictTime(logs []time.Time, weeks int) (string, error) {
+func (PredictionService) PredictTime(logs []time.Time) (string, error) {
 	// logからstart_atを”15:04”形式に変換してスライスに格納
 	var startAt []string
 	for _, log := range logs {
 		startAt = append(startAt, log.Format("15:04"))
 	}
 
-	return stat.GetPredictionTime(startAt, weeks)
+	return stat.GetPredictionTime(startAt)
 }

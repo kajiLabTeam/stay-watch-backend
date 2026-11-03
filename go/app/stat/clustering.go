@@ -4,8 +4,6 @@ import (
 	"fmt"
 	"math"
 	"sort"
-
-	"gonum.org/v1/gonum/stat/distuv"
 )
 
 const (
@@ -69,13 +67,13 @@ func fitGMM(data []float64, k int) ([]gaussianComponent, float64) {
 		responsibilities[i] = make([]float64, k)
 	}
 
+	densities := make([]float64, k)
 	prevLogLikelihood := math.Inf(-1)
 	for iter := 0; iter < maxEMIters; iter++ {
 		// E-step
 		logLikelihood := 0.0
 		for i, x := range data {
 			total := 0.0
-			densities := make([]float64, k)
 			for c, comp := range components {
 				d := comp.weight * normalPDF(x, comp.mean, math.Sqrt(comp.variance))
 				densities[c] = d
@@ -101,6 +99,8 @@ func fitGMM(data []float64, k int) ([]gaussianComponent, float64) {
 				sumR += responsibilities[i][c]
 			}
 			if sumR == 0 {
+				// Keep the weights summing to 1 by zeroing out the empty component.
+				components[c].weight = 0
 				continue
 			}
 			mean := 0.0
@@ -234,15 +234,15 @@ func bic(logLikelihood float64, k, n int) float64 {
 	return -2*logLikelihood + float64(numParams)*math.Log(float64(n))
 }
 
+// normalPDF returns the probability density function of a normal
+// distribution with the given mean and standard deviation, evaluated at x.
 func normalPDF(x, mean, std float64) float64 {
-	if std <= 0 {
-		std = math.Sqrt(varianceFloor)
-	}
-	return distuv.Normal{Mu: mean, Sigma: std}.Prob(x)
+	z := (x - mean) / std
+	return math.Exp(-0.5*z*z) / (std * math.Sqrt(2*math.Pi))
 }
 
 // NormalCDF returns the cumulative distribution function of a normal
 // distribution with the given mean and standard deviation, evaluated at x.
 func NormalCDF(x, mean, std float64) float64 {
-	return distuv.Normal{Mu: mean, Sigma: std}.CDF(x)
+	return 0.5 * math.Erfc(-(x-mean)/(std*math.Sqrt2))
 }

@@ -30,8 +30,10 @@ func TestTimeToMinutes(t *testing.T) {
 }
 
 func TestTimeToMinutesInvalid(t *testing.T) {
-	if _, err := TimeToMinutes("invalid"); err == nil {
-		t.Error("expected error for invalid input")
+	for _, in := range []string{"invalid", "24:00", "-1:00", "12:60", "12:-1"} {
+		if _, err := TimeToMinutes(in); err == nil {
+			t.Errorf("TimeToMinutes(%q): expected error", in)
+		}
 	}
 }
 
