@@ -231,9 +231,3 @@ type PredictionResult struct {
 	UserID         int64  `json:"userId"`
 	PredictionTime string `json:"predictionTime"`
 }
-
-// pythonサーバからの予測結果を格納する構造体
-type Prediction struct {
-	Probability float64 `json:"probability"`
-	Time        string  `json:"time"`
-}

@@ -57,16 +57,6 @@ services:
         condition: service_healthy
     restart: always
 
-  vol_prediction:
-    container_name: vol_prediction
-    build: ./prediction
-    env_file:
-      - .env
-    depends_on:
-      vol_mysql:
-        condition: service_healthy
-    restart: always
-
 networks:
   default:
     external:
