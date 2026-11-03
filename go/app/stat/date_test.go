@@ -8,15 +8,12 @@ func TestTimeToMinutes(t *testing.T) {
 		want int
 	}{
 		{"00:00", 0},
-		{"00:10", 0},
-		{"00:14", 0},
-		{"00:15", 30}, // math.Round rounds half away from zero (diverges from Python's banker's rounding, which would give 0)
-		{"00:16", 30},
-		{"00:29", 30},
-		{"00:44", 30},
-		{"00:45", 60},
-		{"01:15", 90},
-		{"23:59", 24 * 60},
+		{"00:10", 10},
+		{"00:15", 15},
+		{"00:29", 29},
+		{"01:15", 75},
+		{"09:05", 545},
+		{"23:59", 1439},
 	}
 	for _, c := range cases {
 		got, err := TimeToMinutes(c.in)
@@ -48,6 +45,10 @@ func TestMinutesToTime(t *testing.T) {
 		{1439, "23:59"},
 		{1440, "00:00"},
 		{1470, "00:30"},
+		{89.4, "01:29"},
+		{89.5, "01:30"},
+		{89.6, "01:30"},
+		{1439.6, "00:00"},
 	}
 	for _, c := range cases {
 		got := MinutesToTime(c.in)
