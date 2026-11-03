@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"Stay_watch/model"
+	"Stay_watch/presence"
 	"Stay_watch/service"
 	"Stay_watch/util"
 
@@ -154,6 +155,50 @@ func convertBeaconsStayers(inputBeacons []*model.BeaconSignal) []model.Stayer {
 	return outStayers
 }
 
+// 同じユーザが複数件含まれる場合（PrivBeaconのMSDが毎回変わる、複数ビーコン所持など）に
+// 1ユーザ1件へまとめる。RSSIは最も強い値を採用する。
+func mergeStayersByUser(stayers []model.Stayer) []model.Stayer {
+	merged := []model.Stayer{}
+	index := map[int64]int{}
+	for _, s := range stayers {
+		if i, ok := index[s.UserID]; ok {
+			if s.Rssi > merged[i].Rssi {
+				merged[i].Rssi = s.Rssi
+			}
+			continue
+		}
+		index[s.UserID] = len(merged)
+		merged = append(merged, s)
+	}
+	return merged
+}
+
+// 在室中のユーザを退室させる（Stayer削除・ログのendAt更新・Slack通知）
+func exitStayer(pastStayer model.Stayer) error {
+	RoomService := service.RoomService{}
+	UserService := service.UserService{}
+	BotService := service.BotService{}
+
+	if err := RoomService.DeleteStayer(pastStayer.UserID); err != nil {
+		return fmt.Errorf("cannot delete stayer: %w", err)
+	}
+	if err := RoomService.UpdateEndAt(pastStayer.UserID, time.Now()); err != nil {
+		return fmt.Errorf("cannot update endAt: %w", err)
+	}
+	userName, err := UserService.GetUserNameByUserID(pastStayer.UserID)
+	if err != nil {
+		return fmt.Errorf("cannot get user name: %w", err)
+	}
+	roomName, err := RoomService.GetRoomNameByRoomID(pastStayer.RoomID)
+	if err != nil {
+		return fmt.Errorf("cannot get room name: %w", err)
+	}
+	if err := BotService.SendMessage(fmt.Sprintf("%sさんが%sから退室しました", userName, roomName), "B03J95EL3ME/9MLCZ8VTkEFGDVwTxkqYLKyj"); err != nil {
+		return fmt.Errorf("cannot send message: %w", err)
+	}
+	return nil
+}
+
 // ビーコン情報を受け取る
 func Beacon(c *gin.Context) {
 	beaconRoom := model.BeaconRoom{}
@@ -164,14 +209,18 @@ func Beacon(c *gin.Context) {
 		return
 	}
 
-	// requestBeacons := convertBeacons(beaconRoom.Beacons)
-	requestStayers := convertBeaconsStayers(beaconRoom.Beacons)
+	requestStayers := mergeStayersByUser(convertBeaconsStayers(beaconRoom.Beacons))
 	requestRoomId := beaconRoom.RoomID
 
 	RoomService := service.RoomService{}
 	UserService := service.UserService{}
 	BotService := service.BotService{}
 	Util := util.Util{}
+
+	requestStayerByUser := map[int64]model.Stayer{}
+	for _, s := range requestStayers {
+		requestStayerByUser[s.UserID] = s
+	}
 
 	// 事前にStayerテーブルのデータを全て取得する
 	pastAllStayer, err := RoomService.GetAllStayer()
@@ -181,124 +230,39 @@ func Beacon(c *gin.Context) {
 		return
 	}
 
+	now := time.Now()
 	for _, pastStayer := range pastAllStayer {
+		currentStayer, isExist := requestStayerByUser[pastStayer.UserID]
 
-		isExist := false
-		targetUserRssi := -200
+		action := presence.Decide(
+			presence.Current{RoomID: pastStayer.RoomID, Rssi: pastStayer.Rssi, LastSeen: pastStayer.UpdatedAt},
+			presence.Observation{RoomID: requestRoomId, Seen: isExist, Rssi: currentStayer.Rssi},
+			now,
+		)
 
-		// リクエストからの滞在者リスト(beaconRoom.Beacons)とStayerテーブルの滞在者リストを比較
-		for _, currentStayer := range requestStayers {
-			// 現在いる部屋に以前からいた場合
-			if pastStayer.UserID == currentStayer.UserID {
-				targetUserRssi = int(currentStayer.Rssi)
-				isExist = true
-			}
-		}
-
-		// RSSIが以前より強い場合
-		if isExist && targetUserRssi > int(pastStayer.Rssi) {
-			// 同じ部屋にいる場合は更新
-			if requestRoomId == pastStayer.RoomID {
-				fmt.Println("同じ部屋にいる場合は更新 RSSI強くなる")
-				err := RoomService.UpdateStayer(&model.Stayer{
-					UserID: pastStayer.UserID,
-					RoomID: pastStayer.RoomID,
-					Rssi:   int64(targetUserRssi),
-				})
-				if err != nil {
-					fmt.Printf("failed: Cannnot update stayer %v", err)
-					c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Failed to update stayer"})
-					return
-				}
-			} else {
-				fmt.Println("別の部屋にいる場合は削除")
-				// 別の部屋の場合Stayerテーブルから削除する
-				err := RoomService.DeleteStayer(pastStayer.UserID)
-				if err != nil {
-					fmt.Println("failed: Cannnot delete stayer")
-					c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Failed to delete stayer"})
-				}
-				// logテーブルのendAtを更新する
-				err = RoomService.UpdateEndAt(pastStayer.UserID, time.Now())
-				if err != nil {
-					fmt.Println("failed: Cannnot update endAt")
-					c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Failed to update endAt"})
-				}
-
-				pastStayerUserName, err := UserService.GetUserNameByUserID(pastStayer.UserID)
-				if err != nil {
-					fmt.Println("failed: Cannnot get user name")
-					c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Failed to get user name"})
-					return
-				}
-				pastRoomName, err := RoomService.GetRoomNameByRoomID(pastStayer.RoomID)
-				if err != nil {
-					fmt.Println("failed: Cannnot get room name")
-					c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Failed to get room name"})
-					return
-				}
-				err = BotService.SendMessage(fmt.Sprintf("%sさんが%sから退室しました", pastStayerUserName, pastRoomName), "B03J95EL3ME/9MLCZ8VTkEFGDVwTxkqYLKyj")
-				if err != nil {
-					fmt.Println("failed: Cannnot send message")
-					c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Failed to send message"})
-					return
-				}
-			}
-		}
-
-		// //RSSIが以前より弱い場合
-		// if isExist && targetUserRssi < int(pastStayer.Rssi) {
-		// 	//同じ部屋にいる場合は更新
-		// 	if requestRoomId == pastStayer.RoomID {
-		// 		fmt.Println("同じ部屋にいる場合はRSSIを更新 弱くなる")
-		// 		err := RoomService.UpdateStayer(&model.Stayer{
-		// 			UserID: pastStayer.UserID,
-		// 			RoomID: pastStayer.RoomID,
-		// 			Rssi:   int64(targetUserRssi),
-		// 		})
-		// 		if err != nil {
-		// 			c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Failed to"})
-		// 			return
-		// 		}
-		// 	}
-		// }
-
-		// 以前いた部屋のデータに現在はいない場合退室処理
-		if !isExist && pastStayer.RoomID == requestRoomId {
-			fmt.Println("以前いた部屋のデータに存在しない場合")
-
-			// Stayerテーブルから削除する
-			err := RoomService.DeleteStayer(pastStayer.UserID)
+		switch action {
+		case presence.Update:
+			// 同じ部屋で観測できた場合はRSSIと最終観測時刻(updated_at)を更新
+			err := RoomService.UpdateStayer(&model.Stayer{
+				UserID: pastStayer.UserID,
+				RoomID: pastStayer.RoomID,
+				Rssi:   currentStayer.Rssi,
+			})
 			if err != nil {
-				fmt.Println(err)
-			}
-
-			// logテーブルのendAtを更新する
-			err = RoomService.UpdateEndAt(pastStayer.UserID, time.Now())
-			if err != nil {
-				fmt.Println(err)
-			}
-
-			pastStayerUserName, err := UserService.GetUserNameByUserID(pastStayer.UserID)
-			if err != nil {
-				fmt.Println("failed: Cannnot get user name")
-				c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Failed to get user name"})
+				fmt.Printf("failed: Cannnot update stayer %v", err)
+				c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Failed to update stayer"})
 				return
 			}
-			pastRoomName, err := RoomService.GetRoomNameByRoomID(pastStayer.RoomID)
-			if err != nil {
-				fmt.Println("failed: Cannnot get room name")
-				c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Failed to get room name"})
-				return
-			}
-			err = BotService.SendMessage(fmt.Sprintf("%sさんが%sから退室しました", pastStayerUserName, pastRoomName), "B03J95EL3ME/9MLCZ8VTkEFGDVwTxkqYLKyj")
-			if err != nil {
-				fmt.Println("failed: Cannnot send message")
-				c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Failed to send message"})
+		case presence.Exit:
+			// 退室（別部屋の報告による移動の場合は、この後の処理でその部屋に入室する）
+			fmt.Printf("exit: user=%d room=%d rssi=%d -> reportRoom=%d rssi=%d seen=%v\n",
+				pastStayer.UserID, pastStayer.RoomID, pastStayer.Rssi, requestRoomId, currentStayer.Rssi, isExist)
+			if err := exitStayer(pastStayer); err != nil {
+				fmt.Println("failed:", err)
+				c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Failed to exit stayer"})
 				return
 			}
 		}
-
 	}
 
 	for _, currentStayer := range requestStayers {
