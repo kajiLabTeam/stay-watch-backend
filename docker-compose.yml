@@ -42,20 +42,20 @@ services:
       retries: 20
     restart: always
 
-  vol_python:
-    container_name: vol_python
-    build: ./python
-    volumes:
-      - ./python/app:/app
-    env_file:
-      - .env
-    command:
-      - "python3"
-      - "main.py"
-    depends_on:
-      vol_mysql:
-        condition: service_healthy
-    restart: always
+#  vol_python:
+#    container_name: vol_python
+#    build: ./python
+#    volumes:
+#      - ./python/app:/app
+#    env_file:
+#      - .env
+#    command:
+#      - "python3"
+#      - "main.py"
+#    depends_on:
+#      vol_mysql:
+#        condition: service_healthy
+#    restart: always
 
 networks:
   default:
